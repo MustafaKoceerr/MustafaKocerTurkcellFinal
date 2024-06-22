@@ -46,7 +46,6 @@ class HomeActivity : AppCompatActivity() {
                 R.id.favoriteFragment,
                 R.id.orderFragment,
                 R.id.profileFragment,
-                R.id.logoutFragment,
             ), drawerLayout = binding.drawerLayout
         )
 

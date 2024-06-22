@@ -35,9 +35,4 @@
         android:name="com.example.mustafakocer.ui.home.fragment.ProfileFragment"
         android:label="fragment_profile"
         tools:layout="@layout/fragment_profile" />
-    <fragment
-        android:id="@+id/logoutFragment"
-        android:name="com.example.mustafakocer.ui.home.fragment.LogoutFragment"
-        android:label="fragment_logout"
-        tools:layout="@layout/fragment_logout" />
 </navigation>
