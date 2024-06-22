@@ -7,19 +7,22 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.example.mustafakocer.data.network.IDummyApi
 import com.example.mustafakocer.data.repository.NetworkRepository
 import com.example.mustafakocer.databinding.ActivityMainBinding
 import com.example.mustafakocer.viewmodel.HomeViewModel
 import com.example.mustafakocer.viewmodel.factory.HomeViewModelFactory
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var viewModel: HomeViewModel
-    private lateinit var factory : HomeViewModelFactory
+    private lateinit var factory: HomeViewModelFactory
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,17 +44,35 @@ class MainActivity : AppCompatActivity() {
         binding.btnDeneme.setOnClickListener {
             viewModel.getProducts()
         }
-        subscribeToObservables()
+        Log.d("products", "okey")
+
+        subscribeToObservables2()
     }
 
     private fun subscribeToObservables() {
         lifecycleScope.launchWhenStarted {
             viewModel.statedFlowProducts.collectLatest {
-              it?.let {bigproducts ->
-                  bigproducts.products.forEach {
-                      Log.d("products", "$it")
-                  }
-              }
+                // buradan alıp, recycler view adapter'a bağlayacağım
+                it?.let { bigproducts ->
+                    bigproducts.products.forEach {
+                        Log.d("products", "$it")
+                    }
+                }
+            }
+        }
+    }
+
+    private fun subscribeToObservables2() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.statedFlowProducts.collectLatest {
+                    // buradan alıp, recycler view adapter'a bağlayacağım
+                    it?.let { bigproducts ->
+                        bigproducts.products.forEach {
+                            Log.d("products", "$it")
+                        }
+                    }
+                }
             }
         }
     }
