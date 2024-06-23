@@ -10,7 +10,7 @@ interface IDummyHeaderApi {
         // invoke -> MoviesApi() yazınca çalışacak fonksiyondur, özel bir keydir
         private val BASE_URL = "https://dummyjson.com/"
 
-        operator fun invoke(authToken:String?=null): IDummyApi {
+        operator fun invoke(authToken:String?=null): IDummyHeaderApi {
 
             return Retrofit.Builder()
                 .client(
@@ -24,7 +24,7 @@ interface IDummyHeaderApi {
                 .addConverterFactory(GsonConverterFactory.create())
                 .baseUrl(BASE_URL)
                 .build()
-                .create(IDummyApi::class.java)
+                .create(IDummyHeaderApi::class.java)
         }
         // singleton yapısı sağlıyor
     }

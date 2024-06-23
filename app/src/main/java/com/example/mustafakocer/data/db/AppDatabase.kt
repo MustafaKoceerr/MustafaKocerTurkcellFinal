@@ -6,8 +6,6 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import com.example.mustafakocer.data.db.entity.User
-import com.example.mustafakocer.data.model.Product
 
 @Entity(
     tableName = "silbunu"

@@ -1,12 +1,6 @@
 package com.example.mustafakocer.data.db
 
 import androidx.room.Dao
-import androidx.room.Delete
-import androidx.room.Insert
-import androidx.room.Query
-import com.example.mustafakocer.data.db.entity.SelectedProduct
-import com.example.mustafakocer.data.db.entity.User
-import com.example.mustafakocer.data.model.Product
 
 @Dao
 interface UserDao {

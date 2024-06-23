@@ -1,32 +1,23 @@
 package com.example.mustafakocer.data.network
 
-import com.example.mustafakocer.data.model.Products
-import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import retrofit2.http.GET
 
-interface IDummyApi {
+interface ICategoryApi {
 
     companion object {
         // invoke -> MoviesApi() yazınca çalışacak fonksiyondur, özel bir keydir
-        private val BASE_URL = "https://dummyjson.com/"
+        private val BASE_URL = "https://dummyjson.com/category/"
 
-        operator fun invoke(): IDummyApi {
+        operator fun invoke(): ICategoryApi {
 
             return Retrofit.Builder()
                 .addConverterFactory(GsonConverterFactory.create())
                 .baseUrl(BASE_URL)
                 .build()
-                .create(IDummyApi::class.java)
+                .create(ICategoryApi::class.java)
         }
         // singleton yapısı sağlıyor
     }
-
-    @GET("products")
-    suspend fun getProducts() : Products
-
-    @GET("users/1")
-    suspend fun getUser1() : Products
 
 }

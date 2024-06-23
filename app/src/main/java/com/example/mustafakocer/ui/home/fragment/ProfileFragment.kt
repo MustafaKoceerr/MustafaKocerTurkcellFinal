@@ -1,13 +1,24 @@
 package com.example.mustafakocer.ui.home.fragment
 
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import com.example.mustafakocer.R
 import com.example.mustafakocer.base.BaseFragment
+import com.example.mustafakocer.data.model.Resource
 import com.example.mustafakocer.databinding.FragmentProfileBinding
+import com.example.mustafakocer.ui.home.adapter.ProductAdapter
+import com.example.mustafakocer.ui.home.viewmodel.HomeViewModel
+import com.example.mustafakocer.ui.home.viewmodel.ProfileViewModel
+import com.example.mustafakocer.util.visibleProgressBar
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -19,10 +30,14 @@ private const val ARG_PARAM2 = "param2"
  * Use the [ProfileFragment.newInstance] factory method to
  * create an instance of this fragment.
  */
+@AndroidEntryPoint
 class ProfileFragment : BaseFragment<FragmentProfileBinding>() {
     // TODO: Rename and change types of parameters
     private var param1: String? = null
     private var param2: String? = null
+
+    private val viewModel: ProfileViewModel by viewModels()
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,7 +47,15 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding>() {
         }
     }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        observeUser()
 
+        // todo burada user'ın id'sini localdb'den veya token ile istek atarak çek, sonrasında viewModel'e parametre ata
+        viewModel.getUser(2)
+
+
+    }
 
     override fun getFragmentDataBinding(
         inflater: LayoutInflater,
@@ -60,4 +83,36 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding>() {
                 }
             }
     }
+
+
+    private fun observeUser() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.user.collect { resource ->
+                binding.progressbar.visibleProgressBar(false)
+
+                when (resource) {
+                    is Resource.Loading -> {
+                        // Show loading indicator
+                        binding.progressbar.visibleProgressBar(true)
+                    }
+                    is Resource.Success -> {
+                        // Update UI with products data
+                        Toast.makeText(requireContext(), "User Geldi${resource.value}", Toast.LENGTH_SHORT).show()
+                        Log.d("flow","${resource.value}")
+                        // Use the products data to update the UI
+                    }
+
+                    is Resource.Failure -> {
+                        Toast.makeText(requireContext(), "Hata ${resource.errorCode}  ${resource.errorBody}", Toast.LENGTH_SHORT).show()
+                        Log.d("Hata","${resource.errorCode}  ${resource.errorBody}")
+
+                    }
+                }
+
+            }
+
+        }
+    }
+
+
 }

@@ -1,11 +1,11 @@
 package com.example.mustafakocer.data.db.entity
 
-import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.example.mustafakocer.data.model.Dimensions
 import com.example.mustafakocer.data.model.Meta
-import com.example.mustafakocer.data.model.Review
+import com.example.mustafakocer.data.model.Reviews
+import com.google.gson.annotations.SerializedName
 
 @Entity(
     tableName = "products"
@@ -14,26 +14,27 @@ data class SelectedProduct(
     @PrimaryKey(autoGenerate = true)
     val pid : Int, // product local id
     val userId:Int, // UserId
-    val id: Long,
-    val title: String,
-    val description: String,
-    val category: String,
-    val price: Double,
-    val discountPercentage: Double,
-    val rating: Double,
-    val stock: Long,
-    val tags: List<String>,
-    val brand: String,
-    val sku: String,
-    val weight: Long,
-    val dimensions: Dimensions,
-    val warrantyInformation: String,
-    val shippingInformation: String,
-    val availabilityStatus: String,
-    val reviews: List<Review>,
-    val returnPolicy: String,
-    val minimumOrderQuantity: Long,
-    val meta: Meta,
-    val thumbnail: String,
-    val images: List<String>
+    @SerializedName("id") var id: Int? = null,
+    @SerializedName("title") var title: String? = null,
+    @SerializedName("description") var description: String? = null,
+    @SerializedName("category") var category: String? = null,
+    @SerializedName("price") var price: Double? = null,
+    @SerializedName("discountPercentage") var discountPercentage: Double? = null,
+    @SerializedName("rating") var rating: Double? = null,
+    @SerializedName("stock") var stock: Int? = null,
+    @SerializedName("tags") var tags: ArrayList<String> = arrayListOf(),
+    @SerializedName("brand") var brand: String? = null,
+    @SerializedName("sku") var sku: String? = null,
+    @SerializedName("weight") var weight: Int? = null,
+    @SerializedName("dimensions") var dimensions: Dimensions? = Dimensions(),
+    @SerializedName("warrantyInformation") var warrantyInformation: String? = null,
+    @SerializedName("shippingInformation") var shippingInformation: String? = null,
+    @SerializedName("availabilityStatus") var availabilityStatus: String? = null,
+    @SerializedName("reviews") var reviews: ArrayList<Reviews> = arrayListOf(),
+    @SerializedName("returnPolicy") var returnPolicy: String? = null,
+    @SerializedName("minimumOrderQuantity") var minimumOrderQuantity: Int? = null,
+    @SerializedName("meta") var meta: Meta? = Meta(),
+    @SerializedName("images") var images: ArrayList<String> = arrayListOf(),
+    @SerializedName("thumbnail") var thumbnail: String? = null
+
 )

@@ -99,7 +99,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
                     }
                     is Resource.Success -> {
                         // Update UI with products data
-                        // todo recyler view ve adapter'ı hazırla
+                        // todo recyler view DESING YAP
                         Toast.makeText(requireContext(), "Urunler Geldi${resource.value.products}", Toast.LENGTH_SHORT).show()
                         Log.d("flow","${resource.value.products}")
                         // Use the products data to update the UI
