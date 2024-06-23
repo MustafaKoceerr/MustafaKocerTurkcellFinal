@@ -6,25 +6,17 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.Room
 import androidx.room.RoomDatabase
-
-@Entity(
-    tableName = "silbunu"
-)
-data class silBunu(
-    @PrimaryKey(autoGenerate = true)
-    val pid : Int
-)
+import com.example.mustafakocer.data.db.entity.ProductItem
 
 
 @Database(
-    entities =[silBunu::class],
+    entities =[ProductItem::class],
     version = 1
 )
 abstract class AppDatabase: RoomDatabase() {
 
     abstract fun createProductDao(): ProductDao
 
-    abstract fun createUserDao(): UserDao
 
     companion object {
         @Volatile // this variable is immediately visible to all the other threads

@@ -59,8 +59,8 @@ class CartFragment : BaseFragment<FragmentCartBinding>() {
             recyclerView.layoutManager = GridLayoutManager(requireContext(), 1, GridLayoutManager.VERTICAL, false)
         }
         observeCartInfo()
-        val productItem1 = ProductItem(144,4)
-        val productItem2 = ProductItem(98,1)
+        val productItem1 = ProductItem(1,1,144,4)
+        val productItem2 = ProductItem(2,1,98,1)
         val itemList = listOf(productItem1,productItem2)
         val cardRequest = CartRequest(1,itemList)
         viewModel.cartInfo(cardRequest)

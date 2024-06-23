@@ -11,12 +11,10 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import com.example.mustafakocer.ui.base.BaseFragment
 import com.example.mustafakocer.data.model.Resource
 import com.example.mustafakocer.databinding.FragmentSearchBinding
+import com.example.mustafakocer.ui.base.BaseFragment
 import com.example.mustafakocer.ui.home.adapter.ProductAdapter
-import com.example.mustafakocer.ui.home.viewmodel.HomeViewModel
 import com.example.mustafakocer.ui.home.viewmodel.SearchViewModel
 import com.example.mustafakocer.util.visibleProgressBar
 import dagger.hilt.android.AndroidEntryPoint
