@@ -72,7 +72,7 @@ class HomeActivity : AppCompatActivity() {
             R.id.nav_home ->{this.showToast("home")
                 switchFragment(R.id.homeFragment)
             }
-            R.id.nav_category ->{this.showToast("nav_category")
+            R.id.nav_category ->{
                 switchFragment(R.id.categoryFragment)
 
             }

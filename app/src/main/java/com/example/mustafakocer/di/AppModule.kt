@@ -1,5 +1,6 @@
 package com.example.mustafakocer.di
 
+import com.example.mustafakocer.data.network.ICategoryApi
 import com.example.mustafakocer.data.network.IDummyApi
 import com.example.mustafakocer.data.network.IUsersApi
 import dagger.Module
@@ -22,6 +23,12 @@ object AppModule {
     @Provides
     fun provideIUserApi(): IUsersApi{
         return IUsersApi.invoke()
+    }
+
+    @Singleton
+    @Provides
+    fun provideICategoryApi(): ICategoryApi{
+        return ICategoryApi.invoke()
     }
 
 }
