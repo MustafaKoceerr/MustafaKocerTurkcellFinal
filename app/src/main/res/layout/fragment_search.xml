@@ -12,6 +12,11 @@
         xmlns:app="http://schemas.android.com/apk/res-auto"
         tools:context=".ui.home.fragment.SearchFragment">
 
+        <SearchView
+            android:id="@+id/searchView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"/>
+
         <TextView
             android:layout_width="match_parent"
             android:layout_height="match_parent"

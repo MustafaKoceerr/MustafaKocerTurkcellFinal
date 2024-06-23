@@ -14,7 +14,11 @@
         android:id="@+id/categoryFragment"
         android:name="com.example.mustafakocer.ui.home.fragment.CategoryFragment"
         android:label="fragment_category"
-        tools:layout="@layout/fragment_category" />
+        tools:layout="@layout/fragment_category" >
+        <action
+            android:id="@+id/action_categoryFragment_to_productsByCategoryFragment"
+            app:destination="@id/productsByCategoryFragment" />
+    </fragment>
     <fragment
         android:id="@+id/searchFragment"
         android:name="com.example.mustafakocer.ui.home.fragment.SearchFragment"
@@ -35,4 +39,12 @@
         android:name="com.example.mustafakocer.ui.home.fragment.ProfileFragment"
         android:label="fragment_profile"
         tools:layout="@layout/fragment_profile" />
+    <fragment
+        android:id="@+id/productsByCategoryFragment"
+        android:name="com.example.mustafakocer.ui.home.fragment.ProductsByCategoryFragment"
+        android:label="ProductsByCategoryFragment" >
+        <argument
+            android:name="categoryName"
+            app:argType="string" />
+    </fragment>
 </navigation>
