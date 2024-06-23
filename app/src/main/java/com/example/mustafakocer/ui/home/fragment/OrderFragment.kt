@@ -6,7 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.example.mustafakocer.R
-import com.example.mustafakocer.base.BaseFragment
+import com.example.mustafakocer.ui.base.BaseFragment
 import com.example.mustafakocer.databinding.FragmentOrderBinding
 
 // TODO: Rename parameter arguments, choose names that match

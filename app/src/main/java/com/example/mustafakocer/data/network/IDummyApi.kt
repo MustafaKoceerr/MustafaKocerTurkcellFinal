@@ -1,12 +1,17 @@
 package com.example.mustafakocer.data.network
 
+import com.example.mustafakocer.data.db.entity.CartRequest
+import com.example.mustafakocer.data.model.CartResponse
 import com.example.mustafakocer.data.model.Categories
 import com.example.mustafakocer.data.model.Products
 import com.example.mustafakocer.data.model.User
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import retrofit2.http.Body
 import retrofit2.http.GET
+import retrofit2.http.Headers
+import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
 
@@ -45,4 +50,9 @@ interface IDummyApi {
 
     @GET("products/search")
     suspend fun searchProducts(@Query("q") query: String): Products
+
+
+    @Headers("Content-Type: application/json")
+    @POST("carts/add")
+    suspend fun cartInfo(@Body cartRequest: CartRequest): CartResponse
 }

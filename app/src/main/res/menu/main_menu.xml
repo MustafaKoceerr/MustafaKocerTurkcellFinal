@@ -22,6 +22,9 @@
                 <item
                     android:id="@+id/nav_order"
                     android:title="Order" />
+                <item
+                    android:id="@+id/nav_cart"
+                    android:title="Cart" />
             </group>
 
         </menu>

@@ -14,7 +14,7 @@ import androidx.navigation.fragment.navArgs
 import androidx.navigation.ui.setupWithNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.mustafakocer.R
-import com.example.mustafakocer.base.BaseFragment
+import com.example.mustafakocer.ui.base.BaseFragment
 import com.example.mustafakocer.data.model.Resource
 import com.example.mustafakocer.databinding.FragmentHomeBinding
 import com.example.mustafakocer.databinding.FragmentProductsByCategoryBinding

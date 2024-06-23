@@ -47,4 +47,8 @@
             android:name="categoryName"
             app:argType="string" />
     </fragment>
+    <fragment
+        android:id="@+id/cartFragment"
+        android:name="com.example.mustafakocer.ui.home.fragment.CartFragment"
+        android:label="CartFragment" />
 </navigation>

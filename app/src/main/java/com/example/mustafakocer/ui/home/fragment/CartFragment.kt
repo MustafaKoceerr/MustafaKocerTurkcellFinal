@@ -2,22 +2,25 @@ package com.example.mustafakocer.ui.home.fragment
 
 import android.os.Bundle
 import android.util.Log
+import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.SearchView
 import android.widget.Toast
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.mustafakocer.ui.base.BaseFragment
+import com.example.mustafakocer.R
+import com.example.mustafakocer.data.db.entity.CartRequest
+import com.example.mustafakocer.data.db.entity.ProductItem
 import com.example.mustafakocer.data.model.Resource
-import com.example.mustafakocer.databinding.FragmentSearchBinding
+import com.example.mustafakocer.databinding.FragmentCartBinding
+import com.example.mustafakocer.ui.base.BaseFragment
+import com.example.mustafakocer.ui.home.adapter.CartProductAdapter
 import com.example.mustafakocer.ui.home.adapter.ProductAdapter
+import com.example.mustafakocer.ui.home.viewmodel.CartViewModel
 import com.example.mustafakocer.ui.home.viewmodel.HomeViewModel
-import com.example.mustafakocer.ui.home.viewmodel.SearchViewModel
 import com.example.mustafakocer.util.visibleProgressBar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -29,16 +32,17 @@ private const val ARG_PARAM2 = "param2"
 
 /**
  * A simple [Fragment] subclass.
- * Use the [SearchFragment.newInstance] factory method to
+ * Use the [CartFragment.newInstance] factory method to
  * create an instance of this fragment.
  */
-@AndroidEntryPoint
-class SearchFragment : BaseFragment<FragmentSearchBinding>() {
+ @AndroidEntryPoint
+class CartFragment : BaseFragment<FragmentCartBinding>() {
     // TODO: Rename and change types of parameters
     private var param1: String? = null
     private var param2: String? = null
 
-    private val viewModel: SearchViewModel by viewModels()
+    private val viewModel: CartViewModel by viewModels()
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -51,43 +55,23 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.searchRecyclerView.also {  recyclerView ->
+        binding.cartRecyclerView.also {recyclerView ->
             recyclerView.layoutManager = GridLayoutManager(requireContext(), 1, GridLayoutManager.VERTICAL, false)
         }
-        observeProducts()
-
-        binding.searchView.clearFocus()
-        binding.searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener{
-            override fun onQueryTextSubmit(query: String?): Boolean {
-                // todo api isteği at
-                query?.let {
-                    viewModel.searchProducts(query)
-                }
-                return false
-                // if you want to close keyboard then return false
-            }
-
-            override fun onQueryTextChange(newText: String?): Boolean {
-
-                return true
-                /*
-                true döndürmek: Olayı tamamen işlediğinizi belirtir ve varsayılan davranışı iptal eder.
-                false döndürmek: Olayın tamamen işlenmediğini belirtir ve varsayılan davranışın devam etmesine izin verir.
-                 */
-            }
-
-        })
-
-
+        observeCartInfo()
+        val productItem1 = ProductItem(144,4)
+        val productItem2 = ProductItem(98,1)
+        val itemList = listOf(productItem1,productItem2)
+        val cardRequest = CartRequest(1,itemList)
+        viewModel.cartInfo(cardRequest)
 
     }
-
 
     override fun getFragmentDataBinding(
         inflater: LayoutInflater,
         container: ViewGroup?
-    ): FragmentSearchBinding {
-        return FragmentSearchBinding.inflate(inflater,container,false)
+    ): FragmentCartBinding {
+        return FragmentCartBinding.inflate(inflater, container, false)
     }
 
     companion object {
@@ -97,12 +81,12 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>() {
          *
          * @param param1 Parameter 1.
          * @param param2 Parameter 2.
-         * @return A new instance of fragment SearchFragment.
+         * @return A new instance of fragment CartFragment.
          */
         // TODO: Rename and change types and number of parameters
         @JvmStatic
         fun newInstance(param1: String, param2: String) =
-            SearchFragment().apply {
+            CartFragment().apply {
                 arguments = Bundle().apply {
                     putString(ARG_PARAM1, param1)
                     putString(ARG_PARAM2, param2)
@@ -110,9 +94,9 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>() {
             }
     }
 
-    private fun observeProducts() {
+    private fun observeCartInfo() {
         viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.products.collect { resource ->
+            viewModel.cart.collect { resource ->
                 binding.progressbar.visibleProgressBar(false)
 
                 when (resource) {
@@ -126,7 +110,10 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>() {
                         Toast.makeText(requireContext(), "Urunler Geldi${resource.value.products}", Toast.LENGTH_SHORT).show()
                         Log.d("flow","${resource.value.products}")
                         // Use the products data to update the UI
-                        binding.searchRecyclerView.adapter = ProductAdapter(resource.value.products)
+                        binding.cartRecyclerView.adapter = CartProductAdapter(resource.value.products)
+
+                        // todo ürünleri adapter'a pastladım, altta da tasarıma göre resource.value'dan aldığım değerleri kullanacağım.
+                        binding.txtView.setText("Total Price: ${resource.value.total}")
                     }
 
                     is Resource.Failure -> {

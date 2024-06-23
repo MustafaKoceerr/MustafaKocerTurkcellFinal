@@ -10,7 +10,7 @@ import android.widget.Toast
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
-import com.example.mustafakocer.base.BaseFragment
+import com.example.mustafakocer.ui.base.BaseFragment
 import com.example.mustafakocer.data.model.Resource
 import com.example.mustafakocer.databinding.FragmentHomeBinding
 import com.example.mustafakocer.ui.home.adapter.ProductAdapter

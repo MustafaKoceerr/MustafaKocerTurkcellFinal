@@ -1,5 +1,7 @@
 package com.example.mustafakocer.data.repository
 
+import com.example.mustafakocer.data.db.entity.CartRequest
+import com.example.mustafakocer.data.model.CartResponse
 import com.example.mustafakocer.data.model.Categories
 import com.example.mustafakocer.data.model.Products
 import com.example.mustafakocer.data.model.Resource
@@ -40,9 +42,18 @@ class NetworkRepository @Inject constructor(
     }
 
 
-    suspend fun searchProductsRepo(query:String): Resource<Products>{
+    suspend fun searchProductsRepo(query: String): Resource<Products> {
         return safeApiCall {
             api.searchProducts(query)
         }
     }
+
+
+    suspend fun cartInfoRepo(cartRequest: CartRequest): Resource<CartResponse> {
+        return safeApiCall {
+            api.cartInfo(cartRequest)
+        }
+    }
+
+
 }

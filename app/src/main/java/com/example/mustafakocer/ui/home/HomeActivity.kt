@@ -48,6 +48,7 @@ class HomeActivity : AppCompatActivity() {
                 R.id.favoriteFragment,
                 R.id.orderFragment,
                 R.id.profileFragment,
+                R.id.cartFragment
             ), drawerLayout = binding.drawerLayout
         )
 
@@ -92,7 +93,9 @@ class HomeActivity : AppCompatActivity() {
                 switchFragment(R.id.profileFragment)
 
             }
-
+            R.id.nav_cart ->{
+                switchFragment(R.id.cartFragment)
+            }
             R.id.nav_logout ->{
                 // todo logout islemini sagla
             }

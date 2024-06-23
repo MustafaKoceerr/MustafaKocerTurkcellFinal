@@ -1,4 +1,4 @@
-package com.example.mustafakocer.base
+package com.example.mustafakocer.ui.base
 
 import android.os.Bundle
 import android.view.LayoutInflater
