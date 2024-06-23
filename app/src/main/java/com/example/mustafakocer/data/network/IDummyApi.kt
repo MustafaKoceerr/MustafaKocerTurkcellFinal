@@ -8,6 +8,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
 import retrofit2.http.Path
+import retrofit2.http.Query
 
 interface IDummyApi {
 
@@ -27,10 +28,8 @@ interface IDummyApi {
     }
 
     @GET("products")
-    suspend fun getProducts() : Products
+    suspend fun getProducts(): Products
 
-    @GET("users/1")
-    suspend fun getUser1() : Products
 
     @GET("products/categories")
     suspend fun getCategories(): Categories
@@ -40,7 +39,10 @@ interface IDummyApi {
 
 
     @GET("users/{id}")
-    suspend fun getUserById(@Path("id") id: Int) : User
+    suspend fun getUserById(@Path("id") id: Int): User
 
 
+
+    @GET("products/search")
+    suspend fun searchProducts(@Query("q") query: String): Products
 }

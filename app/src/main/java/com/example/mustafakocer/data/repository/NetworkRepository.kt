@@ -39,4 +39,10 @@ class NetworkRepository @Inject constructor(
         }
     }
 
+
+    suspend fun searchProductsRepo(query:String): Resource<Products>{
+        return safeApiCall {
+            api.searchProducts(query)
+        }
+    }
 }
