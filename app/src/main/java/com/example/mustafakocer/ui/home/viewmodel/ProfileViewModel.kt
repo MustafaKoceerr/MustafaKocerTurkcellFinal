@@ -6,6 +6,7 @@ import com.example.mustafakocer.data.model.Products
 import com.example.mustafakocer.data.model.Resource
 import com.example.mustafakocer.data.model.User
 import com.example.mustafakocer.data.repository.BaseRepository
+import com.example.mustafakocer.data.repository.NetworkRepository
 import com.example.mustafakocer.data.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,7 +17,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
-    private val repository: UserRepository
+    private val repository: NetworkRepository
 ):ViewModel() {
 
     private val _user = MutableStateFlow<Resource<User>>(Resource.Loading)

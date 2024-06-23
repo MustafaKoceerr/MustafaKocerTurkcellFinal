@@ -5,18 +5,17 @@ import androidx.lifecycle.viewModelScope
 import com.example.mustafakocer.data.model.Categories
 import com.example.mustafakocer.data.model.Products
 import com.example.mustafakocer.data.model.Resource
-import com.example.mustafakocer.data.repository.CategoryRepository
+import com.example.mustafakocer.data.repository.NetworkRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import okhttp3.Response
 import javax.inject.Inject
 
 @HiltViewModel
 class CategoryViewModel @Inject constructor(
-    private val repository: CategoryRepository
+    private val repository: NetworkRepository
 ):ViewModel() {
 
     private val _categories = MutableStateFlow<Resource<Categories>>(Resource.Loading)

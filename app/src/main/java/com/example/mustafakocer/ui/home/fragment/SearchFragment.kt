@@ -2,7 +2,10 @@ package com.example.mustafakocer.ui.home.fragment
 
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
+import android.widget.SearchView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.example.mustafakocer.base.BaseFragment
 import com.example.mustafakocer.databinding.FragmentSearchBinding
@@ -30,6 +33,32 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>() {
         }
     }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        binding.searchView.clearFocus()
+        binding.searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener{
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                // todo api isteği at
+
+                return false
+                // if you want to close keyboard then return false
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+
+                return true
+                /*
+                true döndürmek: Olayı tamamen işlediğinizi belirtir ve varsayılan davranışı iptal eder.
+                false döndürmek: Olayın tamamen işlenmediğini belirtir ve varsayılan davranışın devam etmesine izin verir.
+                 */
+            }
+
+        })
+
+
+
+    }
 
 
     override fun getFragmentDataBinding(

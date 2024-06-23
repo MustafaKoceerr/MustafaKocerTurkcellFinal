@@ -9,7 +9,7 @@ import retrofit2.http.Path
 
 interface IUsersApi {
 
-   @GET("{id}")
+   @GET("users/{id}")
     suspend fun getUserById(@Path("id") id: Int) : User
 
 
