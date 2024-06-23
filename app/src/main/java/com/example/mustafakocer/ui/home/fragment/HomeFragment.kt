@@ -49,13 +49,15 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.txtView.setText("SELAMLAR ISTE BASARDIN")
-        observeProducts()
-
-        viewModel.getProducts()
 
         binding.homeRecyclerView.also { recyclerView ->
             recyclerView.layoutManager = GridLayoutManager(requireContext(), 1, GridLayoutManager.VERTICAL, false)
         }
+        observeProducts()
+
+        viewModel.getProducts()
+
+
 
 
     }

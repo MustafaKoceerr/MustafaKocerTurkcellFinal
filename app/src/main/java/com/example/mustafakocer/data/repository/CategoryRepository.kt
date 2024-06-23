@@ -1,11 +1,9 @@
 package com.example.mustafakocer.data.repository
 
-import android.util.Log
 import com.example.mustafakocer.data.model.Categories
 import com.example.mustafakocer.data.model.Products
 import com.example.mustafakocer.data.model.Resource
 import com.example.mustafakocer.data.network.ICategoryApi
-import okhttp3.Response
 import javax.inject.Inject
 
 class CategoryRepository @Inject constructor(
@@ -16,7 +14,6 @@ class CategoryRepository @Inject constructor(
         return safeApiCall {
             api.getCategories()
         }
-
 
     }
 

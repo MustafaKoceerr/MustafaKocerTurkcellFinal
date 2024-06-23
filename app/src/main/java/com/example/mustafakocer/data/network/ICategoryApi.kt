@@ -10,15 +10,15 @@ import retrofit2.http.Path
 
 interface ICategoryApi {
 
-   /*
-    @GET("{category_name}")
-    suspend fun getCategoriesOrProducts(@Path("category_name") categoryName: String? = null) : Category
-    */
-   @GET("categories")
-   suspend fun getCategories() : Categories
+    /*
+     @GET("{category_name}")
+     suspend fun getCategoriesOrProducts(@Path("category_name") categoryName: String? = null) : Category
+     */
+    @GET("categories")
+    suspend fun getCategories(): Categories
 
     @GET("category/{category_name}")
-   suspend fun getProductsByCategory(@Path("category_name") categoryName: String) : Products
+    suspend fun getProductsByCategory(@Path("category_name") categoryName: String): Products
 
     companion object {
         // invoke -> MoviesApi() yazınca çalışacak fonksiyondur, özel bir keydir

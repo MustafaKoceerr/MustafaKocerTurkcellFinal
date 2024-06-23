@@ -1,5 +1,6 @@
 package com.example.mustafakocer.data.repository
 
+import android.util.Log
 import com.example.mustafakocer.data.model.Resource
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -14,11 +15,14 @@ abstract class BaseRepository {
         return withContext(Dispatchers.IO) {
             try {
                 val temp = apiCall.invoke()
+                Log.d("Error", "api call atildii temp $temp ")
+
                 // invoke() ile bizim retrofit isteğimizi attık, bunu coroutines içinde
                 // çağırdığımıza dikkat et.
                 // if it be successful we will take result directly
                 // and we will put the result to our Resource class
                 Resource.Success(temp)
+
                 // T Login için User class'ıydı, yani Success fonksiyonun T'si de user class'ı olacak
             } catch (throwable: Throwable) {
                 when (throwable) {
@@ -31,6 +35,7 @@ abstract class BaseRepository {
                     }
 
                     else -> {
+                        Log.d("Error", "Buraya girdim, category ")
                         Resource.Failure(isNetworkError = true, null, null)
                     }
                 }

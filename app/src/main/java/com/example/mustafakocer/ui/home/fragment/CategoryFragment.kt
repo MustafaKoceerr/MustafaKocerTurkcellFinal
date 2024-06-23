@@ -9,9 +9,11 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.GridLayoutManager
 import com.example.mustafakocer.base.BaseFragment
 import com.example.mustafakocer.data.model.Resource
 import com.example.mustafakocer.databinding.FragmentCategoryBinding
+import com.example.mustafakocer.ui.home.adapter.CategoryAdapter
 import com.example.mustafakocer.ui.home.viewmodel.CategoryViewModel
 import com.example.mustafakocer.util.visibleProgressBar
 import dagger.hilt.android.AndroidEntryPoint
@@ -48,10 +50,17 @@ class CategoryFragment : BaseFragment<FragmentCategoryBinding>() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        binding.categoryRecyclerView.also { recyclerView ->
+            recyclerView.layoutManager = GridLayoutManager(requireContext(), 1, GridLayoutManager.VERTICAL, false)
+        }
+
         observeCategories()
         observeProductsByCategories()
+
+
         viewModel.getCategories()
         viewModel.getProductsByCategory("smartphones")
+
 
     }
 
@@ -97,6 +106,7 @@ class CategoryFragment : BaseFragment<FragmentCategoryBinding>() {
                         Toast.makeText(requireContext(), "Kategoriler Geldi${resource.value}", Toast.LENGTH_SHORT).show()
                         Log.d("flow","${resource.value}")
                         // Use the products data to update the UI
+                        binding.categoryRecyclerView.adapter = CategoryAdapter(resource.value)
                     }
 
                     is Resource.Failure -> {
