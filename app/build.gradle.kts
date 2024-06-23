@@ -63,7 +63,7 @@ dependencies {
     // Glide
     implementation("com.github.bumptech.glide:glide:4.16.0")
 
-    // Kotlin Coroutines
+    // For Kotlin coroutines support in ViewModel
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.1")
 
     val lifecycle_version = "2.8.2"

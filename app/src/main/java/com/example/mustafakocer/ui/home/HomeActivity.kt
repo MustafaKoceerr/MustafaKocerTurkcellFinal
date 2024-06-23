@@ -15,7 +15,9 @@ import androidx.navigation.ui.setupWithNavController
 import com.example.mustafakocer.R
 import com.example.mustafakocer.databinding.ActivityHomeBinding
 import com.example.mustafakocer.util.showToast
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class HomeActivity : AppCompatActivity() {
 
     private lateinit var navController: NavController

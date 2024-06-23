@@ -1,11 +1,9 @@
 package com.example.mustafakocer.ui.home.fragment
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import com.example.mustafakocer.R
+import androidx.fragment.app.Fragment
 import com.example.mustafakocer.base.BaseFragment
 import com.example.mustafakocer.databinding.FragmentSearchBinding
 

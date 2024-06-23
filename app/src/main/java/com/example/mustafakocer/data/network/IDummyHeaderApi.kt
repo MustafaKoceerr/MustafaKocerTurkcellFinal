@@ -1,20 +1,26 @@
 package com.example.mustafakocer.data.network
 
-import com.example.mustafakocer.data.model.Products
-import retrofit2.Response
+import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import retrofit2.http.GET
 
-interface IDummyApi {
+interface IDummyHeaderApi {
 
     companion object {
         // invoke -> MoviesApi() yazınca çalışacak fonksiyondur, özel bir keydir
         private val BASE_URL = "https://dummyjson.com/"
 
-        operator fun invoke(): IDummyApi {
+        operator fun invoke(authToken:String?=null): IDummyApi {
 
             return Retrofit.Builder()
+                .client(
+                    OkHttpClient.Builder()
+                        .addInterceptor{ chain ->
+                            // we will use this chain to add our header to the request
+                            chain.proceed(chain.request().newBuilder().also {
+                                it.addHeader("Authorization","Bearer $authToken")
+                            }.build())
+                        }.build())
                 .addConverterFactory(GsonConverterFactory.create())
                 .baseUrl(BASE_URL)
                 .build()
@@ -22,8 +28,6 @@ interface IDummyApi {
         }
         // singleton yapısı sağlıyor
     }
-    @GET("products")
-    suspend fun getProducts() : Products
 
 
 }

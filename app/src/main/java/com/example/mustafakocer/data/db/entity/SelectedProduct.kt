@@ -1,17 +1,19 @@
-package com.example.mustafakocer.data.model
+package com.example.mustafakocer.data.db.entity
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
+import androidx.room.PrimaryKey
+import com.example.mustafakocer.data.model.Dimensions
+import com.example.mustafakocer.data.model.Meta
+import com.example.mustafakocer.data.model.Review
 
-
-data class Products (
-    val products: List<Product>,
-    val total: Long,
-    val skip: Long,
-    val limit: Long
+@Entity(
+    tableName = "products"
 )
-
-@Entity(tableName = "products")
-data class Product (
+data class SelectedProduct(
+    @PrimaryKey(autoGenerate = true)
+    val pid : Int, // product local id
+    val userId:Int, // UserId
     val id: Long,
     val title: String,
     val description: String,
@@ -34,25 +36,4 @@ data class Product (
     val meta: Meta,
     val thumbnail: String,
     val images: List<String>
-)
-
-data class Dimensions (
-    val width: Double,
-    val height: Double,
-    val depth: Double
-)
-
-data class Meta (
-    val createdAt: String,
-    val updatedAt: String,
-    val barcode: String,
-    val qrCode: String
-)
-
-data class Review (
-    val rating: Long,
-    val comment: String,
-    val date: String,
-    val reviewerName: String,
-    val reviewerEmail: String
 )
