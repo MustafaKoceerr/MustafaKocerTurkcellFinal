@@ -2,17 +2,20 @@ package com.example.mustafakocer.data.db
 
 import android.content.Context
 import androidx.room.Database
-import androidx.room.Entity
-import androidx.room.PrimaryKey
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.TypeConverters
 import com.example.mustafakocer.data.db.entity.ProductItem
+import com.example.mustafakocer.data.db.entity.LikedProduct
+import com.example.mustafakocer.util.Converters
 
 
 @Database(
-    entities =[ProductItem::class],
-    version = 1
+    entities =[ProductItem::class,LikedProduct::class],
+    version = 1,
+    exportSchema = false
 )
+@TypeConverters(Converters::class)
 abstract class AppDatabase: RoomDatabase() {
 
     abstract fun createProductDao(): ProductDao

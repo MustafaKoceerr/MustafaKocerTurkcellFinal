@@ -7,17 +7,19 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.mustafakocer.R
 import com.example.mustafakocer.data.model.Product
 import com.example.mustafakocer.databinding.RecylerviewRowBinding
+import com.example.mustafakocer.ui.home.LikeButtonClickListener
 
-class ProductAdapter(
-    private val productList: List<Product>
-):RecyclerView.Adapter<ProductAdapter.ProductViewHolder>() {
+class ProductAdapter2(
+    private val productList: List<Product>,
+    private val likeButtonClickListener: LikeButtonClickListener
+):RecyclerView.Adapter<ProductAdapter2.ProductViewHolder2>() {
 
-    inner class ProductViewHolder(
+    inner class ProductViewHolder2(
         val recylerviewRowBinding : RecylerviewRowBinding
     ) : RecyclerView.ViewHolder(recylerviewRowBinding.root)
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ProductViewHolder {
-        return ProductViewHolder(
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ProductViewHolder2 {
+        return ProductViewHolder2(
             DataBindingUtil.inflate<RecylerviewRowBinding>(
                 LayoutInflater.from(parent.context),
                 R.layout.recylerview_row,
@@ -31,7 +33,7 @@ class ProductAdapter(
         return productList.size
     }
 
-    override fun onBindViewHolder(holder: ProductViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: ProductViewHolder2, position: Int) {
 
         holder.recylerviewRowBinding.product = productList.get(position)
         // bind xml layout with our products
