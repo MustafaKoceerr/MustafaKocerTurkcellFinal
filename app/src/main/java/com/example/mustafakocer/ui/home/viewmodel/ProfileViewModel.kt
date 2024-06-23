@@ -2,12 +2,9 @@ package com.example.mustafakocer.ui.home.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.mustafakocer.data.model.Products
 import com.example.mustafakocer.data.model.Resource
 import com.example.mustafakocer.data.model.User
-import com.example.mustafakocer.data.repository.BaseRepository
 import com.example.mustafakocer.data.repository.NetworkRepository
-import com.example.mustafakocer.data.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
