@@ -128,7 +128,7 @@ dependencies {
 
     // Kotlin Script Runtime
     implementation("org.jetbrains.kotlin:kotlin-script-runtime:1.8.0")
-
+    implementation(kotlin("script-runtime"))
 
 
 }
