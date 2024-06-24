@@ -1,6 +1,7 @@
 package com.example.mustafakocer.ui.home.adapter
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -38,6 +39,7 @@ class ProductAdapter2(
         holder.recylerviewRowBinding.product = productList.get(position)
         // bind xml layout with our products
         // todo sepet simgesi ve favorite simgesi koy ve dinle
+
         var isLiked = false
         holder.recylerviewRowBinding.btnLike.setOnClickListener {
             if (isLiked) {
@@ -46,6 +48,7 @@ class ProductAdapter2(
                 holder.recylerviewRowBinding.btnLike.setImageResource(R.drawable.ic_heart_filled)
             }
             isLiked = !isLiked
+            likeButtonClickListener.onRecyclerViewItemClick(it!!,productList.get(position))
         }
 
     }

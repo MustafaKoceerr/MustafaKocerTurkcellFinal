@@ -19,6 +19,9 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        vectorDrawables {
+            useSupportLibrary = true
+        }
     }
 
     buildTypes {
@@ -39,6 +42,15 @@ android {
     }
     buildFeatures {
         dataBinding = true
+        compose = true
+    }
+    composeOptions {
+        kotlinCompilerExtensionVersion = "1.5.1"
+    }
+    packaging {
+        resources {
+            excludes += "/META-INF/{AL2.0,LGPL2.1}"
+        }
     }
 }
 
@@ -49,11 +61,18 @@ dependencies {
     implementation(libs.material)
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
+    implementation(libs.androidx.activity.compose)
+    implementation(platform(libs.androidx.compose.bom))
+    implementation(libs.androidx.ui)
+    implementation(libs.androidx.ui.graphics)
+    implementation(libs.androidx.ui.tooling.preview)
+    implementation(libs.androidx.material3)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
 
-
+    implementation("androidx.compose.material:material-icons-extended:1.6.8")
+    implementation("androidx.compose.material:material:1.6.8")
 
     // Retrofit
     implementation("com.squareup.retrofit2:retrofit:2.11.0")
@@ -65,6 +84,10 @@ dependencies {
 
     // For Kotlin coroutines support in ViewModel
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.1")
+    androidTestImplementation(platform(libs.androidx.compose.bom))
+    androidTestImplementation(libs.androidx.ui.test.junit4)
+    debugImplementation(libs.androidx.ui.tooling)
+    debugImplementation(libs.androidx.ui.test.manifest)
 
     val lifecycle_version = "2.8.2"
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version")
@@ -97,7 +120,15 @@ dependencies {
     implementation("com.google.dagger:hilt-android:2.51.1")
     kapt("com.google.dagger:hilt-android-compiler:2.51.1")
     implementation("androidx.fragment:fragment-ktx:1.8.0")
+
+    // Kotlin Script Runtime
+    implementation("org.jetbrains.kotlin:kotlin-script-runtime:1.8.0")
+
+
+
 }
+
+
 kapt {
     correctErrorTypes = true
 }

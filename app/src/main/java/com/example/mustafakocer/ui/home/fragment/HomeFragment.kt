@@ -6,14 +6,19 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageButton
 import android.widget.Toast
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
+import com.example.mustafakocer.R
+import com.example.mustafakocer.data.model.Product
 import com.example.mustafakocer.ui.base.BaseFragment
 import com.example.mustafakocer.data.model.Resource
 import com.example.mustafakocer.databinding.FragmentHomeBinding
+import com.example.mustafakocer.ui.home.LikeButtonClickListener
 import com.example.mustafakocer.ui.home.adapter.ProductAdapter
+import com.example.mustafakocer.ui.home.adapter.ProductAdapter2
 import com.example.mustafakocer.ui.home.viewmodel.HomeViewModel
 import com.example.mustafakocer.util.visibleProgressBar
 import dagger.hilt.android.AndroidEntryPoint
@@ -31,7 +36,7 @@ private const val ARG_PARAM2 = "param2"
  */
 
 @AndroidEntryPoint
-class HomeFragment : BaseFragment<FragmentHomeBinding>() {
+class HomeFragment : BaseFragment<FragmentHomeBinding>(), LikeButtonClickListener {
     // TODO: Rename and change types of parameters
     private var param1: String? = null
     private var param2: String? = null
@@ -105,7 +110,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
                         Toast.makeText(requireContext(), "Urunler Geldi${resource.value.products}", Toast.LENGTH_SHORT).show()
                         Log.d("flow","${resource.value.products}")
                         // Use the products data to update the UI
-                        binding.homeRecyclerView.adapter = ProductAdapter(resource.value.products)
+                        binding.homeRecyclerView.adapter = ProductAdapter2(resource.value.products,this@HomeFragment)
                     }
 
                     is Resource.Failure -> {
@@ -117,5 +122,27 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
             }
 
         }
+    }
+
+    override fun onRecyclerViewItemClick(view: View, product: Product) {
+        when(view.id){
+            R.id.btnLike->{
+                // todo db'ye ekleme işlemi
+                Log.d("like","product: $product")
+                //likeButtonClick(view as ImageButton)
+                // todo database'ye ekleme işlemini yap. 
+            }
+        }
+    }
+
+    private fun likeButtonClick(likeButton: ImageButton) {
+        var isLiked = likeButton.tag as? Boolean ?: false
+        if (isLiked) {
+            likeButton.setImageResource(R.drawable.ic_heart_empty)
+        } else {
+            likeButton.setImageResource(R.drawable.ic_heart_filled)
+        }
+        isLiked = !isLiked
+        likeButton.tag = isLiked
     }
 }

@@ -12,6 +12,7 @@ data class LikedProduct(
     @PrimaryKey(autoGenerate = true)
     val localId: Int,
     val userId: Int,
+    var isLiked: Boolean = false,
     @SerializedName("id") var id: Int? = null,
     @SerializedName("title") var title: String? = null,
     @SerializedName("description") var description: String? = null,
