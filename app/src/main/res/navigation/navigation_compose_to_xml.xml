@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/navigation_compose_to_xml"
+    app:startDestination="@id/homeActivity">
+
+    <activity
+        android:id="@+id/homeActivity"
+        android:name="com.example.mustafakocer.ui.home.HomeActivity"
+        android:label="HomeActivity" />
+    <activity
+        android:id="@+id/loginActivity"
+        android:name="com.example.mustafakocer.ui.login.LoginActivity"
+        android:label="LoginActivity" >
+    </activity>
+</navigation>

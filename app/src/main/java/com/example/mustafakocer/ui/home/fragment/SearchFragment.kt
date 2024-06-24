@@ -131,6 +131,10 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>() {
                         Toast.makeText(requireContext(), "Hata ${resource.errorCode}  ${resource.errorBody}", Toast.LENGTH_SHORT).show()
 
                     }
+
+                    is Resource.Waiting ->{
+                        binding.progressbar.visibleProgressBar(false)
+                    }
                 }
 
             }

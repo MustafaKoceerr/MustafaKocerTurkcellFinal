@@ -10,17 +10,13 @@ import android.widget.Toast
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import com.example.mustafakocer.R
 import com.example.mustafakocer.data.db.entity.CartRequest
-import com.example.mustafakocer.data.db.entity.ProductItem
+import com.example.mustafakocer.data.db.entity.CartList
 import com.example.mustafakocer.data.model.Resource
 import com.example.mustafakocer.databinding.FragmentCartBinding
 import com.example.mustafakocer.ui.base.BaseFragment
 import com.example.mustafakocer.ui.home.adapter.CartProductAdapter
-import com.example.mustafakocer.ui.home.adapter.ProductAdapter
 import com.example.mustafakocer.ui.home.viewmodel.CartViewModel
-import com.example.mustafakocer.ui.home.viewmodel.HomeViewModel
 import com.example.mustafakocer.util.visibleProgressBar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -59,9 +55,9 @@ class CartFragment : BaseFragment<FragmentCartBinding>() {
             recyclerView.layoutManager = GridLayoutManager(requireContext(), 1, GridLayoutManager.VERTICAL, false)
         }
         observeCartInfo()
-        val productItem1 = ProductItem(1,1,144,4)
-        val productItem2 = ProductItem(2,1,98,1)
-        val itemList = listOf(productItem1,productItem2)
+        val cartList1 = CartList(1,1,144,4)
+        val cartList2 = CartList(2,1,98,1)
+        val itemList = listOf(cartList1,cartList2)
         val cardRequest = CartRequest(1,itemList)
         viewModel.cartInfo(cardRequest)
 
@@ -119,6 +115,9 @@ class CartFragment : BaseFragment<FragmentCartBinding>() {
                     is Resource.Failure -> {
                         Toast.makeText(requireContext(), "Hata ${resource.errorCode}  ${resource.errorBody}", Toast.LENGTH_SHORT).show()
 
+                    }
+                    is Resource.Waiting ->{
+                        binding.progressbar.visibleProgressBar(false)
                     }
                 }
 

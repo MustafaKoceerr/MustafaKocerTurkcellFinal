@@ -5,13 +5,13 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
-import com.example.mustafakocer.data.db.entity.ProductItem
+import com.example.mustafakocer.data.db.entity.BasicUserInfo
+import com.example.mustafakocer.data.db.entity.CartList
 import com.example.mustafakocer.data.db.entity.LikedProduct
-import com.example.mustafakocer.util.Converters
 
 
 @Database(
-    entities =[ProductItem::class,LikedProduct::class],
+    entities =[CartList::class, BasicUserInfo::class, LikedProduct::class],
     version = 1,
     exportSchema = false
 )
@@ -19,6 +19,8 @@ import com.example.mustafakocer.util.Converters
 abstract class AppDatabase: RoomDatabase() {
 
     abstract fun createProductDao(): ProductDao
+
+    abstract fun createUserDao(): UserDao
 
 
     companion object {

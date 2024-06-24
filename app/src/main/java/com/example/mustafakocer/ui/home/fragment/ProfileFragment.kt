@@ -104,6 +104,9 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding>() {
                         Log.d("Hata","${resource.errorCode}  ${resource.errorBody}")
 
                     }
+                    is Resource.Waiting ->{
+                        binding.progressbar.visibleProgressBar(false)
+                    }
                 }
 
             }

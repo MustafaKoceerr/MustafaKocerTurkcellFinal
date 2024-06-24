@@ -89,11 +89,13 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
+
     val lifecycle_version = "2.8.2"
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version")
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:$lifecycle_version")
     implementation("androidx.lifecycle:lifecycle-viewmodel-savedstate:$lifecycle_version")
     kapt("androidx.lifecycle:lifecycle-compiler:$lifecycle_version")
+    implementation("androidx.lifecycle:lifecycle-runtime-compose:$lifecycle_version")
 
     // Material Design
     runtimeOnly("com.google.android.material:material:1.12.0")
@@ -119,7 +121,10 @@ dependencies {
     // Hilt
     implementation("com.google.dagger:hilt-android:2.51.1")
     kapt("com.google.dagger:hilt-android-compiler:2.51.1")
+    implementation("androidx.hilt:hilt-navigation-fragment:1.0.0")
     implementation("androidx.fragment:fragment-ktx:1.8.0")
+    implementation("androidx.hilt:hilt-navigation-compose:1.0.0")
+
 
     // Kotlin Script Runtime
     implementation("org.jetbrains.kotlin:kotlin-script-runtime:1.8.0")

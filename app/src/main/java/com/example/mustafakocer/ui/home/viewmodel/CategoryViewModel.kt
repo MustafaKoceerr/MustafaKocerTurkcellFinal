@@ -18,7 +18,7 @@ class CategoryViewModel @Inject constructor(
     private val repository: NetworkRepository
 ):ViewModel() {
 
-    private val _categories = MutableStateFlow<Resource<Categories>>(Resource.Loading)
+    private val _categories = MutableStateFlow<Resource<Categories>>(Resource.Waiting)
     val categories: StateFlow<Resource<Categories>> = _categories.asStateFlow()
 
     fun getCategories() {

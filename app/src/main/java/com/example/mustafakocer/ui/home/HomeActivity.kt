@@ -1,11 +1,15 @@
 package com.example.mustafakocer.ui.home
 
 import android.os.Bundle
+import android.util.Log
 import android.view.MenuItem
+import androidx.activity.viewModels
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.Observer
 import androidx.navigation.NavController
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.NavHostFragment
@@ -14,6 +18,8 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.example.mustafakocer.R
 import com.example.mustafakocer.databinding.ActivityHomeBinding
+import com.example.mustafakocer.ui.home.viewmodel.HomeActivityViewModel
+import com.example.mustafakocer.ui.home.viewmodel.HomeViewModel
 import com.example.mustafakocer.util.showToast
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -24,6 +30,9 @@ class HomeActivity : AppCompatActivity() {
     private lateinit var navOptions: NavOptions
 
     private lateinit var binding : ActivityHomeBinding
+
+    private val viewModel: HomeActivityViewModel by viewModels()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_home)
@@ -63,7 +72,6 @@ class HomeActivity : AppCompatActivity() {
         val toggle : ActionBarDrawerToggle = ActionBarDrawerToggle(this@HomeActivity,binding.drawerLayout,toolbar,R.string.navigation_drawer_open, R.string.navigation_drawer_close)
         binding.drawerLayout.addDrawerListener(toggle)
         toggle.syncState()
-
 
 
     }

@@ -18,7 +18,7 @@ class HomeViewModel @Inject constructor(
 ) : ViewModel() {
 
 
-    private val _products = MutableStateFlow<Resource<Products>>(Resource.Loading)
+    private val _products = MutableStateFlow<Resource<Products>>(Resource.Waiting)
     val products: StateFlow<Resource<Products>> = _products.asStateFlow()
     fun getProducts() {
         viewModelScope.launch {

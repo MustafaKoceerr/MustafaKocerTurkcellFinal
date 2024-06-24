@@ -1,25 +1,38 @@
 package com.example.mustafakocer.ui.login
 
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
-
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -35,15 +48,16 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.mustafakocer.R
 import com.example.mustafakocer.ui.login.ui.theme.LightBlue
+import com.example.mustafakocer.ui.login.viewmodel.LoginViewModel
 
-@Preview
 @Composable
-fun LoginScreen() {
+//loginViewModel: LoginViewModel = viewModel(),loginState: Resource<Any>
+fun LoginScreen(viewModel: LoginViewModel = viewModel()) {
     var username by remember { mutableStateOf("") }
     var usernameError by rememberSaveable { mutableStateOf<String?>(null) }
     var passwordError by rememberSaveable { mutableStateOf<String?>(null) }
@@ -51,6 +65,11 @@ fun LoginScreen() {
     var isPasswordVisible by rememberSaveable { mutableStateOf(false) }
     var isFocusedUsername by remember { mutableStateOf(false) }
     var isFocusedPassword by remember { mutableStateOf(false) }
+
+    var isLoading by remember { mutableStateOf(false) }
+    // Observe loading state from ViewModel or any other source
+    LoadingIndicator(isLoading = isLoading)
+    // loading'deyken loading gösterecek
 
     Box(
         modifier = Modifier
@@ -214,6 +233,8 @@ fun LoginScreen() {
                             if (username.isNotBlank() && password.isNotBlank()) {
                                 // login kontrol işlemi yapılacak
                                 // todo retrofit işlemi yapılacak
+                                viewModel.loginUser(username, password)
+                                Log.d("viewmodel","deneme")
                             }
                         },
                         modifier = Modifier
@@ -224,6 +245,7 @@ fun LoginScreen() {
                     ) {
                         Text(text = "Login", fontSize = 18.sp)
                     }
+
 
                     Spacer(modifier = Modifier.height(8.dp))
 
@@ -236,8 +258,34 @@ fun LoginScreen() {
                             .fillMaxWidth()
                             .padding(8.dp)
                     )
+
+
+                    /*
+                          when (val resource = loginState){
+                              is Resource.Loading -> {
+                                  isLoading = true // Set loading state before making API call
+                              }
+                              is Resource.Failure -> {
+                                  Snackbar(
+                                      content = { Text(text = "Hata ${resource.errorCode} ${resource.errorBody}") },
+                                      action = {
+                                          // Opsiyonel: Hata mesajını kapatmak için bir eylem butonu ekleyebilirsiniz.
+                                          // actionLabel = "Kapat",
+                                          // onClick = { snackbarState.dismiss() }
+                                      }
+                                  )
+                              }
+
+                              is Resource.Success -> {
+                                  // todo diğer aktiviteye geçiş yap
+                              }
+                          }
+                     */
+
+
                 }
             }
         }
     }
 }
+

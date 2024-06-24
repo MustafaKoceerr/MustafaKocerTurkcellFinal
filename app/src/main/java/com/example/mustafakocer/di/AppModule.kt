@@ -1,9 +1,14 @@
 package com.example.mustafakocer.di
 
+import android.content.Context
+import androidx.room.Room
+import com.example.mustafakocer.data.db.AppDatabase
 import com.example.mustafakocer.data.network.IDummyApi
+import com.example.mustafakocer.data.repository.DatabaseRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
@@ -17,6 +22,21 @@ object AppModule {
         return IDummyApi.invoke()
     }
 
+    @Provides
+    @Singleton
+    fun provideDatabase(@ApplicationContext appContext: Context): AppDatabase {
+        return Room.databaseBuilder(
+            appContext,
+            AppDatabase::class.java,
+            "app_database"
+        ).build()
+    }
 
+
+    @Provides
+    @Singleton
+    fun provideDatabaseRepository(api: IDummyApi, db: AppDatabase): DatabaseRepository {
+        return DatabaseRepository(api, db)
+    }
 
 }

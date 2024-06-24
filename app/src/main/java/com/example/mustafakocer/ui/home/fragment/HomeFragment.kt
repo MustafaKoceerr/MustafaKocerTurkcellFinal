@@ -96,6 +96,11 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(), LikeButtonClickListene
 
     private fun observeProducts() {
         viewLifecycleOwner.lifecycleScope.launch {
+            /*
+            When collecting from a StateFlow in your UI, you should typically use Dispatchers.Main.
+            This is because you usually want to update the UI in response to the collected state,
+            and all UI updates must occur on the main thread.
+             */
             viewModel.products.collect { resource ->
                 binding.progressbar.visibleProgressBar(false)
 
@@ -110,12 +115,27 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(), LikeButtonClickListene
                         Toast.makeText(requireContext(), "Urunler Geldi${resource.value.products}", Toast.LENGTH_SHORT).show()
                         Log.d("flow","${resource.value.products}")
                         // Use the products data to update the UI
+                        /*
+                        database'den islike = true olanı çek.
+                        onların id'lerini al.
+                        id'leri liste halinde alıp recylerview'e gönder.
+                        recycler view'de karşılaştırma ya, eğer ürünün id'si çektiğin id listesinde var ise, kalbi kırmızı yaptırt
+                        yok ise bir şey yaptırtma.
+
+                        var ise ve tekrar tıklandıysa, update ile isliked'ı false yap, değiştir.
+
+                         */
                         binding.homeRecyclerView.adapter = ProductAdapter2(resource.value.products,this@HomeFragment)
+
                     }
 
                     is Resource.Failure -> {
                         Toast.makeText(requireContext(), "Hata ${resource.errorCode}  ${resource.errorBody}", Toast.LENGTH_SHORT).show()
 
+                    }
+
+                    is Resource.Waiting ->{
+                        binding.progressbar.visibleProgressBar(false)
                     }
                 }
 

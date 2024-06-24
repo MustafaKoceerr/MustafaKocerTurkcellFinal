@@ -19,7 +19,7 @@ class CartViewModel @Inject constructor(
     private val repository: NetworkRepository
 ):ViewModel() {
 
-    private val _cart = MutableStateFlow<Resource<CartResponse>>(Resource.Loading)
+    private val _cart = MutableStateFlow<Resource<CartResponse>>(Resource.Waiting)
     val cart: StateFlow<Resource<CartResponse>> = _cart.asStateFlow()
 
     fun cartInfo(cartRequest: CartRequest) {

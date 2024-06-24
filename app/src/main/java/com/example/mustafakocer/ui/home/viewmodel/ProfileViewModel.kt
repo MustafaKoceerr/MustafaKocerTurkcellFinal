@@ -17,7 +17,7 @@ class ProfileViewModel @Inject constructor(
     private val repository: NetworkRepository
 ):ViewModel() {
 
-    private val _user = MutableStateFlow<Resource<User>>(Resource.Loading)
+    private val _user = MutableStateFlow<Resource<User>>(Resource.Waiting)
     val user: StateFlow<Resource<User>> = _user.asStateFlow()
 
     fun getUser(userId: Int) {

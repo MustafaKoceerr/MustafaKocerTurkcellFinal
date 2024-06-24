@@ -3,12 +3,15 @@ package com.example.mustafakocer.data.network
 import com.example.mustafakocer.data.db.entity.CartRequest
 import com.example.mustafakocer.data.model.CartResponse
 import com.example.mustafakocer.data.model.Categories
+import com.example.mustafakocer.data.model.LoginResponse
 import com.example.mustafakocer.data.model.Products
 import com.example.mustafakocer.data.model.User
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.Body
+import retrofit2.http.Field
+import retrofit2.http.FormUrlEncoded
 import retrofit2.http.GET
 import retrofit2.http.Headers
 import retrofit2.http.POST
@@ -55,4 +58,13 @@ interface IDummyApi {
     @Headers("Content-Type: application/json")
     @POST("carts/add")
     suspend fun cartInfo(@Body cartRequest: CartRequest): CartResponse
+
+
+    @FormUrlEncoded
+    @POST("auth/login")
+    suspend fun userLogin(
+        @Field("username") username: String,
+        @Field("password") password: String
+    ): LoginResponse
+
 }

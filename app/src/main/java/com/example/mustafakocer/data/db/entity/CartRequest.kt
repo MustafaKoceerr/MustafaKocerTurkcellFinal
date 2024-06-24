@@ -7,11 +7,14 @@ import com.google.gson.annotations.SerializedName
 
 data class CartRequest(
     val userId: Int,
-    val products: List<ProductItem>
+    val products: List<CartList>
+    // api böyle istediği için böyle gönderiyorum
+    // yani ben api'ye bunları göndersem yeterli, api bana gönderdiğim ürünleri tekrar döndürüyor
+    // onları da alıp sepetim kısmında listeleteceğim.
 )
 
-@Entity(tableName = "productitem")
-data class ProductItem(
+@Entity(tableName = "cart_list")
+data class CartList(
     @PrimaryKey(autoGenerate = true)
     val localId:Int,
     val userId: Int,
