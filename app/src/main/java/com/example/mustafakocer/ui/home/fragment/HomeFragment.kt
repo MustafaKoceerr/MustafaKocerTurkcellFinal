@@ -1,27 +1,30 @@
 package com.example.mustafakocer.ui.home.fragment
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.Toast
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.mustafakocer.R
+import com.example.mustafakocer.data.db.entity.LikedProduct
 import com.example.mustafakocer.data.model.Product
-import com.example.mustafakocer.ui.base.BaseFragment
 import com.example.mustafakocer.data.model.Resource
 import com.example.mustafakocer.databinding.FragmentHomeBinding
+import com.example.mustafakocer.ui.base.BaseFragment
 import com.example.mustafakocer.ui.home.LikeButtonClickListener
-import com.example.mustafakocer.ui.home.adapter.ProductAdapter
 import com.example.mustafakocer.ui.home.adapter.ProductAdapter2
 import com.example.mustafakocer.ui.home.viewmodel.HomeViewModel
+import com.example.mustafakocer.util.UserId
 import com.example.mustafakocer.util.visibleProgressBar
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 // TODO: Rename parameter arguments, choose names that match
@@ -43,6 +46,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(), LikeButtonClickListene
 
     private val viewModel: HomeViewModel by viewModels()
 
+    private var likedProductList : MutableList<LikedProduct>? = mutableListOf()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
@@ -55,13 +59,18 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(), LikeButtonClickListene
         super.onViewCreated(view, savedInstanceState)
         binding.txtView.setText("SELAMLAR ISTE BASARDIN")
 
+        /*
+        database listesi getirilecek ve user id getirilecek.
+         */
+
+
         binding.homeRecyclerView.also { recyclerView ->
             recyclerView.layoutManager = GridLayoutManager(requireContext(), 1, GridLayoutManager.VERTICAL, false)
         }
         observeProducts()
 
+        viewModel.gelAllLikedProductsDB(UserId.userId)
         viewModel.getProducts()
-
 
 
 
@@ -93,6 +102,9 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(), LikeButtonClickListene
                 }
             }
     }
+
+
+
 
     private fun observeProducts() {
         viewLifecycleOwner.lifecycleScope.launch {
@@ -149,6 +161,15 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(), LikeButtonClickListene
             R.id.btnLike->{
                 // todo db'ye ekleme işlemi
                 Log.d("like","product: $product")
+
+                // todo eğer liked product list'te yoksa bunu yapacağım
+
+                    val likedProduct = LikedProduct(null,UserId.userId,0, product )
+                    viewModel.insertProduct(likedProduct)
+                // todo varsa update işlemini gerçekleştireceğim
+                // listeden ara, eğer o listede varsa o objenin isliked'ını değiştir
+                // gidip databasede o değeri update et
+
                 //likeButtonClick(view as ImageButton)
                 // todo database'ye ekleme işlemini yap. 
             }

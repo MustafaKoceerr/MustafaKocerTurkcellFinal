@@ -7,11 +7,13 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.mustafakocer.data.PreferenceKeys
+import com.example.mustafakocer.data.db.entity.BasicUserInfo
 import com.example.mustafakocer.data.model.LoginResponse
 import com.example.mustafakocer.data.model.Resource
-import com.example.mustafakocer.data.repository.DataStoreRepository
+import com.example.mustafakocer.data.repository.DatabaseRepository
 import com.example.mustafakocer.data.repository.NetworkRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -21,9 +23,9 @@ import javax.inject.Inject
 @HiltViewModel
 class LoginViewModel @Inject constructor(
     private val userRepository: NetworkRepository,
-    private val dataStoreRepository: DataStoreRepository
+    private val databaseRepository: DatabaseRepository,
 ) : ViewModel() {
-   // var _loginState by mutableStateOf<Resource<LoginResponse>>(Resource.Loading)
+    // var _loginState by mutableStateOf<Resource<LoginResponse>>(Resource.Loading)
     //        private set
     //val loginState: State<Resource<LoginResponse>>
 
@@ -42,16 +44,51 @@ class LoginViewModel @Inject constructor(
     }
 
 
-    private val _authToken = MutableStateFlow<String?>(null)
-    val authToken: StateFlow<String?> get() = _authToken
+    /*
+      fun saveAuthToken(token: String) {
+          viewModelScope.launch {
+              dataStoreRepository.saveAuthTokenRepo(token)
+          }
+      }
 
-    private fun collectPreferences(preferenceKey: PreferenceKeys) {
+      fun saveUserId(id: String) {
+          viewModelScope.launch {
+              dataStoreRepository.saveUserIdRepo(id)
+          }
+      }
+     */
+    suspend fun saveAuthToken(token: String) {
+        databaseRepository.saveAuthTokenRepo(token)
+    }
+        // bunları kaydedip activity değiştireceğim için ve bunlar kaydedilirkenb, activity'nin değişme
+    // ihtimali olduğu için bunları suspend yapıp UI'da çağırıcam böylelikle işlemler sırayla gerçekleşecek
+
+    suspend fun saveUserId(id: String) {
+        databaseRepository.saveUserIdRepo(id)
+    }
+
+    fun getAuthToken(): Flow<String?> {
+        return databaseRepository.collectPreferencesRepo(PreferenceKeys.KEY_AUTH)
+    }
+
+    fun getUserId(): Flow<String?> {
+        return databaseRepository.collectPreferencesRepo(PreferenceKeys.USER_ID)
+    }
+
+    fun clearDataStore() {
         viewModelScope.launch {
-            dataStoreRepository.collectPreferencesRepo(preferenceKey).collect{
-
-            }
-
+            databaseRepository.clearDataStoreRepo()
         }
+    }
+
+    suspend fun saveUser(basicUserInfo: BasicUserInfo):Long{
+        val result = databaseRepository.insertUser(basicUserInfo)
+        return result
+    }
+
+    suspend fun getUser(): BasicUserInfo {
+        val result = databaseRepository.getUser()
+        return result
     }
 
 }

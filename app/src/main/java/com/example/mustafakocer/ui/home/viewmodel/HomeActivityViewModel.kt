@@ -3,12 +3,14 @@ package com.example.mustafakocer.ui.home.viewmodel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.mustafakocer.data.PreferenceKeys
 import com.example.mustafakocer.data.db.entity.BasicUserInfo
 import com.example.mustafakocer.data.model.Products
 import com.example.mustafakocer.data.model.Resource
 import com.example.mustafakocer.data.repository.DatabaseRepository
 import com.example.mustafakocer.data.repository.NetworkRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -18,7 +20,7 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeActivityViewModel @Inject constructor(
     private val repository: NetworkRepository,
-    private val databaseRepository: DatabaseRepository
+    private val databaseRepository: DatabaseRepository,
 ) : ViewModel() {
 
 
@@ -32,6 +34,14 @@ class HomeActivityViewModel @Inject constructor(
             // assign the value, it can be success or failure
             _products.value = response
         }
+    }
+
+    fun getAuthToken(): Flow<String?> {
+        return databaseRepository.collectPreferencesRepo(PreferenceKeys.KEY_AUTH)
+    }
+
+    fun getUserId(): Flow<String?> {
+        return databaseRepository.collectPreferencesRepo(PreferenceKeys.USER_ID)
     }
 
 

@@ -10,6 +10,7 @@ import androidx.appcompat.widget.Toolbar
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.NavHostFragment
@@ -20,8 +21,13 @@ import com.example.mustafakocer.R
 import com.example.mustafakocer.databinding.ActivityHomeBinding
 import com.example.mustafakocer.ui.home.viewmodel.HomeActivityViewModel
 import com.example.mustafakocer.ui.home.viewmodel.HomeViewModel
+import com.example.mustafakocer.util.UserId
 import com.example.mustafakocer.util.showToast
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+
+const val x = 10
 
 @AndroidEntryPoint
 class HomeActivity : AppCompatActivity() {
@@ -32,11 +38,12 @@ class HomeActivity : AppCompatActivity() {
     private lateinit var binding : ActivityHomeBinding
 
     private val viewModel: HomeActivityViewModel by viewModels()
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_home)
         setContentView(binding.root)
+
+        getUserId()
 
         // enableEdgeToEdge()
         //setContentView(R.layout.activity_home)
@@ -124,4 +131,15 @@ class HomeActivity : AppCompatActivity() {
     }
 
 
+    private fun getUserId(){
+        // todo base fragment'a eklenebilir.
+        this.lifecycleScope.launch (Dispatchers.Main) {
+            viewModel.getUserId().collect { value ->
+                // Burada value, Flow'un içindeki değeri temsil eder
+                if (value != null) {
+                    UserId.userId = value.toInt()
+                }
+            }
+        }
+    }
 }

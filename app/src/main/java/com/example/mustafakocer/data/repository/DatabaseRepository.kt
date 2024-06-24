@@ -1,27 +1,28 @@
 package com.example.mustafakocer.data.repository
 
-import androidx.lifecycle.LiveData
+import com.example.mustafakocer.data.PreferenceKeys
+import com.example.mustafakocer.data.UserPreferences
 import com.example.mustafakocer.data.db.AppDatabase
 import com.example.mustafakocer.data.db.entity.BasicUserInfo
 import com.example.mustafakocer.data.db.entity.LikedProduct
 import com.example.mustafakocer.data.model.Product
-import com.example.mustafakocer.data.network.IDummyApi
+import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 class DatabaseRepository @Inject constructor(
-    private val db: AppDatabase
+    private val db: AppDatabase,
+    private val preferences: UserPreferences
+
 ) {
 
-    suspend fun insertProduct(likedProduct: LikedProduct): Long {
+    suspend fun insertProductRepo(likedProduct: LikedProduct): Long {
         return db.createProductDao().insertProduct(likedProduct)
     }
 
-    suspend fun updateProduct(likedProduct: LikedProduct): Int {
-        return db.createProductDao().updateProduct(likedProduct)
-    }
 
-    suspend fun getFavoriteProducts(userId: Int): List<Product> {
-        return db.createProductDao().favoriteProducts(userId)
+
+    suspend fun gelAllLikedProductsDB(userId: Int): List<LikedProduct> {
+        return db.createProductDao().getAllProducts(userId)
     }
 
 
@@ -33,8 +34,30 @@ class DatabaseRepository @Inject constructor(
         return db.createUserDao().deleteUser(localUser)
     }
 
-    suspend fun getUser(localId: Long): BasicUserInfo {
+    suspend fun getUser(): BasicUserInfo {
         return db.createUserDao().getUser()
     }
+
+
+
+
+    //######################DataStoreOperations######################
+    suspend fun saveAuthTokenRepo(token: String) {
+        preferences.saveAuthToken(token)
+    }
+
+    suspend fun saveUserIdRepo(id: String) {
+        preferences.saveUserId(id)
+    }
+
+    fun collectPreferencesRepo(preferenceKey: PreferenceKeys): Flow<String?> {
+        return preferences.getPreferenceFlow(preferenceKey)
+    }
+
+    suspend fun clearDataStoreRepo() {
+        preferences.clearDataStore()
+    }
+
+
 
 }

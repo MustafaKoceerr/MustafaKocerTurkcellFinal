@@ -2,6 +2,7 @@ package com.example.mustafakocer.di
 
 import android.content.Context
 import androidx.room.Room
+import com.example.mustafakocer.data.UserPreferences
 import com.example.mustafakocer.data.db.AppDatabase
 import com.example.mustafakocer.data.network.IDummyApi
 import com.example.mustafakocer.data.repository.DatabaseRepository
@@ -35,8 +36,8 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideDatabaseRepository(api: IDummyApi, db: AppDatabase): DatabaseRepository {
-        return DatabaseRepository(api, db)
+    fun provideDatabaseRepository(db: AppDatabase,preferences:UserPreferences): DatabaseRepository {
+        return DatabaseRepository(db,preferences)
     }
 
 }

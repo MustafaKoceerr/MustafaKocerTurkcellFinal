@@ -13,3 +13,7 @@ fun Context.showToast(message:String, duration: Int = Toast.LENGTH_SHORT){
 fun View.visibleProgressBar(isVisible:Boolean){
     visibility = if (isVisible) View.VISIBLE else View.GONE
 }
+
+object UserId{
+    var userId : Int=0
+}
