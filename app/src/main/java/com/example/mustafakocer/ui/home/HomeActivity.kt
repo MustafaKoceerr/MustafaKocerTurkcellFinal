@@ -173,8 +173,10 @@ class HomeActivity : AppCompatActivity() {
                 // Burada value, Flow'un içindeki değeri temsil eder
                 if (value != null) {
                     Log.d("isdeleted", "dataStore'dan silmeden önce değeri $value")
-                } else
+                } else{
                     Log.d("isdeleted", "dataStore'dan silindi")
+
+                }
 
 
             Log.d("isdeleted", "before clearDataStore")
