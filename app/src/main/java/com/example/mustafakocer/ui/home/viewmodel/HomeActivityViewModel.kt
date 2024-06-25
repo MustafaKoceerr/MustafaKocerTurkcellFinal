@@ -9,6 +9,7 @@ import com.example.mustafakocer.data.model.Products
 import com.example.mustafakocer.data.model.Resource
 import com.example.mustafakocer.data.repository.DatabaseRepository
 import com.example.mustafakocer.data.repository.NetworkRepository
+import com.example.mustafakocer.util.UserId
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -40,10 +41,28 @@ class HomeActivityViewModel @Inject constructor(
         return databaseRepository.collectPreferencesRepo(PreferenceKeys.KEY_AUTH)
     }
 
-    fun getUserId(): Flow<String?> {
-        return databaseRepository.collectPreferencesRepo(PreferenceKeys.USER_ID)
+
+
+    private val _userInfo = MutableStateFlow<BasicUserInfo?>(null)
+    val userInfo: StateFlow<BasicUserInfo?> = _userInfo.asStateFlow()
+     fun getUser() {
+         viewModelScope.launch {
+             // Make the API call
+             val result = databaseRepository.getUser()
+             // assign the value, it can be success or failure
+             _userInfo.value = result
+         }
     }
 
+    suspend fun deleteUser():Int{
+        val result = databaseRepository.deleteUser()
+        return result
+    }
+    // NOT BU İŞLEMLER YAPILMADAN LOGİN ACTİVİTY'YE GEÇMESİNİ İSTEMEDİĞİM İÇİN
+    // BUNLARA SUSPEND VERDİM VE MAİN'DE ÇAĞIRACAĞIM
+    suspend fun clearDataStore() {
+            databaseRepository.clearDataStoreRepo()
+    }
 
 
 }

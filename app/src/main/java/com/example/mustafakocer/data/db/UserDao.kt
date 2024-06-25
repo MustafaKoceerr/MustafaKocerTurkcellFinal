@@ -17,8 +17,9 @@ interface UserDao {
     @Insert
     suspend fun insertUser( localUser : BasicUserInfo ): Long // sqlite return id
 
-    @Delete
-    suspend fun deleteUser( localUser : BasicUserInfo): Int // sqlite return id
+    @Query("DELETE FROM basic_user_info WHERE localId = $LOCAL_ID")
+    suspend fun deleteUserById(): Int
+    // tek bir tane kullanıcım olduğu için bu şekilde silebiliyorum
 
     @Query("SELECT * FROM basic_user_info where localId == $LOCAL_ID")
     suspend fun getUser(): BasicUserInfo

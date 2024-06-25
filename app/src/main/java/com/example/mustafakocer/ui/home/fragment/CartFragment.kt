@@ -11,7 +11,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.mustafakocer.data.db.entity.CartRequest
-import com.example.mustafakocer.data.db.entity.CartList
+import com.example.mustafakocer.data.db.entity.Cart
 import com.example.mustafakocer.data.model.Resource
 import com.example.mustafakocer.databinding.FragmentCartBinding
 import com.example.mustafakocer.ui.base.BaseFragment
@@ -55,9 +55,9 @@ class CartFragment : BaseFragment<FragmentCartBinding>() {
             recyclerView.layoutManager = GridLayoutManager(requireContext(), 1, GridLayoutManager.VERTICAL, false)
         }
         observeCartInfo()
-        val cartList1 = CartList(1,1,144,4)
-        val cartList2 = CartList(2,1,98,1)
-        val itemList = listOf(cartList1,cartList2)
+        val cart1 = Cart(1,1,144,4)
+        val cart2 = Cart(2,1,98,1)
+        val itemList = listOf(cart1,cart2)
         val cardRequest = CartRequest(1,itemList)
         viewModel.cartInfo(cardRequest)
 

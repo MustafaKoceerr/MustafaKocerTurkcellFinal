@@ -87,8 +87,8 @@ class LoginActivity : ComponentActivity() {
                             LaunchedEffect(Dispatchers.Main) {
                                 val result = loginState.value
                                 loginViewModel.saveAuthToken(result.token)
-                                loginViewModel.saveUserId(result.id.toString())
-                                val user = BasicUserInfo(null,result.id, result.username, result.email, result.firstName,
+                                //loginViewModel.saveUserId(result.id.toString())
+                                val user = BasicUserInfo(result.id, result.username, result.email, result.firstName,
                                     result.lastName, result.gender, result.image)
                                 // kullanıcı ilk kez giriş yaptığında db'ye yazdırıyorum,
                                 // db sadece giriş yapan kullanıcıyı tutuyor
@@ -100,7 +100,6 @@ class LoginActivity : ComponentActivity() {
 
                                 val intent = Intent(this@LoginActivity, HomeActivity::class.java)
                                 startActivity(intent)
-                                finish()
                             }
                         }
                     }

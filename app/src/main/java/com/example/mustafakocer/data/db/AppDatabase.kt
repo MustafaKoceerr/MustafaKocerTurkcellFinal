@@ -6,13 +6,13 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.example.mustafakocer.data.db.entity.BasicUserInfo
-import com.example.mustafakocer.data.db.entity.CartList
+import com.example.mustafakocer.data.db.entity.Cart
 import com.example.mustafakocer.data.db.entity.LikedProduct
 
 
 @Database(
-    entities =[CartList::class, BasicUserInfo::class, LikedProduct::class],
-    version = 1,
+    entities =[Cart::class, BasicUserInfo::class, LikedProduct::class],
+    version = 2,
     exportSchema = false
 )
 @TypeConverters(Converters::class)

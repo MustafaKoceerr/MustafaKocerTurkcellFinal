@@ -9,7 +9,7 @@
 
     <com.google.android.material.card.MaterialCardView
         android:layout_width="match_parent"
-        android:layout_height="400dp">
+        android:layout_height="300dp">
 
       <androidx.constraintlayout.widget.ConstraintLayout
           android:layout_width="match_parent"
@@ -26,8 +26,8 @@
               app:layout_constraintBottom_toBottomOf="parent"
               app:layout_constraintTop_toTopOf="parent"
               app:layout_constraintEnd_toEndOf="parent"
-
               />
+
           <ImageButton
               android:id="@+id/btnLike"
               android:layout_width="wrap_content"
@@ -37,6 +37,17 @@
               app:layout_constraintStart_toStartOf="@id/txtView"
               app:layout_constraintEnd_toEndOf="@id/txtView"
               app:layout_constraintTop_toBottomOf="@id/txtView"
+              android:layout_marginTop="20dp"
+              />
+          <ImageButton
+              android:id="@+id/btnCart"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:src="@drawable/ic_shopping_cart"
+              android:backgroundTint="@color/transparent"
+              app:layout_constraintStart_toStartOf="@id/btnLike"
+              app:layout_constraintEnd_toEndOf="@id/btnLike"
+              app:layout_constraintTop_toBottomOf="@id/btnLike"
               android:layout_marginTop="20dp"
               />
       </androidx.constraintlayout.widget.ConstraintLayout>

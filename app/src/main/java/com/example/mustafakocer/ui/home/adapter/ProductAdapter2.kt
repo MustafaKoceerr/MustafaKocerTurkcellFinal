@@ -1,7 +1,6 @@
 package com.example.mustafakocer.ui.home.adapter
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -12,7 +11,8 @@ import com.example.mustafakocer.ui.home.LikeButtonClickListener
 
 class ProductAdapter2(
     private val productList: List<Product>,
-    private val likeButtonClickListener: LikeButtonClickListener
+    private val likeButtonClickListener: LikeButtonClickListener,
+    private val likedProductsIdList: List<Int>
 ):RecyclerView.Adapter<ProductAdapter2.ProductViewHolder2>() {
 
     inner class ProductViewHolder2(
@@ -40,7 +40,16 @@ class ProductAdapter2(
         // bind xml layout with our products
         // todo sepet simgesi ve favorite simgesi koy ve dinle
 
-        var isLiked = false
+        val isLiked : Boolean= productList.get(position).id in likedProductsIdList
+        if (isLiked) {
+            holder.recylerviewRowBinding.btnLike.setImageResource(R.drawable.ic_heart_filled)
+        } else {
+            holder.recylerviewRowBinding.btnLike.setImageResource(R.drawable.ic_heart_empty)
+        }
+        holder.recylerviewRowBinding.btnLike.setOnClickListener {
+            likeButtonClickListener.onRecyclerViewItemClick(it!!, productList.get(position))
+        }
+     /*
         holder.recylerviewRowBinding.btnLike.setOnClickListener {
             if (isLiked) {
                 holder.recylerviewRowBinding.btnLike.setImageResource(R.drawable.ic_heart_empty)
@@ -50,6 +59,7 @@ class ProductAdapter2(
             isLiked = !isLiked
             likeButtonClickListener.onRecyclerViewItemClick(it!!,productList.get(position))
         }
+      */
 
     }
 

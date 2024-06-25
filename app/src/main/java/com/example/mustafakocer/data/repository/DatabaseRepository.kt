@@ -4,8 +4,8 @@ import com.example.mustafakocer.data.PreferenceKeys
 import com.example.mustafakocer.data.UserPreferences
 import com.example.mustafakocer.data.db.AppDatabase
 import com.example.mustafakocer.data.db.entity.BasicUserInfo
+import com.example.mustafakocer.data.db.entity.Cart
 import com.example.mustafakocer.data.db.entity.LikedProduct
-import com.example.mustafakocer.data.model.Product
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
@@ -15,23 +15,31 @@ class DatabaseRepository @Inject constructor(
 
 ) {
 
-    suspend fun insertProductRepo(likedProduct: LikedProduct): Long {
+    // // ################ DB Product Operations ################
+    suspend fun insertProductDBRepo(likedProduct: LikedProduct): Long {
         return db.createProductDao().insertProduct(likedProduct)
     }
 
-
+    suspend fun deleteProductDBRepo(userId:Int, productId:Int): Int {
+        return db.createProductDao().deleteLikedProduct(userId,productId)
+    }
 
     suspend fun gelAllLikedProductsDB(userId: Int): List<LikedProduct> {
         return db.createProductDao().getAllProducts(userId)
     }
 
+    suspend fun getOneProductDB(userId: Int, productId: Int): LikedProduct? {
+        return db.createProductDao().getOneProduct(userId, productId)
+    }
 
+
+    // ################ DB User Operations ################
     suspend fun insertUser(localUser: BasicUserInfo): Long {
         return db.createUserDao().insertUser(localUser)
     }
 
-    suspend fun deleteUser(localUser: BasicUserInfo): Int {
-        return db.createUserDao().deleteUser(localUser)
+    suspend fun deleteUser(): Int {
+        return db.createUserDao().deleteUserById()
     }
 
     suspend fun getUser(): BasicUserInfo {
@@ -39,17 +47,11 @@ class DatabaseRepository @Inject constructor(
     }
 
 
+    // ################ DataStoreOperations ################
 
-
-    //######################DataStoreOperations######################
-    suspend fun saveAuthTokenRepo(token: String) {
-        preferences.saveAuthToken(token)
-    }
-
-    suspend fun saveUserIdRepo(id: String) {
-        preferences.saveUserId(id)
-    }
-
+     suspend fun saveAuthTokenRepo(token: String) {
+         preferences.saveAuthToken(token)
+     }
     fun collectPreferencesRepo(preferenceKey: PreferenceKeys): Flow<String?> {
         return preferences.getPreferenceFlow(preferenceKey)
     }
@@ -59,5 +61,18 @@ class DatabaseRepository @Inject constructor(
     }
 
 
+    // ################ DB Cart Operations ################
+
+    suspend fun insertCartDBRepo(cart: Cart): Long {
+        return db.createProductDao().insertCart(cart)
+    }
+
+    suspend fun deleteCartDBRepo(userId:Int, productId:Int): Int {
+        return db.createProductDao().deleteCart(userId,productId)
+    }
+
+    suspend fun gelAllCartsDBRepo(userId: Int): List<Cart> {
+        return db.createProductDao().getAllCarts(userId)
+    }
 
 }

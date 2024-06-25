@@ -62,18 +62,20 @@ class LoginViewModel @Inject constructor(
     }
         // bunları kaydedip activity değiştireceğim için ve bunlar kaydedilirkenb, activity'nin değişme
     // ihtimali olduğu için bunları suspend yapıp UI'da çağırıcam böylelikle işlemler sırayla gerçekleşecek
+        fun getAuthToken(): Flow<String?> {
+            return databaseRepository.collectPreferencesRepo(PreferenceKeys.KEY_AUTH)
+        }
 
+/*
     suspend fun saveUserId(id: String) {
         databaseRepository.saveUserIdRepo(id)
-    }
-
-    fun getAuthToken(): Flow<String?> {
-        return databaseRepository.collectPreferencesRepo(PreferenceKeys.KEY_AUTH)
     }
 
     fun getUserId(): Flow<String?> {
         return databaseRepository.collectPreferencesRepo(PreferenceKeys.USER_ID)
     }
+ */
+
 
     fun clearDataStore() {
         viewModelScope.launch {

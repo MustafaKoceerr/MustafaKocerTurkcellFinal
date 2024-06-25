@@ -20,7 +20,7 @@ class UserPreferences @Inject constructor(
 
     // even when we will pass a context from activity or fragment we will get the application context here
     private val KEY_AUTH = stringPreferencesKey("key_auth")
-    private val ID = stringPreferencesKey("user_id")
+    //private val ID = stringPreferencesKey("user_id")
 
     suspend fun savePreference(preferenceKey: PreferenceKeys, value: String) {
         applicationContext.dataStore.edit { preferences ->
@@ -33,9 +33,11 @@ class UserPreferences @Inject constructor(
         savePreference(PreferenceKeys.KEY_AUTH, authToken)
     }
 
+   /*
     suspend fun saveUserId(userId: String) {
         savePreference(PreferenceKeys.USER_ID, userId)
     }
+    */
 
 
     fun getPreferenceFlow(preferenceKey: PreferenceKeys): Flow<String?> {
@@ -64,5 +66,5 @@ class UserPreferences @Inject constructor(
 
 enum class PreferenceKeys(val key: Preferences.Key<String>) {
     KEY_AUTH(stringPreferencesKey("key_auth")),
-    USER_ID(stringPreferencesKey("user_id"))
+    //USER_ID(stringPreferencesKey("user_id"))
 }

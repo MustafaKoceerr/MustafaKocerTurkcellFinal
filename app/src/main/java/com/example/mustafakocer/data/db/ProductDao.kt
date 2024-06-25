@@ -3,6 +3,7 @@ package com.example.mustafakocer.data.db
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
+import com.example.mustafakocer.data.db.entity.Cart
 import com.example.mustafakocer.data.db.entity.LikedProduct
 import com.example.mustafakocer.data.model.Product
 
@@ -10,23 +11,30 @@ import com.example.mustafakocer.data.model.Product
 interface ProductDao {
 
 
-
     @Insert
     suspend fun insertProduct(likedProduct: LikedProduct): Long // sqlite return id
-    // todo bbeğenirlerse db'ye ekleyeceğim.
 
- /*
-    @Update
-    suspend fun updateProduct(likedProduct: LikedProduct): Int // sqlite return id
-
-  */
-    @Query("UPDATE liked_product SET isLiked = CASE WHEN isLiked == 0 THEN 1 ELSE 0 END WHERE userId = :userId AND product = :product")
-    suspend fun toggleLikedStatus(userId: Int, product: Product): Int
+    // LikedProduct tablosundan belirli bir kullanıcı ve ürün ID'sine göre ürünü silen suspend fonksiyon
+    @Query("DELETE FROM liked_product WHERE userId = :userId AND  productId = :productId")
+    suspend fun deleteLikedProduct(userId: Int, productId: Int): Int
     // 0 dönerse failed, 0'dan farklı dönerse succes
 
-    @Query("select * from liked_product where userId = :userId and isLiked = 1 ")
+    @Query("select * from liked_product where userId = :userId")
     suspend fun getAllProducts(userId: Int): List<LikedProduct>
     // todo beğenilen ürünleri getirir. bunu beğenilen ürünlerde çağır
 
+    @Query("select * from liked_product where userId = :userId and productId = :productId ")
+    suspend fun getOneProduct(userId: Int, productId:Int): LikedProduct?
+
+
+
+    @Insert
+    suspend fun insertCart(cart: Cart): Long // sqlite return id
+
+    @Query("DELETE FROM cart_list WHERE userId = :userId AND  id = :productId")
+    suspend fun deleteCart(userId: Int, productId: Int): Int
+
+    @Query("select * from cart_list where userId = :userId")
+    suspend fun getAllCarts(userId: Int): List<Cart>
 
 }

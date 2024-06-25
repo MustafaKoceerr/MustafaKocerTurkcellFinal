@@ -17,3 +17,6 @@ fun View.visibleProgressBar(isVisible:Boolean){
 object UserId{
     var userId : Int=0
 }
+object IsAdapterAttached{
+    var isAdapterAttached : Int=0
+}

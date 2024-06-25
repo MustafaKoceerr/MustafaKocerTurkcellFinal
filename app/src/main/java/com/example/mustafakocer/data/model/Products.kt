@@ -1,5 +1,7 @@
 package com.example.mustafakocer.data.model
 
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 import com.google.gson.annotations.SerializedName
 
 data class Products(
@@ -20,7 +22,6 @@ data class Meta(
     @SerializedName("qrCode") var qrCode: String? = null
 
 )
-
 
 data class Product(
 
@@ -45,9 +46,9 @@ data class Product(
     @SerializedName("minimumOrderQuantity") var minimumOrderQuantity: Int? = null,
     @SerializedName("meta") var meta: Meta? = Meta(),
     @SerializedName("images") var images: List<String> = mutableListOf(),
-    @SerializedName("thumbnail") var thumbnail: String? = null
+    @SerializedName("thumbnail") var thumbnail: String? = null,
 
-)
+    )
 
 
 data class Reviews(

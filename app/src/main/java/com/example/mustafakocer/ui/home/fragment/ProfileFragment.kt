@@ -13,6 +13,7 @@ import com.example.mustafakocer.data.model.Resource
 import com.example.mustafakocer.databinding.FragmentProfileBinding
 import com.example.mustafakocer.ui.base.BaseFragment
 import com.example.mustafakocer.ui.home.viewmodel.ProfileViewModel
+import com.example.mustafakocer.util.UserId
 import com.example.mustafakocer.util.visibleProgressBar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -49,7 +50,8 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding>() {
         observeUser()
 
         // todo burada user'ın id'sini localdb'den veya token ile istek atarak çek, sonrasında viewModel'e parametre ata
-        viewModel.getUser(2)
+
+        viewModel.getUser(UserId.userId)
 
 
     }

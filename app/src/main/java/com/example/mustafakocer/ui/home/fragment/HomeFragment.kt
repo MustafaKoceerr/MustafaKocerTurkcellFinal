@@ -1,6 +1,5 @@
 package com.example.mustafakocer.ui.home.fragment
 
-import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -21,11 +20,14 @@ import com.example.mustafakocer.ui.base.BaseFragment
 import com.example.mustafakocer.ui.home.LikeButtonClickListener
 import com.example.mustafakocer.ui.home.adapter.ProductAdapter2
 import com.example.mustafakocer.ui.home.viewmodel.HomeViewModel
+import com.example.mustafakocer.util.IsAdapterAttached
 import com.example.mustafakocer.util.UserId
 import com.example.mustafakocer.util.visibleProgressBar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -45,8 +47,9 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(), LikeButtonClickListene
     private var param2: String? = null
 
     private val viewModel: HomeViewModel by viewModels()
+    private lateinit var productIdList: MutableList<Int>
 
-    private var likedProductList : MutableList<LikedProduct>? = mutableListOf()
+    private var likedProductList: MutableList<LikedProduct>? = mutableListOf()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
@@ -63,24 +66,26 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(), LikeButtonClickListene
         database listesi getirilecek ve user id getirilecek.
          */
 
-
         binding.homeRecyclerView.also { recyclerView ->
-            recyclerView.layoutManager = GridLayoutManager(requireContext(), 1, GridLayoutManager.VERTICAL, false)
+            recyclerView.layoutManager =
+                GridLayoutManager(requireContext(), 1, GridLayoutManager.VERTICAL, false)
         }
+        viewModel.getProducts()
         observeProducts()
 
-        viewModel.gelAllLikedProductsDB(UserId.userId)
-        viewModel.getProducts()
 
 
+        binding.getButton.setOnClickListener {
+            viewModel.getProducts()
 
+        }
     }
 
     override fun getFragmentDataBinding(
         inflater: LayoutInflater,
         container: ViewGroup?
     ): FragmentHomeBinding {
-        return FragmentHomeBinding.inflate(inflater,container,false)
+        return FragmentHomeBinding.inflate(inflater, container, false)
     }
 
     companion object {
@@ -104,8 +109,6 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(), LikeButtonClickListene
     }
 
 
-
-
     private fun observeProducts() {
         viewLifecycleOwner.lifecycleScope.launch {
             /*
@@ -113,7 +116,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(), LikeButtonClickListene
             This is because you usually want to update the UI in response to the collected state,
             and all UI updates must occur on the main thread.
              */
-            viewModel.products.collect { resource ->
+            viewModel.products.collectLatest { resource ->
                 binding.progressbar.visibleProgressBar(false)
 
                 when (resource) {
@@ -121,11 +124,16 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(), LikeButtonClickListene
                         // Show loading indicator
                         binding.progressbar.visibleProgressBar(true)
                     }
+
                     is Resource.Success -> {
                         // Update UI with products data
                         // todo recyler view DESING YAP
-                        Toast.makeText(requireContext(), "Urunler Geldi${resource.value.products}", Toast.LENGTH_SHORT).show()
-                        Log.d("flow","${resource.value.products}")
+                        Toast.makeText(
+                            requireContext(),
+                            "Urunler Geldi${resource.value.products}",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        Log.d("flow", "${resource.value.products}")
                         // Use the products data to update the UI
                         /*
                         database'den islike = true olanı çek.
@@ -137,16 +145,36 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(), LikeButtonClickListene
                         var ise ve tekrar tıklandıysa, update ile isliked'ı false yap, değiştir.
 
                          */
-                        binding.homeRecyclerView.adapter = ProductAdapter2(resource.value.products,this@HomeFragment)
+                        val likedProductList = withContext(Dispatchers.IO) {
+                            viewModel.gelAllLikedProductsDB(UserId.userId)
+                        }
 
+                        Log.d("likedProductList", "Listem geldi $likedProductList")
+
+                        productIdList = likedProductList!!.mapNotNull { it.productId }.toMutableList()
+                        Log.d("likedProductList", "ID LIST $productIdList")
+
+                        if (IsAdapterAttached.isAdapterAttached==0){
+                            binding.homeRecyclerView.adapter =
+                                ProductAdapter2(resource.value.products, this@HomeFragment, productIdList)
+                            IsAdapterAttached.isAdapterAttached++
+                        }else{
+                            binding.homeRecyclerView.adapter!!.notifyDataSetChanged()
+                        }
+
+                        // her veri geldiğinde db'ye bakıyor ve oradan karşılaştırıyor
                     }
 
                     is Resource.Failure -> {
-                        Toast.makeText(requireContext(), "Hata ${resource.errorCode}  ${resource.errorBody}", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(
+                            requireContext(),
+                            "Hata ${resource.errorCode}  ${resource.errorBody}",
+                            Toast.LENGTH_SHORT
+                        ).show()
 
                     }
 
-                    is Resource.Waiting ->{
+                    is Resource.Waiting -> {
                         binding.progressbar.visibleProgressBar(false)
                     }
                 }
@@ -156,24 +184,37 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(), LikeButtonClickListene
         }
     }
 
+
+
     override fun onRecyclerViewItemClick(view: View, product: Product) {
-        when(view.id){
-            R.id.btnLike->{
+        when (view.id) {
+            R.id.btnLike -> {
                 // todo db'ye ekleme işlemi
-                Log.d("like","product: $product")
+                Log.d("like", "product: $product")
 
                 // todo eğer liked product list'te yoksa bunu yapacağım
 
-                    val likedProduct = LikedProduct(null,UserId.userId,0, product )
-                    viewModel.insertProduct(likedProduct)
-                // todo varsa update işlemini gerçekleştireceğim
-                // listeden ara, eğer o listede varsa o objenin isliked'ını değiştir
-                // gidip databasede o değeri update et
+                viewLifecycleOwner.lifecycleScope.launch {
+                    val value = viewModel.getOneProductsDB(UserId.userId, product.id!!)
 
-                //likeButtonClick(view as ImageButton)
-                // todo database'ye ekleme işlemini yap. 
+                    if(value==null){
+                        val likedProduct = LikedProduct(null, UserId.userId, 0, product.id, product)
+                        viewModel.insertProductDB(likedProduct)
+                        productIdList.add(product.id!!)
+                    }else{
+                        viewModel.deleteProductDB(UserId.userId, product.id!!)
+                        productIdList.remove(product.id)
+                    }
+                    updateLikeButton()
+                }
+
             }
         }
+    }
+
+    private fun updateLikeButton(){
+        binding.homeRecyclerView.adapter!!.notifyDataSetChanged()
+
     }
 
     private fun likeButtonClick(likeButton: ImageButton) {

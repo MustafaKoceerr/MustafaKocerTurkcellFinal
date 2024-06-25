@@ -1,15 +1,17 @@
 package com.example.mustafakocer.ui.home
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
+import android.view.View
+import android.widget.TextView
+import android.window.OnBackInvokedDispatcher
 import androidx.activity.viewModels
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.databinding.DataBindingUtil
-import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.NavOptions
@@ -20,14 +22,13 @@ import androidx.navigation.ui.setupWithNavController
 import com.example.mustafakocer.R
 import com.example.mustafakocer.databinding.ActivityHomeBinding
 import com.example.mustafakocer.ui.home.viewmodel.HomeActivityViewModel
-import com.example.mustafakocer.ui.home.viewmodel.HomeViewModel
+import com.example.mustafakocer.ui.login.LoginActivity
 import com.example.mustafakocer.util.UserId
 import com.example.mustafakocer.util.showToast
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
-const val x = 10
 
 @AndroidEntryPoint
 class HomeActivity : AppCompatActivity() {
@@ -43,7 +44,8 @@ class HomeActivity : AppCompatActivity() {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_home)
         setContentView(binding.root)
 
-        getUserId()
+        observeUser()
+        viewModel.getUser()
 
         // enableEdgeToEdge()
         //setContentView(R.layout.activity_home)
@@ -113,6 +115,10 @@ class HomeActivity : AppCompatActivity() {
             }
             R.id.nav_logout ->{
                 // todo logout islemini sagla
+                clearUserData()
+                val intent = Intent(this, LoginActivity::class.java)
+                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                startActivity(intent)
             }
 
             else -> {return  false}
@@ -131,15 +137,67 @@ class HomeActivity : AppCompatActivity() {
     }
 
 
-    private fun getUserId(){
-        // todo base fragment'a eklenebilir.
-        this.lifecycleScope.launch (Dispatchers.Main) {
-            viewModel.getUserId().collect { value ->
-                // Burada value, Flow'un içindeki değeri temsil eder
-                if (value != null) {
-                    UserId.userId = value.toInt()
+
+    private fun observeUser() {
+        this.lifecycleScope.launch {
+            /*
+            When collecting from a StateFlow in your UI, you should typically use Dispatchers.Main.
+            This is because you usually want to update the UI in response to the collected state,
+            and all UI updates must occur on the main thread.
+             */
+            viewModel.userInfo.collect { resource ->
+                resource?.let {
+                    Log.d("getuser","Buraya girdi ve resource $it")
+                    val headerView :View = binding.navView
+                    val headerName = headerView.findViewById<TextView>(R.id.txtNameHeader)
+                    val headerMail = headerView.findViewById<TextView>(R.id.txtMailHeader)
+                    val fullName = it.firstName + it.lastName
+                    headerName.setText(fullName)
+                    headerMail.setText(it.email)
+                    UserId.userId = it.id.toInt()
+
                 }
+                if (resource==null)
+                    Log.d("isdeleted","viewmodel getuser cagirildi ve user basariyla silindi")
+
             }
+
         }
     }
+
+    private fun clearUserData(){
+        this.lifecycleScope.launch {
+            val isDeleted = viewModel.deleteUser()
+            Log.d("isdeleted","silindi mi : $isDeleted")
+            val value = viewModel.getAuthToken().first()
+                // Burada value, Flow'un içindeki değeri temsil eder
+                if (value != null) {
+                    Log.d("isdeleted", "dataStore'dan silmeden önce değeri $value")
+                } else
+                    Log.d("isdeleted", "dataStore'dan silindi")
+
+
+            Log.d("isdeleted", "before clearDataStore")
+
+            viewModel.clearDataStore()
+            Log.d("isdeleted", "after clearDataStore")
+
+            val intent = Intent(this@HomeActivity, LoginActivity::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            startActivity(intent)
+
+            Log.d("isdeleted", "intent işlemi")
+        }
+        }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        Log.d("onDestroy", "onDestroy işlemi gerçkelşetir")
+
+    }
+
+    override fun getOnBackInvokedDispatcher(): OnBackInvokedDispatcher {
+        return super.getOnBackInvokedDispatcher()
+    }
+
 }
