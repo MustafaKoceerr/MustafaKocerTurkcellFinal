@@ -41,12 +41,13 @@ class CategoryAdapter(
 
         holder.recyclerRowCategoryBinding.category = categoryList.get(position)
         // bind xml layout with our categories
-        // todo setoncliklistener ile başka bir fragment'a götür ve kategorideki ürünleri listelet
 
         holder.recyclerRowCategoryBinding.root.setOnClickListener {
             Log.d("bakalım", "bakalım,bakalım,bakalım ${categoryList.get(position)}")
             val action =
-                CategoryFragmentDirections.actionCategoryFragmentToProductsByCategoryFragment(categoryList.get(position).slug)
+                CategoryFragmentDirections.actionCategoryFragmentToProductsByCategoryFragment(
+                    categoryList.get(position).slug
+                )
             Navigation.findNavController(holder.recyclerRowCategoryBinding.root).navigate(action)
         }
 

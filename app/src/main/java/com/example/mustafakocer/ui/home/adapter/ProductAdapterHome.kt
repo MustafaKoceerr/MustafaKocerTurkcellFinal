@@ -9,11 +9,11 @@ import com.example.mustafakocer.data.model.Product
 import com.example.mustafakocer.databinding.RecylerviewRowBinding
 import com.example.mustafakocer.ui.home.LikeButtonClickListener
 
-class ProductAdapter2(
+class ProductAdapterHome(
     private val productList: List<Product>,
     private val likeButtonClickListener: LikeButtonClickListener,
     private val likedProductsIdList: List<Int>
-):RecyclerView.Adapter<ProductAdapter2.ProductViewHolder2>() {
+):RecyclerView.Adapter<ProductAdapterHome.ProductViewHolder2>() {
 
     inner class ProductViewHolder2(
         val recylerviewRowBinding : RecylerviewRowBinding

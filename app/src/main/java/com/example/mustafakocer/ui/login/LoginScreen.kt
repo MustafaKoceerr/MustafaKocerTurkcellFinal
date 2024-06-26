@@ -22,7 +22,6 @@ import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -56,7 +55,6 @@ import com.example.mustafakocer.ui.login.ui.theme.LightBlue
 import com.example.mustafakocer.ui.login.viewmodel.LoginViewModel
 
 @Composable
-//loginViewModel: LoginViewModel = viewModel(),loginState: Resource<Any>
 fun LoginScreen(viewModel: LoginViewModel = viewModel()) {
     var username by remember { mutableStateOf("") }
     var usernameError by rememberSaveable { mutableStateOf<String?>(null) }
@@ -66,10 +64,9 @@ fun LoginScreen(viewModel: LoginViewModel = viewModel()) {
     var isFocusedUsername by remember { mutableStateOf(false) }
     var isFocusedPassword by remember { mutableStateOf(false) }
 
-    var isLoading by remember { mutableStateOf(false) }
+    val isLoading by remember { mutableStateOf(false) }
     // Observe loading state from ViewModel or any other source
     LoadingIndicator(isLoading = isLoading)
-    // loading'deyken loading gösterecek
 
     Box(
         modifier = Modifier
@@ -231,10 +228,8 @@ fun LoginScreen(viewModel: LoginViewModel = viewModel()) {
                                 null
                             }
                             if (username.isNotBlank() && password.isNotBlank()) {
-                                // login kontrol işlemi yapılacak
                                 // todo retrofit işlemi yapılacak
                                 viewModel.loginUser(username, password)
-                                Log.d("viewmodel","deneme")
                             }
                         },
                         modifier = Modifier
@@ -245,6 +240,7 @@ fun LoginScreen(viewModel: LoginViewModel = viewModel()) {
                     ) {
                         Text(text = "Login", fontSize = 18.sp)
                     }
+
 
 
                     Spacer(modifier = Modifier.height(8.dp))

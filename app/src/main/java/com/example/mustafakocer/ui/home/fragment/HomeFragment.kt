@@ -1,14 +1,11 @@
 package com.example.mustafakocer.ui.home.fragment
 
-import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageButton
 import android.widget.Toast
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
@@ -20,12 +17,10 @@ import com.example.mustafakocer.data.model.Resource
 import com.example.mustafakocer.databinding.FragmentHomeBinding
 import com.example.mustafakocer.ui.base.BaseFragment
 import com.example.mustafakocer.ui.home.LikeButtonClickListener
-import com.example.mustafakocer.ui.home.adapter.ProductAdapter2
+import com.example.mustafakocer.ui.home.adapter.ProductAdapterHome
 import com.example.mustafakocer.ui.home.viewmodel.HomeViewModel
 import com.example.mustafakocer.util.UserId
 import com.example.mustafakocer.util.visibleProgressBar
-import com.google.firebase.remoteconfig.FirebaseRemoteConfig
-import com.google.firebase.remoteconfig.remoteConfigSettings
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
@@ -116,7 +111,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(), LikeButtonClickListene
 
                         if (isAdapterAttached == 0) {
                             binding.homeRecyclerView.adapter =
-                                ProductAdapter2(
+                                ProductAdapterHome(
                                     resource.value.products,
                                     this@HomeFragment,
                                     productIdList

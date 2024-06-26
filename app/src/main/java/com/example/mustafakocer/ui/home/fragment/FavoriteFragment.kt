@@ -2,23 +2,18 @@ package com.example.mustafakocer.ui.home.fragment
 
 import android.os.Bundle
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.mustafakocer.data.model.Product
-import com.example.mustafakocer.data.model.Resource
-import com.example.mustafakocer.ui.base.BaseFragment
 import com.example.mustafakocer.databinding.FragmentFavoriteBinding
-import com.example.mustafakocer.ui.home.adapter.OrderProductAdapter
+import com.example.mustafakocer.ui.base.BaseFragment
 import com.example.mustafakocer.ui.home.adapter.ProductAdapter
 import com.example.mustafakocer.ui.home.viewmodel.FavoriteViewModel
 import com.example.mustafakocer.util.UserId
-import com.example.mustafakocer.util.visibleProgressBar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch

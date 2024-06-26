@@ -9,7 +9,8 @@ import com.example.mustafakocer.data.model.ProductsInCart
 import com.example.mustafakocer.databinding.RecyclerRowProductsInCartBinding
 
 class CartProductAdapter(
-    private val productsInCartList: List<ProductsInCart>) :
+    private val productsInCartList: List<ProductsInCart>
+) :
     RecyclerView.Adapter<CartProductAdapter.CartProductViewHolder>() {
 
     inner class CartProductViewHolder(val recyclerRowProductsInCartBinding: RecyclerRowProductsInCartBinding) :

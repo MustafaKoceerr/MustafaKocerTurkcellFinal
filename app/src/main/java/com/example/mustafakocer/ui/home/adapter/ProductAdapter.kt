@@ -6,15 +6,14 @@ import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.mustafakocer.R
 import com.example.mustafakocer.data.model.Product
-import com.example.mustafakocer.databinding.RecylerviewRowBinding
 import com.example.mustafakocer.databinding.RecylerviewRowVerticalBinding
 
 class ProductAdapter(
     private val productList: List<Product>
-):RecyclerView.Adapter<ProductAdapter.ProductViewHolder>() {
+) : RecyclerView.Adapter<ProductAdapter.ProductViewHolder>() {
 
     inner class ProductViewHolder(
-        val recylerviewRowVerticalBinding : RecylerviewRowVerticalBinding
+        val recylerviewRowVerticalBinding: RecylerviewRowVerticalBinding
     ) : RecyclerView.ViewHolder(recylerviewRowVerticalBinding.root)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ProductViewHolder {

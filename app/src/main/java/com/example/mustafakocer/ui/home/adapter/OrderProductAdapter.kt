@@ -6,11 +6,11 @@ import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.mustafakocer.R
 import com.example.mustafakocer.data.model.CartResponse
-import com.example.mustafakocer.databinding.RecyclerRowProductsInCartBinding
 import com.example.mustafakocer.databinding.RecylerRowOrderBinding
 
 class OrderProductAdapter(
-    private val cartsInOrder: List<CartResponse>) :
+    private val cartsInOrder: List<CartResponse>
+) :
     RecyclerView.Adapter<OrderProductAdapter.OrderCartViewHolder>() {
 
     inner class OrderCartViewHolder(val recyclerRowOrderBinding: RecylerRowOrderBinding) :
