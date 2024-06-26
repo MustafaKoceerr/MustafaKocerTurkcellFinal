@@ -16,7 +16,7 @@ data class CartRequest(
 @Entity(tableName = "cart_list")
 data class Cart(
     @PrimaryKey(autoGenerate = true)
-    val localId:Int,
+    val localId:Int?,
     val userId: Int,
     @SerializedName("id") val id: Int? = null, // aslında product id
     @SerializedName("quantity")val quantity: Int? = null

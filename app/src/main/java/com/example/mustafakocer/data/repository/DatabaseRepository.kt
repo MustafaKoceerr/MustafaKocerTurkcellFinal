@@ -75,4 +75,11 @@ class DatabaseRepository @Inject constructor(
         return db.createProductDao().getAllCarts(userId)
     }
 
+    suspend fun getOneCartDBRepo(userId: Int, productId: Int): Cart? {
+        return db.createProductDao().getOneCart(userId, productId)
+    }
+
+    suspend fun updateCartDBRepo(cart: Cart): Int {
+        return db.createProductDao().updateCart(cart)
+    }
 }

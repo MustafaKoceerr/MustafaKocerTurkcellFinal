@@ -4,11 +4,11 @@ import com.example.mustafakocer.data.db.entity.CartRequest
 import com.example.mustafakocer.data.model.CartResponse
 import com.example.mustafakocer.data.model.Categories
 import com.example.mustafakocer.data.model.LoginResponse
+import com.example.mustafakocer.data.model.OrderResponse
 import com.example.mustafakocer.data.model.Products
 import com.example.mustafakocer.data.model.Resource
 import com.example.mustafakocer.data.model.User
 import com.example.mustafakocer.data.network.IDummyApi
-import retrofit2.Response
 import javax.inject.Inject
 
 class NetworkRepository @Inject constructor(
@@ -63,4 +63,15 @@ class NetworkRepository @Inject constructor(
         }
     }
 
+    suspend fun getCartsByUserRepo(userId: String): Resource<OrderResponse> {
+        return safeApiCall {
+            api.getCartsByUser(userId)
+        }
+    }
+
+    suspend fun getLoggedUserRepo(token: String): Resource<User> {
+        return safeApiCall {
+            api.getLoggedUser(token)
+        }
+    }
 }

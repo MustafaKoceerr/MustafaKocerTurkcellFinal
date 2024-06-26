@@ -17,8 +17,10 @@ import com.example.mustafakocer.databinding.FragmentCartBinding
 import com.example.mustafakocer.ui.base.BaseFragment
 import com.example.mustafakocer.ui.home.adapter.CartProductAdapter
 import com.example.mustafakocer.ui.home.viewmodel.CartViewModel
+import com.example.mustafakocer.util.UserId
 import com.example.mustafakocer.util.visibleProgressBar
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 // TODO: Rename parameter arguments, choose names that match
@@ -54,12 +56,17 @@ class CartFragment : BaseFragment<FragmentCartBinding>() {
         binding.cartRecyclerView.also {recyclerView ->
             recyclerView.layoutManager = GridLayoutManager(requireContext(), 1, GridLayoutManager.VERTICAL, false)
         }
-        observeCartInfo()
+
+        getCartFromDB()
+     /*
         val cart1 = Cart(1,1,144,4)
         val cart2 = Cart(2,1,98,1)
         val itemList = listOf(cart1,cart2)
         val cardRequest = CartRequest(1,itemList)
         viewModel.cartInfo(cardRequest)
+      */
+        // todo db'den çekip, api'ye istek atıp ekranda listeleteceğim.
+
 
     }
 
@@ -89,9 +96,20 @@ class CartFragment : BaseFragment<FragmentCartBinding>() {
                 }
             }
     }
-
-    private fun observeCartInfo() {
+    private fun getCartFromDB(){
         viewLifecycleOwner.lifecycleScope.launch {
+
+            val cartList = viewModel.GetAllCarts(UserId.userId)
+            Log.d("cartList","cartList $cartList")
+
+            val cartRequest = CartRequest(UserId.userId, cartList)
+            viewModel.cartInfo(cartRequest)
+
+            observeCartInfo()
+        }
+    }
+
+    private suspend fun observeCartInfo() {
             viewModel.cart.collect { resource ->
                 binding.progressbar.visibleProgressBar(false)
 
@@ -106,7 +124,7 @@ class CartFragment : BaseFragment<FragmentCartBinding>() {
                         Toast.makeText(requireContext(), "Urunler Geldi${resource.value.products}", Toast.LENGTH_SHORT).show()
                         Log.d("flow","${resource.value.products}")
                         // Use the products data to update the UI
-                        binding.cartRecyclerView.adapter = CartProductAdapter(resource.value.products)
+                        binding.cartRecyclerView.adapter = CartProductAdapter(resource.value.products!!)
 
                         // todo ürünleri adapter'a pastladım, altta da tasarıma göre resource.value'dan aldığım değerleri kullanacağım.
                         binding.txtView.setText("Total Price: ${resource.value.total}")
@@ -123,7 +141,6 @@ class CartFragment : BaseFragment<FragmentCartBinding>() {
 
             }
 
-        }
     }
 
 }

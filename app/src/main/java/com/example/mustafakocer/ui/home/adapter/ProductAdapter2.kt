@@ -49,6 +49,12 @@ class ProductAdapter2(
         holder.recylerviewRowBinding.btnLike.setOnClickListener {
             likeButtonClickListener.onRecyclerViewItemClick(it!!, productList.get(position))
         }
+        holder.recylerviewRowBinding.btnPlus.setOnClickListener {
+            likeButtonClickListener.onRecyclerViewItemClick(it!!, productList.get(position))
+        }
+        holder.recylerviewRowBinding.btnMinus.setOnClickListener {
+            likeButtonClickListener.onRecyclerViewItemClick(it!!, productList.get(position))
+        }
      /*
         holder.recylerviewRowBinding.btnLike.setOnClickListener {
             if (isLiked) {

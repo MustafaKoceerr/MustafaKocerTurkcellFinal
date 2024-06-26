@@ -3,29 +3,34 @@ package com.example.mustafakocer.data.model
 import com.google.gson.annotations.SerializedName
 
 
-data class CartResponse (
-
-    @SerializedName("id"              ) var id              : Int?                = null,
-    @SerializedName("products"        ) var products        : List<ProductsInCart> = mutableListOf(),
-    @SerializedName("total"           ) var total           : Double?             = null,
-    @SerializedName("discountedTotal" ) var discountedTotal : Int?                = null,
-    @SerializedName("userId"          ) var userId          : Int?                = null,
-    @SerializedName("totalProducts"   ) var totalProducts   : Int?                = null,
-    @SerializedName("totalQuantity"   ) var totalQuantity   : Int?                = null
-
+data class OrderResponse(
+    @SerializedName("carts") val carts: List<CartResponse>,
+    @SerializedName("total") val total: Int? = null,
+    @SerializedName("skip") val skip: Int? = null,
+    @SerializedName("limit") val limit: Int? = null
 )
 
-data class ProductsInCart (
-    // the items in cart, I will get them after add some items in cart
-    // then I will show them in
 
-    @SerializedName("id"                 ) var id                 : Int?    = null,
-    @SerializedName("title"              ) var title              : String? = null,
-    @SerializedName("price"              ) var price              : Double? = null,
-    @SerializedName("quantity"           ) var quantity           : Int?    = null,
-    @SerializedName("total"              ) var total              : Double? = null,
-    @SerializedName("discountPercentage" ) var discountPercentage : Double? = null,
-    @SerializedName("discountedPrice"    ) var discountedPrice    : Int?    = null,
-    @SerializedName("thumbnail"          ) var thumbnail          : String? = null
+data class CartResponse(
 
+    @SerializedName("id") val id: Int? = null,
+    @SerializedName("products") val products: List<ProductsInCart>? = null,
+    @SerializedName("total") val total: Double? = null,
+    @SerializedName("discountedTotal") val discountedTotal: Double? = null,
+    @SerializedName("userId") val userId: Int? = null,
+    @SerializedName("totalProducts") val totalProducts: Int? = null,
+    @SerializedName("totalQuantity") val totalQuantity: Int? = null
+)
+
+
+data class ProductsInCart(
+
+    @SerializedName("id") val id: Int? = null,
+    @SerializedName("title") val title: String? = null,
+    @SerializedName("price") val price: Double? = null,
+    @SerializedName("quantity") val quantity: Int? = null,
+    @SerializedName("total") val total: Double? = null,
+    @SerializedName("discountPercentage") val discountPercentage: Double? = null,
+    @SerializedName("discountedTotal") val discountedTotal: Double? = null,
+    @SerializedName("thumbnail") val thumbnail: String? = null
 )

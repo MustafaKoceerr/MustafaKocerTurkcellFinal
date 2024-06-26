@@ -1,5 +1,6 @@
 package com.example.mustafakocer.ui.home.fragment
 
+import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -12,6 +13,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.mustafakocer.R
+import com.example.mustafakocer.data.db.entity.Cart
 import com.example.mustafakocer.data.db.entity.LikedProduct
 import com.example.mustafakocer.data.model.Product
 import com.example.mustafakocer.data.model.Resource
@@ -20,9 +22,10 @@ import com.example.mustafakocer.ui.base.BaseFragment
 import com.example.mustafakocer.ui.home.LikeButtonClickListener
 import com.example.mustafakocer.ui.home.adapter.ProductAdapter2
 import com.example.mustafakocer.ui.home.viewmodel.HomeViewModel
-import com.example.mustafakocer.util.IsAdapterAttached
 import com.example.mustafakocer.util.UserId
 import com.example.mustafakocer.util.visibleProgressBar
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig
+import com.google.firebase.remoteconfig.remoteConfigSettings
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
@@ -45,6 +48,8 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(), LikeButtonClickListene
     // TODO: Rename and change types of parameters
     private var param1: String? = null
     private var param2: String? = null
+    private var isAdapterAttached = 0
+
 
     private val viewModel: HomeViewModel by viewModels()
     private lateinit var productIdList: MutableList<Int>
@@ -58,9 +63,13 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(), LikeButtonClickListene
         }
     }
 
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.txtView.setText("SELAMLAR ISTE BASARDIN")
+
+
+
 
         /*
         database listesi getirilecek ve user id getirilecek.
@@ -75,10 +84,6 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(), LikeButtonClickListene
 
 
 
-        binding.getButton.setOnClickListener {
-            viewModel.getProducts()
-
-        }
     }
 
     override fun getFragmentDataBinding(
@@ -154,10 +159,10 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(), LikeButtonClickListene
                         productIdList = likedProductList!!.mapNotNull { it.productId }.toMutableList()
                         Log.d("likedProductList", "ID LIST $productIdList")
 
-                        if (IsAdapterAttached.isAdapterAttached==0){
+                        if (isAdapterAttached==0){
                             binding.homeRecyclerView.adapter =
                                 ProductAdapter2(resource.value.products, this@HomeFragment, productIdList)
-                            IsAdapterAttached.isAdapterAttached++
+                            isAdapterAttached++
                         }else{
                             binding.homeRecyclerView.adapter!!.notifyDataSetChanged()
                         }
@@ -207,8 +212,51 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(), LikeButtonClickListene
                     }
                     updateLikeButton()
                 }
+            }
+            R.id.btnPlus -> {
+                Toast.makeText(requireContext(),"plus",Toast.LENGTH_SHORT).show()
+                viewLifecycleOwner.lifecycleScope.launch {
+                    val cart = viewModel.GetOneCart(UserId.userId, product.id!!)
+
+                    if(cart==null){
+                        // üründen yoktur 1 tane ekle
+                        val addedCart = Cart(null, UserId.userId,product.id,1)
+                        viewModel.InsertCart(addedCart)
+                        // todo snackbar göster
+                    }else{
+                        // üründen var sayısını arttır.
+                        val updatedCart = cart.copy(quantity = cart.quantity!! + 1)
+                        viewModel.UpdateCart(updatedCart)
+                        // todo snackbar göster
+                    }
+                }
 
             }
+            R.id.btnMinus -> {
+                Toast.makeText(requireContext(),"minus",Toast.LENGTH_SHORT).show()
+                viewLifecycleOwner.lifecycleScope.launch {
+                    val cart = viewModel.GetOneCart(UserId.userId, product.id!!)
+
+                    if(cart==null){
+                        // üründen yoktur bir işlem yapma
+                        // todo snackbar göster
+                    }else{
+                        // üründen var sayısını azalt.
+                        val quantity = cart.quantity!! -1
+                        if (quantity==0){
+                            // sil
+                            viewModel.DeleteCart(cart.userId, cart.id!!)
+                        }
+                        else{
+                            val updatedCart = cart.copy(quantity = quantity)
+                            viewModel.UpdateCart(updatedCart)
+                        }
+                        // todo snackbar göster
+                    }
+                }
+            }
+
+
         }
     }
 

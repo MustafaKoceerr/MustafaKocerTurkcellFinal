@@ -3,6 +3,7 @@ package com.example.mustafakocer.data.db
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
+import androidx.room.Update
 import com.example.mustafakocer.data.db.entity.Cart
 import com.example.mustafakocer.data.db.entity.LikedProduct
 import com.example.mustafakocer.data.model.Product
@@ -37,4 +38,9 @@ interface ProductDao {
     @Query("select * from cart_list where userId = :userId")
     suspend fun getAllCarts(userId: Int): List<Cart>
 
+    @Query("select * from cart_list where userId = :userId and id = :productId ")
+    suspend fun getOneCart(userId: Int, productId:Int): Cart?
+
+    @Update
+    suspend fun updateCart(cart: Cart): Int
 }

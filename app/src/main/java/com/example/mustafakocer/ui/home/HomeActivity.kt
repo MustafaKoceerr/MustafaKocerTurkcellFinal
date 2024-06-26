@@ -1,6 +1,7 @@
 package com.example.mustafakocer.ui.home
 
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
@@ -25,6 +26,9 @@ import com.example.mustafakocer.ui.home.viewmodel.HomeActivityViewModel
 import com.example.mustafakocer.ui.login.LoginActivity
 import com.example.mustafakocer.util.UserId
 import com.example.mustafakocer.util.showToast
+import com.google.firebase.messaging.FirebaseMessaging
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig
+import com.google.firebase.remoteconfig.remoteConfigSettings
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -38,11 +42,13 @@ class HomeActivity : AppCompatActivity() {
 
     private lateinit var binding : ActivityHomeBinding
 
+
     private val viewModel: HomeActivityViewModel by viewModels()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_home)
         setContentView(binding.root)
+
 
         observeUser()
         viewModel.getUser()
@@ -175,7 +181,6 @@ class HomeActivity : AppCompatActivity() {
                     Log.d("isdeleted", "dataStore'dan silmeden önce değeri $value")
                 } else{
                     Log.d("isdeleted", "dataStore'dan silindi")
-
                 }
 
 
@@ -198,8 +203,7 @@ class HomeActivity : AppCompatActivity() {
 
     }
 
-    override fun getOnBackInvokedDispatcher(): OnBackInvokedDispatcher {
-        return super.getOnBackInvokedDispatcher()
-    }
+
+
 
 }
