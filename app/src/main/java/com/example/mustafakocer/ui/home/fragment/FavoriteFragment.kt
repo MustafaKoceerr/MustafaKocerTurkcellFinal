@@ -23,31 +23,11 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
 
-/**
- * A simple [Fragment] subclass.
- * Use the [FavoriteFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 @AndroidEntryPoint
 class FavoriteFragment : BaseFragment<FragmentFavoriteBinding>() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
 
     private val viewModel: FavoriteViewModel by viewModels()
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
-    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -65,27 +45,7 @@ class FavoriteFragment : BaseFragment<FragmentFavoriteBinding>() {
         inflater: LayoutInflater,
         container: ViewGroup?
     ): FragmentFavoriteBinding {
-        return FragmentFavoriteBinding.inflate(inflater,container,false)
-    }
-
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment MyFavoriteFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            FavoriteFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
-                }
-            }
+        return FragmentFavoriteBinding.inflate(inflater, container, false)
     }
 
     private fun observeFavorites() {
@@ -98,7 +58,7 @@ class FavoriteFragment : BaseFragment<FragmentFavoriteBinding>() {
             viewModel.likedproducts.collectLatest { resource ->
 
                 val productList: List<Product> = resource.map { it.product }
-                Log.d("Favorite","resource $resource,  productList $productList")
+                Log.d("Favorite", "resource $resource,  productList $productList")
                 binding.favoriteRecyclerView.adapter =
                     ProductAdapter(productList)
 

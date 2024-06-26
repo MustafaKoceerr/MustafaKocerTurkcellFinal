@@ -21,48 +21,29 @@ import com.example.mustafakocer.util.visibleProgressBar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
 
-/**
- * A simple [Fragment] subclass.
- * Use the [CartFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
- @AndroidEntryPoint
+@AndroidEntryPoint
 class CartFragment : BaseFragment<FragmentCartBinding>() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
 
     private val viewModel: CartViewModel by viewModels()
 
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.cartRecyclerView.also {recyclerView ->
-            recyclerView.layoutManager = GridLayoutManager(requireContext(), 2, GridLayoutManager.VERTICAL, false)
+        binding.cartRecyclerView.also { recyclerView ->
+            recyclerView.layoutManager =
+                GridLayoutManager(requireContext(), 2, GridLayoutManager.VERTICAL, false)
         }
 
         getCartFromDB()
-     /*
-        val cart1 = Cart(1,1,144,4)
-        val cart2 = Cart(2,1,98,1)
-        val itemList = listOf(cart1,cart2)
-        val cardRequest = CartRequest(1,itemList)
-        viewModel.cartInfo(cardRequest)
-      */
+        /*
+           val cart1 = Cart(1,1,144,4)
+           val cart2 = Cart(2,1,98,1)
+           val itemList = listOf(cart1,cart2)
+           val cardRequest = CartRequest(1,itemList)
+           viewModel.cartInfo(cardRequest)
+         */
         // todo db'den çekip, api'ye istek atıp ekranda listeleteceğim.
 
 
@@ -75,30 +56,12 @@ class CartFragment : BaseFragment<FragmentCartBinding>() {
         return FragmentCartBinding.inflate(inflater, container, false)
     }
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment CartFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            CartFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
-                }
-            }
-    }
-    private fun getCartFromDB(){
+
+    private fun getCartFromDB() {
         viewLifecycleOwner.lifecycleScope.launch {
 
             val cartList = viewModel.GetAllCarts(UserId.userId)
-            Log.d("cartList","cartList $cartList")
+            Log.d("cartList", "cartList $cartList")
 
             val cartRequest = CartRequest(UserId.userId, cartList)
             viewModel.cartInfo(cartRequest)
@@ -108,38 +71,48 @@ class CartFragment : BaseFragment<FragmentCartBinding>() {
     }
 
     private suspend fun observeCartInfo() {
-            viewModel.cart.collect { resource ->
-                binding.progressbar.visibleProgressBar(false)
+        viewModel.cart.collect { resource ->
+            binding.progressbar.visibleProgressBar(false)
 
-                when (resource) {
-                    is Resource.Loading -> {
-                        // Show loading indicator
-                        binding.progressbar.visibleProgressBar(true)
-                    }
-                    is Resource.Success -> {
-                        // Update UI with products data
-                        // todo recyler view DESING YAP
-                        Toast.makeText(requireContext(), "Urunler Geldi${resource.value.products}", Toast.LENGTH_SHORT).show()
-                        Log.d("flow","${resource.value.products}")
-                        Log.d("flow","discountedTotal ${resource.value.discountedTotal}")
-
-                        // Use the products data to update the UI
-                        binding.cartRecyclerView.adapter = CartProductAdapter(resource.value.products!!)
-
-                        // todo ürünleri adapter'a pastladım, altta da tasarıma göre resource.value'dan aldığım değerleri kullanacağım.
-                        binding.txtView.setText("Cart Total Price: $${resource.value.discountedTotal}")
-                    }
-
-                    is Resource.Failure -> {
-                        Toast.makeText(requireContext(), "Hata ${resource.errorCode}  ${resource.errorBody}", Toast.LENGTH_SHORT).show()
-
-                    }
-                    is Resource.Waiting ->{
-                        binding.progressbar.visibleProgressBar(false)
-                    }
+            when (resource) {
+                is Resource.Loading -> {
+                    // Show loading indicator
+                    binding.progressbar.visibleProgressBar(true)
                 }
 
+                is Resource.Success -> {
+                    // Update UI with products data
+                    // todo recyler view DESING YAP
+                    Toast.makeText(
+                        requireContext(),
+                        "Urunler Geldi${resource.value.products}",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    Log.d("flow", "${resource.value.products}")
+                    Log.d("flow", "discountedTotal ${resource.value.discountedTotal}")
+
+                    // Use the products data to update the UI
+                    binding.cartRecyclerView.adapter = CartProductAdapter(resource.value.products!!)
+
+                    // todo ürünleri adapter'a pastladım, altta da tasarıma göre resource.value'dan aldığım değerleri kullanacağım.
+                    binding.txtView.setText("Cart Total Price: $${resource.value.discountedTotal}")
+                }
+
+                is Resource.Failure -> {
+                    Toast.makeText(
+                        requireContext(),
+                        "Hata ${resource.errorCode}  ${resource.errorBody}",
+                        Toast.LENGTH_SHORT
+                    ).show()
+
+                }
+
+                is Resource.Waiting -> {
+                    binding.progressbar.visibleProgressBar(false)
+                }
             }
+
+        }
 
     }
 
