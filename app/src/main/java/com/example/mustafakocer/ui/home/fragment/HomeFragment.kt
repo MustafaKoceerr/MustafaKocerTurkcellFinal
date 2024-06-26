@@ -66,7 +66,6 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(), LikeButtonClickListene
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding.txtView.setText("SELAMLAR ISTE BASARDIN")
 
 
         /*

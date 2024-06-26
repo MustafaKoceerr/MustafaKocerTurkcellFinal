@@ -5,7 +5,6 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
-
         <variable
             name="order"
             type="com.example.mustafakocer.data.model.CartResponse" />
@@ -17,7 +16,6 @@
         android:layout_margin="8dp"
         app:cardCornerRadius="8dp"
         app:cardElevation="4dp">
-
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -58,11 +56,11 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    app:set_dollar="@{order.total}"
                     android:fontFamily="@font/lato_italic"
                     android:textColor="@color/black"
                     android:textSize="18sp"
                     android:textStyle="bold"
+                    app:set_dollar="@{order.total}"
                     tools:text="$100" />
 
             </LinearLayout>
@@ -78,21 +76,21 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/lato_italic"
-                    android:textSize="18sp"
-                    android:textStyle="bold"
                     android:text="Discounted Total: "
-                    android:textColor="@color/dark_green" />
+                    android:textColor="@color/dark_green"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/txtTotalQuantityValue"
                     android:layout_width="0dp"
-                    app:set_dollar="@{order.discountedTotal}"
                     android:layout_height="wrap_content"
-                    android:textStyle="bold"
                     android:layout_weight="1"
-                    android:textSize="18sp"
                     android:fontFamily="@font/lato_italic"
                     android:textColor="@color/black"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    app:set_dollar="@{order.discountedTotal}"
                     tools:text="10" />
 
             </LinearLayout>
@@ -117,8 +115,8 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="@{order.totalProducts.toString()}"
                     android:fontFamily="@font/lato_italic"
+                    android:text="@{order.totalProducts.toString()}"
                     android:textColor="@color/black"
                     android:textSize="16sp"
                     tools:text="$100.00" />
@@ -144,10 +142,10 @@
                 <TextView
                     android:id="@+id/txtDiscountedTotalValue"
                     android:layout_width="0dp"
-                    android:text="@{order.totalQuantity.toString()}"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:fontFamily="@font/lato_italic"
+                    android:text="@{order.totalQuantity.toString()}"
                     android:textColor="@color/black"
                     android:textSize="16sp"
                     tools:text="$80.00" />
@@ -155,4 +153,5 @@
             </LinearLayout>
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
+
 </layout>

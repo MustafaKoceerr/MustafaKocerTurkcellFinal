@@ -4,12 +4,10 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
-
         <variable
             name="product"
             type="com.example.mustafakocer.data.model.Product" />
     </data>
-
 
     <com.google.android.material.card.MaterialCardView
         android:layout_width="match_parent"
@@ -62,11 +60,11 @@
                 android:fontFamily="@font/roboto_medium"
                 android:text="@{product.price.toString()}"
                 android:textColor="@color/colorAccent"
-                app:setStrikeThrough="@{product.discountPercentage >0}"
                 android:textSize="14sp"
                 app:layout_constraintStart_toStartOf="@id/txtTitle"
+                app:layout_constraintTop_toBottomOf="@id/txtTitle"
                 app:setDiscountedPriceColor="@{product.discountPercentage}"
-                app:layout_constraintTop_toBottomOf="@id/txtTitle" />
+                app:setStrikeThrough="@{product.discountPercentage >0}" />
 
             <!-- İndirim Yüzdesi -->
             <TextView
@@ -75,12 +73,12 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
                 android:fontFamily="@font/roboto_medium"
-                app:setDiscountPercentage="@{product.discountPercentage}"
                 android:textColor="@android:color/holo_red_dark"
                 android:textSize="12sp"
-                app:textViewVisibility="@{product.discountPercentage}"
                 app:layout_constraintStart_toEndOf="@id/txtPrice"
-                app:layout_constraintTop_toTopOf="@id/txtPrice" />
+                app:layout_constraintTop_toTopOf="@id/txtPrice"
+                app:setDiscountPercentage="@{product.discountPercentage}"
+                app:textViewVisibility="@{product.discountPercentage}" />
 
             <!-- İndirimli Fiyat -->
             <TextView
@@ -92,27 +90,27 @@
                 android:textSize="14sp"
 
                 app:discount_percentage="@{product.discountPercentage}"
-                app:product_price="@{product.price}"
-
-                app:textViewVisibility="@{product.discountPercentage}"
                 app:layout_constraintStart_toStartOf="@id/txtPrice"
-                app:layout_constraintTop_toBottomOf="@id/txtPrice" />
+
+                app:layout_constraintTop_toBottomOf="@id/txtPrice"
+                app:product_price="@{product.price}"
+                app:textViewVisibility="@{product.discountPercentage}" />
 
             <!-- Ürün Puanı -->
             <RatingBar
                 android:id="@+id/ratingBar"
+                style="?android:attr/ratingBarStyleSmall"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
                 android:numStars="5"
                 android:stepSize="0.5"
-                style="?android:attr/ratingBarStyleSmall"
-                app:set_rating="@{product.rating}"
                 android:textColor="@android:color/darker_gray"
                 android:textSize="12sp"
                 android:theme="@style/RatingBar"
                 app:layout_constraintStart_toStartOf="@id/txtTitle"
-                app:layout_constraintTop_toBottomOf="@id/txtDiscountedPrice" />
+                app:layout_constraintTop_toBottomOf="@id/txtDiscountedPrice"
+                app:set_rating="@{product.rating}" />
 
             <!-- Stok Durumu -->
             <TextView
@@ -191,4 +189,5 @@
                 app:layout_constraintGuide_percent="0.4" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </com.google.android.material.card.MaterialCardView>
+
 </layout>
