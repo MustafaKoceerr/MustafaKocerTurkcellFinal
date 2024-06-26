@@ -8,22 +8,27 @@
 
                 <item
                     android:id="@+id/nav_home"
-                    android:icon="@drawable/ic_temp"
+                    android:icon="@drawable/home_icon"
                     android:title="Home" />
                 <item
                     android:id="@+id/nav_category"
+                    android:icon="@drawable/ic_category"
                     android:title="Category" />
                 <item
                     android:id="@+id/nav_search"
+                    android:icon="@drawable/search_icon"
                     android:title="Search" />
                 <item
                     android:id="@+id/nav_favorite"
+                    android:icon="@drawable/ic_favorite"
                     android:title="Favorite" />
                 <item
                     android:id="@+id/nav_order"
+                    android:icon="@drawable/ic_order"
                     android:title="Order" />
                 <item
                     android:id="@+id/nav_cart"
+                    android:icon="@drawable/ic_shopping_cart"
                     android:title="Cart" />
             </group>
 
@@ -37,9 +42,11 @@
 
                 <item
                     android:id="@+id/nav_profile"
+                    android:icon="@drawable/profile_icon"
                     android:title="Profile" />
                 <item
                     android:id="@+id/nav_logout"
+                    android:icon="@drawable/ic_logout"
                     android:title="Log out" />
             </group>
 

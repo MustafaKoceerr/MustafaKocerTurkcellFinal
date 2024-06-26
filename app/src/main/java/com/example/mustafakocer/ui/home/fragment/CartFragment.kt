@@ -11,7 +11,6 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.mustafakocer.data.db.entity.CartRequest
-import com.example.mustafakocer.data.db.entity.Cart
 import com.example.mustafakocer.data.model.Resource
 import com.example.mustafakocer.databinding.FragmentCartBinding
 import com.example.mustafakocer.ui.base.BaseFragment
@@ -20,7 +19,6 @@ import com.example.mustafakocer.ui.home.viewmodel.CartViewModel
 import com.example.mustafakocer.util.UserId
 import com.example.mustafakocer.util.visibleProgressBar
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 // TODO: Rename parameter arguments, choose names that match
@@ -54,7 +52,7 @@ class CartFragment : BaseFragment<FragmentCartBinding>() {
         super.onViewCreated(view, savedInstanceState)
 
         binding.cartRecyclerView.also {recyclerView ->
-            recyclerView.layoutManager = GridLayoutManager(requireContext(), 1, GridLayoutManager.VERTICAL, false)
+            recyclerView.layoutManager = GridLayoutManager(requireContext(), 2, GridLayoutManager.VERTICAL, false)
         }
 
         getCartFromDB()
@@ -123,11 +121,13 @@ class CartFragment : BaseFragment<FragmentCartBinding>() {
                         // todo recyler view DESING YAP
                         Toast.makeText(requireContext(), "Urunler Geldi${resource.value.products}", Toast.LENGTH_SHORT).show()
                         Log.d("flow","${resource.value.products}")
+                        Log.d("flow","discountedTotal ${resource.value.discountedTotal}")
+
                         // Use the products data to update the UI
                         binding.cartRecyclerView.adapter = CartProductAdapter(resource.value.products!!)
 
                         // todo ürünleri adapter'a pastladım, altta da tasarıma göre resource.value'dan aldığım değerleri kullanacağım.
-                        binding.txtView.setText("Total Price: ${resource.value.total}")
+                        binding.txtView.setText("Cart Total Price: $${resource.value.discountedTotal}")
                     }
 
                     is Resource.Failure -> {

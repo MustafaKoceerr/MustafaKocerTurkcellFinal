@@ -7,29 +7,121 @@
             type="com.example.mustafakocer.data.model.ProductsInCart" />
     </data>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <com.google.android.material.card.MaterialCardView
         android:layout_width="match_parent"
-        android:layout_height="300dp">
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        app:cardCornerRadius="8dp"
+        app:cardElevation="4dp">
 
-        <TextView
-            android:id="@+id/txtView"
-            android:layout_width="wrap_content"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            android:text="@{products_in_cart.title}"
-            android:textSize="20sp"
-            />
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintEnd_toEndOf="@id/txtView"
-            app:layout_constraintStart_toStartOf="@id/txtView"
-            app:layout_constraintTop_toBottomOf="@id/txtView"
-            android:text="@{products_in_cart.price.toString()}"
-            android:textSize="20sp"
-            />
-    </androidx.constraintlayout.widget.ConstraintLayout>
+            android:padding="8dp">
+
+            <!-- Ürün Resmi -->
+            <ImageView
+                android:id="@+id/imgProduct"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_marginBottom="8dp"
+                android:scaleType="centerCrop"
+                app:imageUrl="@{products_in_cart.thumbnail}"
+                app:layout_constraintDimensionRatio="H,1:1"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <!-- Ürün Başlığı -->
+            <TextView
+                android:id="@+id/txtTitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:fontFamily="@font/roboto_bold"
+                android:maxLines="2"
+                android:text="@{products_in_cart.title}"
+                android:textColor="@android:color/black"
+                android:textSize="16sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/imgProduct" />
+
+            <!-- Ürün Fiyatı -->
+            <TextView
+                android:id="@+id/txtPrice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:fontFamily="@font/roboto_medium"
+                android:text="@{products_in_cart.price.toString()}"
+                android:textColor="@color/colorAccent"
+                android:textSize="14sp"
+                app:layout_constraintStart_toStartOf="@id/txtTitle"
+                app:layout_constraintTop_toBottomOf="@id/txtTitle"
+                app:setDiscountedPriceColor="@{products_in_cart.discountPercentage}"
+                app:setStrikeThrough="@{products_in_cart.discountPercentage >0}" />
+
+            <!-- İndirim Yüzdesi -->
+            <TextView
+                android:id="@+id/txtDiscount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:fontFamily="@font/roboto_medium"
+                android:text="INDIRIM YUZDESI"
+                android:textColor="@android:color/holo_red_dark"
+                android:textSize="12sp"
+                app:layout_constraintStart_toEndOf="@id/txtPrice"
+                app:layout_constraintTop_toTopOf="@id/txtPrice"
+                app:setDiscountPercentage="@{products_in_cart.discountPercentage}"
+                app:textViewVisibility="@{products_in_cart.discountPercentage}" />
+
+            <!-- İndirimli Fiyat -->
+            <TextView
+                android:id="@+id/txtDiscountedPrice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/roboto_medium"
+                android:textColor="@color/orange"
+                android:textSize="14sp"
+                app:layout_constraintStart_toStartOf="@id/txtPrice"
+
+                app:layout_constraintTop_toBottomOf="@id/txtPrice"
+                app:product_price="@{products_in_cart.price}"
+                app:discount_percentage="@{products_in_cart.discountPercentage}"
+
+                app:textViewVisibility="@{products_in_cart.discountPercentage}" />
+
+            <!-- Ürün Miktarı -->
+            <TextView
+                android:id="@+id/ratingBar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:fontFamily="@font/roboto_medium"
+                app:setQuantityText="@{products_in_cart.quantity}"
+                app:layout_constraintStart_toStartOf="@id/txtTitle"
+                app:layout_constraintTop_toBottomOf="@id/txtDiscountedPrice"
+                />
+
+            <!-- Total Miktar -->
+            <TextView
+                android:id="@+id/txtTotalPrice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:fontFamily="@font/roboto_medium"
+
+                app:product_price="@{products_in_cart.price}"
+                app:discount_percentage="@{products_in_cart.discountPercentage}"
+                app:product_quantity="@{products_in_cart.quantity}"
+                android:textColor="@android:color/holo_green_dark"
+                app:layout_constraintStart_toStartOf="@id/txtTitle"
+                app:layout_constraintTop_toBottomOf="@id/ratingBar"
+                />
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </com.google.android.material.card.MaterialCardView>
 </layout>

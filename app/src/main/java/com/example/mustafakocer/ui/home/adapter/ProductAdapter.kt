@@ -7,20 +7,21 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.mustafakocer.R
 import com.example.mustafakocer.data.model.Product
 import com.example.mustafakocer.databinding.RecylerviewRowBinding
+import com.example.mustafakocer.databinding.RecylerviewRowVerticalBinding
 
 class ProductAdapter(
     private val productList: List<Product>
 ):RecyclerView.Adapter<ProductAdapter.ProductViewHolder>() {
 
     inner class ProductViewHolder(
-        val recylerviewRowBinding : RecylerviewRowBinding
-    ) : RecyclerView.ViewHolder(recylerviewRowBinding.root)
+        val recylerviewRowVerticalBinding : RecylerviewRowVerticalBinding
+    ) : RecyclerView.ViewHolder(recylerviewRowVerticalBinding.root)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ProductViewHolder {
         return ProductViewHolder(
-            DataBindingUtil.inflate<RecylerviewRowBinding>(
+            DataBindingUtil.inflate<RecylerviewRowVerticalBinding>(
                 LayoutInflater.from(parent.context),
-                R.layout.recylerview_row,
+                R.layout.recylerview_row_vertical,
                 parent,
                 false
             )
@@ -33,18 +34,10 @@ class ProductAdapter(
 
     override fun onBindViewHolder(holder: ProductViewHolder, position: Int) {
 
-        holder.recylerviewRowBinding.product = productList.get(position)
+        holder.recylerviewRowVerticalBinding.product = productList.get(position)
         // bind xml layout with our products
         // todo sepet simgesi ve favorite simgesi koy ve dinle
-        var isLiked = false
-        holder.recylerviewRowBinding.btnLike.setOnClickListener {
-            if (isLiked) {
-                holder.recylerviewRowBinding.btnLike.setImageResource(R.drawable.ic_heart_empty)
-            } else {
-                holder.recylerviewRowBinding.btnLike.setImageResource(R.drawable.ic_heart_filled)
-            }
-            isLiked = !isLiked
-        }
+
 
     }
 

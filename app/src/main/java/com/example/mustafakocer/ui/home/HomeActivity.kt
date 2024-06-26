@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
 import android.view.View
+import android.widget.ImageView
 import android.widget.TextView
 import android.window.OnBackInvokedDispatcher
 import androidx.activity.viewModels
@@ -20,6 +21,7 @@ import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
+import com.bumptech.glide.Glide
 import com.example.mustafakocer.R
 import com.example.mustafakocer.databinding.ActivityHomeBinding
 import com.example.mustafakocer.ui.home.viewmodel.HomeActivityViewModel
@@ -83,10 +85,15 @@ class HomeActivity : AppCompatActivity() {
             return@setNavigationItemSelectedListener navigationItemSelected(it)
         }
 
+
         binding.navView.bringToFront()
         val toggle : ActionBarDrawerToggle = ActionBarDrawerToggle(this@HomeActivity,binding.drawerLayout,toolbar,R.string.navigation_drawer_open, R.string.navigation_drawer_close)
+
         binding.drawerLayout.addDrawerListener(toggle)
+
         toggle.syncState()
+
+        toolbar.setNavigationIcon(R.drawable.ic_shopping_cart)
 
 
     }
@@ -157,10 +164,26 @@ class HomeActivity : AppCompatActivity() {
                     val headerView :View = binding.navView
                     val headerName = headerView.findViewById<TextView>(R.id.txtNameHeader)
                     val headerMail = headerView.findViewById<TextView>(R.id.txtMailHeader)
-                    val fullName = it.firstName + it.lastName
-                    headerName.setText(fullName)
-                    headerMail.setText(it.email)
-                    UserId.userId = it.id.toInt()
+
+                    val headerImage = headerView.findViewById<ImageView>(R.id.imgViewHeader)
+
+                    it.image?.let { imageUrl ->
+                        Glide.with(this@HomeActivity)
+                            .load(imageUrl)
+                            .into(headerImage)
+                    }
+
+                    it.email?.let { email ->
+                        headerMail.text = email
+
+                        // İsim kontrolünü ve atamasını burada yapalım
+                        val fullName = it.firstName + it.lastName
+                        headerName.text = fullName
+                    }
+
+                    it.id?.let { id ->
+                        UserId.userId = id.toInt()
+                    }
 
                 }
                 if (resource==null)

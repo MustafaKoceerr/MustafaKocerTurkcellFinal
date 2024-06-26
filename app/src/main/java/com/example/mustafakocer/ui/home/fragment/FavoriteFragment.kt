@@ -54,7 +54,7 @@ class FavoriteFragment : BaseFragment<FragmentFavoriteBinding>() {
 
         binding.favoriteRecyclerView.also { recyclerView ->
             recyclerView.layoutManager =
-                GridLayoutManager(requireContext(), 1, GridLayoutManager.VERTICAL, false)
+                GridLayoutManager(requireContext(), 2, GridLayoutManager.VERTICAL, false)
         }
         viewModel.getAllLikedProducts(UserId.userId)
         observeFavorites()

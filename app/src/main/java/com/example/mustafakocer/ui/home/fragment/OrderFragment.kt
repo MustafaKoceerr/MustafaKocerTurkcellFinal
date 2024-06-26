@@ -2,30 +2,23 @@ package com.example.mustafakocer.ui.home.fragment
 
 import android.os.Bundle
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
-import com.example.mustafakocer.R
 import com.example.mustafakocer.data.model.Resource
-import com.example.mustafakocer.ui.base.BaseFragment
 import com.example.mustafakocer.databinding.FragmentOrderBinding
-import com.example.mustafakocer.ui.home.adapter.CartProductAdapter
+import com.example.mustafakocer.ui.base.BaseFragment
 import com.example.mustafakocer.ui.home.adapter.OrderProductAdapter
-import com.example.mustafakocer.ui.home.adapter.ProductAdapter2
-import com.example.mustafakocer.ui.home.viewmodel.HomeViewModel
 import com.example.mustafakocer.ui.home.viewmodel.OrderViewModel
-import com.example.mustafakocer.util.UserId
 import com.example.mustafakocer.util.visibleProgressBar
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -56,7 +49,7 @@ class OrderFragment : BaseFragment<FragmentOrderBinding>() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-    // // todo api'den order çekilecek
+        // // todo api'den order çekilecek
         binding.orderRecyclerView.also { recyclerView ->
             recyclerView.layoutManager =
                 GridLayoutManager(requireContext(), 1, GridLayoutManager.VERTICAL, false)
@@ -73,7 +66,7 @@ class OrderFragment : BaseFragment<FragmentOrderBinding>() {
         inflater: LayoutInflater,
         container: ViewGroup?
     ): FragmentOrderBinding {
-        return FragmentOrderBinding.inflate(inflater,container,false)
+        return FragmentOrderBinding.inflate(inflater, container, false)
     }
 
     private fun observeOrder() {
@@ -101,7 +94,7 @@ class OrderFragment : BaseFragment<FragmentOrderBinding>() {
                             Toast.LENGTH_SHORT
                         ).show()
                         Log.d("flow", "${resource.value}")
-                            val temp = resource.value.carts
+                        val temp = resource.value.carts
                         Log.d("temp", "listem : ${temp.size}")
 
                         binding.orderRecyclerView.adapter =
@@ -129,7 +122,6 @@ class OrderFragment : BaseFragment<FragmentOrderBinding>() {
 
         }
     }
-
 
 
     companion object {

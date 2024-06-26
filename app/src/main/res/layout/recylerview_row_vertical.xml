@@ -10,7 +10,6 @@
             type="com.example.mustafakocer.data.model.Product" />
     </data>
 
-
     <com.google.android.material.card.MaterialCardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -28,12 +27,11 @@
                 android:id="@+id/imgProduct"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
-                android:layout_marginEnd="8dp"
+                android:layout_marginBottom="8dp"
                 android:scaleType="centerCrop"
                 app:imageUrl="@{product.images.get(0)}"
-                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintDimensionRatio="H,1:1"
-                app:layout_constraintEnd_toStartOf="@+id/guideline"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -49,9 +47,8 @@
                 android:textColor="@android:color/black"
                 android:textSize="16sp"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0"
-                app:layout_constraintStart_toStartOf="@id/guideline"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/imgProduct" />
 
             <!-- Ürün Fiyatı -->
             <TextView
@@ -62,11 +59,11 @@
                 android:fontFamily="@font/roboto_medium"
                 android:text="@{product.price.toString()}"
                 android:textColor="@color/colorAccent"
-                app:setStrikeThrough="@{product.discountPercentage >0}"
                 android:textSize="14sp"
                 app:layout_constraintStart_toStartOf="@id/txtTitle"
+                app:layout_constraintTop_toBottomOf="@id/txtTitle"
                 app:setDiscountedPriceColor="@{product.discountPercentage}"
-                app:layout_constraintTop_toBottomOf="@id/txtTitle" />
+                app:setStrikeThrough="@{product.discountPercentage >0}" />
 
             <!-- İndirim Yüzdesi -->
             <TextView
@@ -75,12 +72,13 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
                 android:fontFamily="@font/roboto_medium"
-                app:setDiscountPercentage="@{product.discountPercentage}"
+                android:text="INDIRIM YUZDESI"
                 android:textColor="@android:color/holo_red_dark"
                 android:textSize="12sp"
-                app:textViewVisibility="@{product.discountPercentage}"
                 app:layout_constraintStart_toEndOf="@id/txtPrice"
-                app:layout_constraintTop_toTopOf="@id/txtPrice" />
+                app:layout_constraintTop_toTopOf="@id/txtPrice"
+                app:setDiscountPercentage="@{product.discountPercentage}"
+                app:textViewVisibility="@{product.discountPercentage}" />
 
             <!-- İndirimli Fiyat -->
             <TextView
@@ -92,27 +90,28 @@
                 android:textSize="14sp"
 
                 app:discount_percentage="@{product.discountPercentage}"
+                app:layout_constraintStart_toStartOf="@id/txtPrice"
+
+                app:layout_constraintTop_toBottomOf="@id/txtPrice"
                 app:product_price="@{product.price}"
 
-                app:textViewVisibility="@{product.discountPercentage}"
-                app:layout_constraintStart_toStartOf="@id/txtPrice"
-                app:layout_constraintTop_toBottomOf="@id/txtPrice" />
+                app:textViewVisibility="@{product.discountPercentage}" />
 
             <!-- Ürün Puanı -->
             <RatingBar
                 android:id="@+id/ratingBar"
+                style="?android:attr/ratingBarStyleSmall"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
+                android:fontFamily="@font/roboto_medium"
                 android:numStars="5"
                 android:stepSize="0.5"
-                style="?android:attr/ratingBarStyleSmall"
-                app:set_rating="@{product.rating}"
-                android:textColor="@android:color/darker_gray"
-                android:textSize="12sp"
+                android:text="PUAN"
                 android:theme="@style/RatingBar"
                 app:layout_constraintStart_toStartOf="@id/txtTitle"
-                app:layout_constraintTop_toBottomOf="@id/txtDiscountedPrice" />
+                app:layout_constraintTop_toBottomOf="@id/txtDiscountedPrice"
+                app:set_rating="@{product.rating}" />
 
             <!-- Stok Durumu -->
             <TextView
@@ -121,74 +120,14 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
                 android:fontFamily="@font/roboto_medium"
+                android:text="STOK"
                 android:textColor="@android:color/holo_green_dark"
                 android:textSize="12sp"
                 app:layout_constraintStart_toStartOf="@id/txtTitle"
                 app:layout_constraintTop_toBottomOf="@id/ratingBar"
                 app:stockStatus="@{product.stock}" />
 
-            <!-- Like Butonu -->
-            <ImageButton
-                android:id="@+id/btnLike"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="20dp"
-                android:layout_marginTop="20dp"
-                android:backgroundTint="@color/transparent"
-                android:src="@drawable/ic_heart_empty"
-                app:layout_constraintStart_toEndOf="@id/layoutCartOperations"
-                app:layout_constraintTop_toBottomOf="@id/txtStock"
-                tools:ignore="SpeakableTextPresentCheck" />
 
-            <!-- Sepet İşlemleri -->
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/layoutCartOperations"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:layout_constraintBottom_toBottomOf="@id/btnLike"
-                app:layout_constraintStart_toStartOf="@id/txtTitle"
-                app:layout_constraintTop_toTopOf="@id/btnLike">
-
-                <ImageView
-                    android:id="@+id/imgCart"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:backgroundTint="@color/transparent"
-                    android:src="@drawable/ic_shopping_cart"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-                <ImageButton
-                    android:id="@+id/btnPlus"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:backgroundTint="@color/transparent"
-                    android:src="@drawable/ic_plus"
-                    app:layout_constraintBottom_toBottomOf="@id/imgCart"
-                    app:layout_constraintStart_toEndOf="@id/imgCart"
-                    app:layout_constraintTop_toTopOf="@id/imgCart"
-                    tools:ignore="SpeakableTextPresentCheck" />
-
-                <ImageButton
-                    android:id="@+id/btnMinus"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:backgroundTint="@color/transparent"
-                    android:src="@drawable/ic_minus"
-                    app:layout_constraintBottom_toBottomOf="@id/imgCart"
-                    app:layout_constraintEnd_toStartOf="@id/imgCart"
-                    app:layout_constraintTop_toTopOf="@id/imgCart"
-                    tools:ignore="SpeakableTextPresentCheck" />
-            </androidx.constraintlayout.widget.ConstraintLayout>
-
-            <androidx.constraintlayout.widget.Guideline
-                android:id="@+id/guideline"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                app:layout_constraintGuide_percent="0.4" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </com.google.android.material.card.MaterialCardView>
 </layout>

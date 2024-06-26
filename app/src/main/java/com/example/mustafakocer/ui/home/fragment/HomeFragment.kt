@@ -69,8 +69,6 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(), LikeButtonClickListene
         binding.txtView.setText("SELAMLAR ISTE BASARDIN")
 
 
-
-
         /*
         database listesi getirilecek ve user id getirilecek.
          */
@@ -81,7 +79,6 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(), LikeButtonClickListene
         }
         viewModel.getProducts()
         observeProducts()
-
 
 
     }
@@ -156,14 +153,19 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(), LikeButtonClickListene
 
                         Log.d("likedProductList", "Listem geldi $likedProductList")
 
-                        productIdList = likedProductList!!.mapNotNull { it.productId }.toMutableList()
+                        productIdList =
+                            likedProductList!!.mapNotNull { it.productId }.toMutableList()
                         Log.d("likedProductList", "ID LIST $productIdList")
 
-                        if (isAdapterAttached==0){
+                        if (isAdapterAttached == 0) {
                             binding.homeRecyclerView.adapter =
-                                ProductAdapter2(resource.value.products, this@HomeFragment, productIdList)
+                                ProductAdapter2(
+                                    resource.value.products,
+                                    this@HomeFragment,
+                                    productIdList
+                                )
                             isAdapterAttached++
-                        }else{
+                        } else {
                             binding.homeRecyclerView.adapter!!.notifyDataSetChanged()
                         }
 
@@ -190,7 +192,6 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(), LikeButtonClickListene
     }
 
 
-
     override fun onRecyclerViewItemClick(view: View, product: Product) {
         when (view.id) {
             R.id.btnLike -> {
@@ -202,28 +203,29 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(), LikeButtonClickListene
                 viewLifecycleOwner.lifecycleScope.launch {
                     val value = viewModel.getOneProductsDB(UserId.userId, product.id!!)
 
-                    if(value==null){
+                    if (value == null) {
                         val likedProduct = LikedProduct(null, UserId.userId, 0, product.id, product)
                         viewModel.insertProductDB(likedProduct)
                         productIdList.add(product.id!!)
-                    }else{
+                    } else {
                         viewModel.deleteProductDB(UserId.userId, product.id!!)
                         productIdList.remove(product.id)
                     }
                     updateLikeButton()
                 }
             }
+
             R.id.btnPlus -> {
-                Toast.makeText(requireContext(),"plus",Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), "plus", Toast.LENGTH_SHORT).show()
                 viewLifecycleOwner.lifecycleScope.launch {
                     val cart = viewModel.GetOneCart(UserId.userId, product.id!!)
 
-                    if(cart==null){
+                    if (cart == null) {
                         // üründen yoktur 1 tane ekle
-                        val addedCart = Cart(null, UserId.userId,product.id,1)
+                        val addedCart = Cart(null, UserId.userId, product.id, 1)
                         viewModel.InsertCart(addedCart)
                         // todo snackbar göster
-                    }else{
+                    } else {
                         // üründen var sayısını arttır.
                         val updatedCart = cart.copy(quantity = cart.quantity!! + 1)
                         viewModel.UpdateCart(updatedCart)
@@ -232,22 +234,22 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(), LikeButtonClickListene
                 }
 
             }
+
             R.id.btnMinus -> {
-                Toast.makeText(requireContext(),"minus",Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), "minus", Toast.LENGTH_SHORT).show()
                 viewLifecycleOwner.lifecycleScope.launch {
                     val cart = viewModel.GetOneCart(UserId.userId, product.id!!)
 
-                    if(cart==null){
+                    if (cart == null) {
                         // üründen yoktur bir işlem yapma
                         // todo snackbar göster
-                    }else{
+                    } else {
                         // üründen var sayısını azalt.
-                        val quantity = cart.quantity!! -1
-                        if (quantity==0){
+                        val quantity = cart.quantity!! - 1
+                        if (quantity == 0) {
                             // sil
                             viewModel.DeleteCart(cart.userId, cart.id!!)
-                        }
-                        else{
+                        } else {
                             val updatedCart = cart.copy(quantity = quantity)
                             viewModel.UpdateCart(updatedCart)
                         }
@@ -260,19 +262,10 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(), LikeButtonClickListene
         }
     }
 
-    private fun updateLikeButton(){
+    private fun updateLikeButton() {
         binding.homeRecyclerView.adapter!!.notifyDataSetChanged()
 
     }
 
-    private fun likeButtonClick(likeButton: ImageButton) {
-        var isLiked = likeButton.tag as? Boolean ?: false
-        if (isLiked) {
-            likeButton.setImageResource(R.drawable.ic_heart_empty)
-        } else {
-            likeButton.setImageResource(R.drawable.ic_heart_filled)
-        }
-        isLiked = !isLiked
-        likeButton.tag = isLiked
-    }
+
 }

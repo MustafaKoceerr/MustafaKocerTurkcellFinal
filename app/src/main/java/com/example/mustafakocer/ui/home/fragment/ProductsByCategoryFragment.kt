@@ -54,7 +54,7 @@ class ProductsByCategoryFragment : BaseFragment<FragmentProductsByCategoryBindin
         val categoryName = args.categoryName
         // we get categoryName from categoryFragment. Now we can send it as parameter to viewModel
         binding.productsByCategoryRecyclerView.also { recyclerView ->
-            recyclerView.layoutManager = GridLayoutManager(requireContext(),1,GridLayoutManager.VERTICAL,false)
+            recyclerView.layoutManager = GridLayoutManager(requireContext(),2,GridLayoutManager.VERTICAL,false)
         }
 
         // todo sepete veya favoriye tıklayınca gitmesi lazım

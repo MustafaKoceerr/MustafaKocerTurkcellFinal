@@ -35,12 +35,16 @@
         <TextView
             android:id="@+id/txtView"
             android:layout_width="match_parent"
-            android:layout_height="30dp"
+            android:layout_height="wrap_content"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="@id/cartRecyclerView"
             app:layout_constraintStart_toStartOf="@id/cartRecyclerView"
-            android:layout_marginBottom="5dp"
+            android:layout_marginBottom="10dp"
+            android:padding="8dp"
+            android:fontFamily="@font/roboto_bold"
             android:textSize="20sp"
+            android:textColor="@color/black"
+            android:layout_marginStart="5dp"
             />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
