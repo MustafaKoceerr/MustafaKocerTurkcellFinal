@@ -1,5 +1,7 @@
 package com.example.mustafakocer.ui.home.viewmodel
 
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.mustafakocer.data.PreferenceKeys
@@ -21,20 +23,35 @@ class ProfileViewModel @Inject constructor(
     private val databaseRepository: DatabaseRepository,
     ):ViewModel() {
 
-    private val _user = MutableStateFlow<Resource<User>>(Resource.Waiting)
-    val user: StateFlow<Resource<User>> = _user.asStateFlow()
+    /*
+    private val _updateUser = MutableStateFlow<Resource<User>>(Resource.Waiting)
+    val updateUser: StateFlow<Resource<User>> = _updateUser.asStateFlow()
 
-    fun getUser(token: String) {
+    fun UpdateUser(userId: Int, user: User) {
         viewModelScope.launch {
-            _user.value = Resource.Loading
-            // Make the API call
-            val response = repository.getLoggedUserRepo(token)
-            // assign the value, it can be success or failure
-            _user.value = response
+            _updateUser.value = Resource.Loading
+            // Simulate login action or make API call
+            val result = repository.updateUser(userId, user)
+            _updateUser.value = Resource.Loading
+
+            _updateUser.value = result
+
+        }
+    }
+     */
+    private val _updateUser = MutableLiveData<Resource<User>>()
+    val updateUser: LiveData<Resource<User>> get() = _updateUser
+
+    fun UpdateUser(userId: Int, user: User) {
+        viewModelScope.launch {
+            _updateUser.value = Resource.Loading
+
+            // Simulate update action or make API call
+            val result = repository.updateUser(userId, user)
+
+            _updateUser.value = result
         }
     }
 
-    fun getAuthToken(): Flow<String?> {
-        return databaseRepository.collectPreferencesRepo(PreferenceKeys.KEY_AUTH)
-    }
+
 }

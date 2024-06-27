@@ -55,29 +55,7 @@ class ProductAdapterHome(
         holder.recylerviewRowBinding.btnMinus.setOnClickListener {
             likeButtonClickListener.onRecyclerViewItemClick(it!!, productList.get(position))
         }
-     /*
-        holder.recylerviewRowBinding.btnLike.setOnClickListener {
-            if (isLiked) {
-                holder.recylerviewRowBinding.btnLike.setImageResource(R.drawable.ic_heart_empty)
-            } else {
-                holder.recylerviewRowBinding.btnLike.setImageResource(R.drawable.ic_heart_filled)
-            }
-            isLiked = !isLiked
-            likeButtonClickListener.onRecyclerViewItemClick(it!!,productList.get(position))
-        }
-      */
 
     }
-
-
-    /*
-      fun updateProducts(newProducts: List<Product>) {
-        productList = newProducts
-        notifyDataSetChanged()
-    }
-     */
-    //                         productAdapter.updateProducts(products)  // Assuming you have this method in your adapter
-    // bunu da flow'dan verileri alınca çağırıcam
-
 
 }

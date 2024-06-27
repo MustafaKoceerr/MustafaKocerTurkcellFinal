@@ -1,27 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
     <data>
 
     </data>
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        android:id="@+id/profileFragmentRoot"
-        tools:context=".ui.home.fragment.ProfileFragment">
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:text="PROFILE FRAGMENT"
-            android:textSize="40sp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:id="@+id/profileFragmentRoot"
+        android:padding="16dp">
 
         <ProgressBar
             android:id="@+id/progressbar"
@@ -32,7 +22,212 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             android:visibility="invisible"/>
-    </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <!-- First Name -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:id="@+id/txtFirstName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="First Name"
+                android:textSize="16sp"
+                android:textColor="@color/black"
+                android:layout_marginEnd="8dp"/>
+
+            <EditText
+                android:id="@+id/editFirstName"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textSize="16sp"
+                android:hint="Enter First Name"
+                android:inputType="text"
+                android:background="@android:drawable/edit_text"
+                android:padding="8dp"/>
+        </LinearLayout>
+
+        <!-- Last Name -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:id="@+id/txtLastName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Last Name"
+                android:textSize="16sp"
+                android:textColor="@color/black"
+                android:layout_marginEnd="8dp"/>
+
+            <EditText
+                android:id="@+id/editLastName"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textSize="16sp"
+                android:hint="Enter Last Name"
+                android:inputType="text"
+                android:background="@android:drawable/edit_text"
+                android:padding="8dp"/>
+        </LinearLayout>
+
+        <!-- Age -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:id="@+id/txtAge"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Age"
+                android:textSize="16sp"
+                android:textColor="@color/black"
+                android:layout_marginEnd="8dp"/>
+
+            <EditText
+                android:id="@+id/editAge"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textSize="16sp"
+                android:hint="Enter Age"
+                android:inputType="number"
+                android:background="@android:drawable/edit_text"
+                android:padding="8dp"/>
+        </LinearLayout>
+
+        <!-- Gender -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:id="@+id/txtGender"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Gender"
+                android:textSize="16sp"
+                android:textColor="@color/black"
+                android:layout_marginEnd="8dp"/>
+
+            <EditText
+                android:id="@+id/editGender"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textSize="16sp"
+                android:hint="Enter Gender"
+                android:inputType="text"
+                android:background="@android:drawable/edit_text"
+                android:padding="8dp"/>
+        </LinearLayout>
+
+        <!-- Email -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:id="@+id/txtEmail"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Email"
+                android:textSize="16sp"
+                android:textColor="@color/black"
+                android:layout_marginEnd="8dp"/>
+
+            <EditText
+                android:id="@+id/editEmail"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textSize="16sp"
+                android:hint="Enter Email"
+                android:inputType="textEmailAddress"
+                android:background="@android:drawable/edit_text"
+                android:padding="8dp"/>
+        </LinearLayout>
+
+        <!-- Phone -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:id="@+id/txtPhone"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Phone"
+                android:textSize="16sp"
+                android:textColor="@color/black"
+                android:layout_marginEnd="8dp"/>
+
+            <EditText
+                android:id="@+id/editPhone"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textSize="16sp"
+                android:hint="Enter Phone Number"
+                android:inputType="phone"
+                android:background="@android:drawable/edit_text"
+                android:padding="8dp"/>
+        </LinearLayout>
+
+        <!-- Username -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:id="@+id/txtUsername"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Username"
+                android:textSize="16sp"
+                android:textColor="@color/black"
+                android:layout_marginEnd="8dp"/>
+
+            <EditText
+                android:id="@+id/editUsername"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textSize="16sp"
+                android:hint="Enter Username"
+                android:inputType="text"
+                android:background="@android:drawable/edit_text"
+                android:padding="8dp"/>
+        </LinearLayout>
+        <Button
+            android:id="@+id/btnUpdateUser"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Update User"
+            android:textColor="@android:color/white"
+            android:backgroundTint="@color/dark_blue"
+            android:layout_margin="16dp"/>
+
+    </LinearLayout>
 
 
 

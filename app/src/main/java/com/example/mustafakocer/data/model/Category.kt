@@ -1,6 +1,5 @@
 package com.example.mustafakocer.data.model
 
-import com.google.gson.annotations.SerializedName
 
 typealias Categories = List<Category>
 

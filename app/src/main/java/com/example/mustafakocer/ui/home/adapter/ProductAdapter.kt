@@ -34,21 +34,7 @@ class ProductAdapter(
     override fun onBindViewHolder(holder: ProductViewHolder, position: Int) {
 
         holder.recylerviewRowVerticalBinding.product = productList.get(position)
-        // bind xml layout with our products
-        // todo sepet simgesi ve favorite simgesi koy ve dinle
-
 
     }
-
-
-    /*
-      fun updateProducts(newProducts: List<Product>) {
-        productList = newProducts
-        notifyDataSetChanged()
-    }
-     */
-    //                         productAdapter.updateProducts(products)  // Assuming you have this method in your adapter
-    // bunu da flow'dan verileri alınca çağırıcam
-
 
 }

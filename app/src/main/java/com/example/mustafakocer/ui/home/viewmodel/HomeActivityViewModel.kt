@@ -1,5 +1,6 @@
 package com.example.mustafakocer.ui.home.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -42,26 +43,29 @@ class HomeActivityViewModel @Inject constructor(
     }
 
 
-
     private val _userInfo = MutableStateFlow<BasicUserInfo?>(null)
     val userInfo: StateFlow<BasicUserInfo?> = _userInfo.asStateFlow()
-     fun getUser() {
-         viewModelScope.launch {
-             // Make the API call
-             val result = databaseRepository.getUser()
-             // assign the value, it can be success or failure
-             _userInfo.value = result
-         }
+    fun getUser() {
+        viewModelScope.launch {
+            // Make the API call
+            val result = databaseRepository.getUser()
+            // assign the value, it can be success or failure
+            Log.d("problem", "get user result $result")
+
+            _userInfo.value = result
+        }
     }
 
-    suspend fun deleteUser():Int{
+
+    suspend fun deleteUser(): Int {
         val result = databaseRepository.deleteUser()
         return result
     }
+
     // NOT BU İŞLEMLER YAPILMADAN LOGİN ACTİVİTY'YE GEÇMESİNİ İSTEMEDİĞİM İÇİN
     // BUNLARA SUSPEND VERDİM VE MAİN'DE ÇAĞIRACAĞIM
     suspend fun clearDataStore() {
-            databaseRepository.clearDataStoreRepo()
+        databaseRepository.clearDataStoreRepo()
     }
 
 

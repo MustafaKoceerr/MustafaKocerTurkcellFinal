@@ -3,6 +3,7 @@ package com.example.mustafakocer.ui.home
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.ImageView
@@ -10,11 +11,13 @@ import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.view.ActionMode
 import androidx.appcompat.widget.Toolbar
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.NavOptions
+import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
@@ -25,9 +28,7 @@ import com.example.mustafakocer.databinding.ActivityHomeBinding
 import com.example.mustafakocer.ui.home.viewmodel.HomeActivityViewModel
 import com.example.mustafakocer.ui.login.LoginActivity
 import com.example.mustafakocer.util.UserId
-import com.example.mustafakocer.util.showToast
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 
@@ -43,9 +44,10 @@ class HomeActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_home)
         setContentView(binding.root)
+        viewModel.getUser()
 
         observeUser()
-        viewModel.getUser()
+
 
         val toolbar = binding.toolbar as Toolbar
         if (toolbar != null) {
@@ -70,6 +72,21 @@ class HomeActivity : AppCompatActivity() {
         setupActionBarWithNavController(navController, appBarConfiguration)
         binding.navView.setupWithNavController(navController)
 
+        navController.addOnDestinationChangedListener { _, destination, _ ->
+            supportActionBar?.title = when (destination.id) {
+                R.id.homeFragment -> "Home"
+                R.id.categoryFragment -> "Categories"
+                R.id.productsByCategoryFragment -> "Products by Categories"
+                R.id.searchFragment -> "Search"
+                R.id.favoriteFragment -> "Favorites"
+                R.id.orderFragment -> "Orders"
+                R.id.profileFragment -> "Profile"
+                R.id.cartFragment -> "Cart"
+                else -> "Home" // Varsayılan başlık
+            }
+
+        }
+
         binding.navView.setNavigationItemSelectedListener { it: MenuItem ->
             return@setNavigationItemSelectedListener navigationItemSelected(it)
         }
@@ -84,13 +101,12 @@ class HomeActivity : AppCompatActivity() {
         )
         binding.drawerLayout.addDrawerListener(toggle)
         toggle.syncState()
-        toolbar.setNavigationIcon(R.drawable.ic_shopping_cart)
+
     }
 
     private fun navigationItemSelected(it: MenuItem): Boolean {
         when (it.itemId) {
             R.id.nav_home -> {
-                this.showToast("home")
                 switchFragment(R.id.homeFragment)
             }
 
@@ -126,6 +142,7 @@ class HomeActivity : AppCompatActivity() {
             }
 
             else -> {
+
                 return false
             }
         }
@@ -150,9 +167,10 @@ class HomeActivity : AppCompatActivity() {
         this.lifecycleScope.launch {
 
             viewModel.userInfo.collect { resource ->
+
                 resource?.let {
-                    Log.d("getuser", "Buraya girdi ve resource $it")
-                    val headerView: View = binding.navView
+
+                    val headerView: View = binding.navView.getHeaderView(0)
                     val headerName = headerView.findViewById<TextView>(R.id.txtNameHeader)
                     val headerMail = headerView.findViewById<TextView>(R.id.txtMailHeader)
                     val headerImage = headerView.findViewById<ImageView>(R.id.imgViewHeader)

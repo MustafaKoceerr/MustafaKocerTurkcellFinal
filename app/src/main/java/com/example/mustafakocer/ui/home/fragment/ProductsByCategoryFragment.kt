@@ -1,11 +1,9 @@
 package com.example.mustafakocer.ui.home.fragment
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.navArgs
@@ -36,7 +34,6 @@ class ProductsByCategoryFragment : BaseFragment<FragmentProductsByCategoryBindin
             recyclerView.layoutManager = GridLayoutManager(requireContext(),2,GridLayoutManager.VERTICAL,false)
         }
 
-        // todo sepete veya favoriye tıklayınca gitmesi lazım
         observeProductsByCategories()
 
         viewModel.getProductsByCategory(categoryName)
@@ -62,15 +59,10 @@ class ProductsByCategoryFragment : BaseFragment<FragmentProductsByCategoryBindin
                     }
                     is Resource.Success -> {
                         // Update UI with products data
-                        Toast.makeText(requireContext(), "Kategoriler Geldi${resource.value}", Toast.LENGTH_SHORT).show()
-                        Log.d("flow","${resource.value}")
-                        // Use the products data to update the UI
                         binding.productsByCategoryRecyclerView.adapter = ProductAdapter(resource.value.products)
                     }
 
                     is Resource.Failure -> {
-                        Toast.makeText(requireContext(), "Hata ${resource.errorCode}  ${resource.errorBody}", Toast.LENGTH_SHORT).show()
-                        Log.d("Hata","${resource.errorCode}  ${resource.errorBody}")
 
                     }
                     is Resource.Waiting ->{

@@ -15,7 +15,7 @@ abstract class BaseRepository {
         return withContext(Dispatchers.IO) {
             try {
                 val temp = apiCall.invoke()
-                Log.d("Error", "api call atildii temp $temp ")
+                Log.d("Error", "api call senden $temp ")
 
                 // invoke() ile bizim retrofit isteğimizi attık, bunu coroutines içinde
                 // çağırdığımıza dikkat et.
@@ -35,7 +35,6 @@ abstract class BaseRepository {
                     }
 
                     else -> {
-                        Log.d("Error", "Buraya girdim, category ")
                         Resource.Failure(isNetworkError = true, null, null)
                     }
                 }
