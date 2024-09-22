@@ -7,16 +7,15 @@ import com.example.mustafakocer.data.model.LoginResponse
 import com.example.mustafakocer.data.model.OrderResponse
 import com.example.mustafakocer.data.model.Products
 import com.example.mustafakocer.data.model.User
-import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.Body
 import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
 import retrofit2.http.GET
-import retrofit2.http.Header
 import retrofit2.http.Headers
 import retrofit2.http.POST
+import retrofit2.http.PUT
 import retrofit2.http.Path
 import retrofit2.http.Query
 
@@ -48,10 +47,6 @@ interface IDummyApi {
     suspend fun getProductsByCategory(@Path("category_name") categoryName: String): Products
 
 
-    @GET("users/{id}")
-    suspend fun getUserById(@Path("id") id: Int): User
-
-
     @GET("products/search")
     suspend fun searchProducts(@Query("q") query: String): Products
 
@@ -73,10 +68,10 @@ interface IDummyApi {
     suspend fun getCartsByUser(@Path("id") id: String): OrderResponse
 
 
-    @GET("user/me")
-    suspend fun getLoggedUser(
-        @Header("Authorization") authToken: String
+    @PUT("users/{id}")
+    suspend fun updateUser(
+        @Path("id") userId: Int,
+        @Body user: User
     ): User
-
 
 }

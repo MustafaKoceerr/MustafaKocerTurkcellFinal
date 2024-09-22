@@ -15,7 +15,7 @@ abstract class BaseRepository {
         return withContext(Dispatchers.IO) {
             try {
                 val temp = apiCall.invoke()
-                Log.d("Error", "api call atildii temp $temp ")
+                Log.d("Error", "api call senden $temp ")
 
                 // invoke() ile bizim retrofit isteğimizi attık, bunu coroutines içinde
                 // çağırdığımıza dikkat et.
@@ -25,6 +25,8 @@ abstract class BaseRepository {
 
                 // T Login için User class'ıydı, yani Success fonksiyonun T'si de user class'ı olacak
             } catch (throwable: Throwable) {
+                Log.d("Error", "hat amesajın ${throwable.message} ")
+
                 when (throwable) {
                     is HttpException -> {
                         Resource.Failure(
@@ -35,7 +37,6 @@ abstract class BaseRepository {
                     }
 
                     else -> {
-                        Log.d("Error", "Buraya girdim, category ")
                         Resource.Failure(isNetworkError = true, null, null)
                     }
                 }

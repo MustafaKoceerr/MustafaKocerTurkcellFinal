@@ -36,13 +36,6 @@ class NetworkRepository @Inject constructor(
     }
 
 
-    suspend fun getUserRepo(userId: Int): Resource<User> {
-        return safeApiCall {
-            api.getUserById(userId)
-        }
-    }
-
-
     suspend fun searchProductsRepo(query: String): Resource<Products> {
         return safeApiCall {
             api.searchProducts(query)
@@ -69,9 +62,10 @@ class NetworkRepository @Inject constructor(
         }
     }
 
-    suspend fun getLoggedUserRepo(token: String): Resource<User> {
+    suspend fun updateUser(userId:Int, user :User): Resource<User> {
         return safeApiCall {
-            api.getLoggedUser(token)
+            api.updateUser(userId,user)
         }
     }
+
 }

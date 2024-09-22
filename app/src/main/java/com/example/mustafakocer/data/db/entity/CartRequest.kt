@@ -8,9 +8,6 @@ import com.google.gson.annotations.SerializedName
 data class CartRequest(
     val userId: Int,
     val products: List<Cart>
-    // api böyle istediği için böyle gönderiyorum
-    // yani ben api'ye bunları göndersem yeterli, api bana gönderdiğim ürünleri tekrar döndürüyor
-    // onları da alıp sepetim kısmında listeleteceğim.
 )
 
 @Entity(tableName = "cart_list")

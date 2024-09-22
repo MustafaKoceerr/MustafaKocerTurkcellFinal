@@ -33,17 +33,14 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(), LikeButtonClickListene
 
     private var isAdapterAttached = 0
 
-
+    /**
+     * Life cycle aware olmak ne demek? nasıl çalışıyor?
+     */
     private val viewModel: HomeViewModel by viewModels()
     private lateinit var productIdList: MutableList<Int>
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-
-        /*
-        database listesi getirilecek ve user id getirilecek.
-         */
 
         binding.homeRecyclerView.also { recyclerView ->
             recyclerView.layoutManager =
@@ -51,7 +48,6 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(), LikeButtonClickListene
         }
         viewModel.getProducts()
         observeProducts()
-
 
     }
 
@@ -65,48 +61,25 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(), LikeButtonClickListene
 
     private fun observeProducts() {
         viewLifecycleOwner.lifecycleScope.launch {
-            /*
-            When collecting from a StateFlow in your UI, you should typically use Dispatchers.Main.
-            This is because you usually want to update the UI in response to the collected state,
-            and all UI updates must occur on the main thread.
-             */
+
             viewModel.products.collectLatest { resource ->
                 binding.progressbar.visibleProgressBar(false)
 
                 when (resource) {
                     is Resource.Loading -> {
-                        // Show loading indicator
                         binding.progressbar.visibleProgressBar(true)
                     }
 
                     is Resource.Success -> {
                         // Update UI with products data
-                        // todo recyler view DESING YAP
-                        Toast.makeText(
-                            requireContext(),
-                            "Urunler Geldi${resource.value.products}",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                        Log.d("flow", "${resource.value.products}")
-                        // Use the products data to update the UI
-                        /*
-                        database'den islike = true olanı çek.
-                        onların id'lerini al.
-                        id'leri liste halinde alıp recylerview'e gönder.
-                        recycler view'de karşılaştırma ya, eğer ürünün id'si çektiğin id listesinde var ise, kalbi kırmızı yaptırt
-                        yok ise bir şey yaptırtma.
 
-                        var ise ve tekrar tıklandıysa, update ile isliked'ı false yap, değiştir.
-
-                         */
                         val likedProductList = withContext(Dispatchers.IO) {
                             viewModel.gelAllLikedProductsDB(UserId.userId)
                         }
 
-                        Log.d("likedProductList", "Listem geldi $likedProductList")
-
                         productIdList =
                             likedProductList!!.mapNotNull { it.productId }.toMutableList()
+
                         Log.d("likedProductList", "ID LIST $productIdList")
 
                         if (isAdapterAttached == 0) {
@@ -125,11 +98,6 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(), LikeButtonClickListene
                     }
 
                     is Resource.Failure -> {
-                        Toast.makeText(
-                            requireContext(),
-                            "Hata ${resource.errorCode}  ${resource.errorBody}",
-                            Toast.LENGTH_SHORT
-                        ).show()
 
                     }
 
@@ -147,10 +115,6 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(), LikeButtonClickListene
     override fun onRecyclerViewItemClick(view: View, product: Product) {
         when (view.id) {
             R.id.btnLike -> {
-                // todo db'ye ekleme işlemi
-                Log.d("like", "product: $product")
-
-                // todo eğer liked product list'te yoksa bunu yapacağım
 
                 viewLifecycleOwner.lifecycleScope.launch {
                     val value = viewModel.getOneProductsDB(UserId.userId, product.id!!)
@@ -168,7 +132,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(), LikeButtonClickListene
             }
 
             R.id.btnPlus -> {
-                Toast.makeText(requireContext(), "plus", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), "Item Added", Toast.LENGTH_SHORT).show()
                 viewLifecycleOwner.lifecycleScope.launch {
                     val cart = viewModel.GetOneCart(UserId.userId, product.id!!)
 
@@ -176,25 +140,22 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(), LikeButtonClickListene
                         // üründen yoktur 1 tane ekle
                         val addedCart = Cart(null, UserId.userId, product.id, 1)
                         viewModel.InsertCart(addedCart)
-                        // todo snackbar göster
                     } else {
                         // üründen var sayısını arttır.
                         val updatedCart = cart.copy(quantity = cart.quantity!! + 1)
                         viewModel.UpdateCart(updatedCart)
-                        // todo snackbar göster
                     }
                 }
 
             }
 
             R.id.btnMinus -> {
-                Toast.makeText(requireContext(), "minus", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), "Item Deleted", Toast.LENGTH_SHORT).show()
                 viewLifecycleOwner.lifecycleScope.launch {
                     val cart = viewModel.GetOneCart(UserId.userId, product.id!!)
 
                     if (cart == null) {
                         // üründen yoktur bir işlem yapma
-                        // todo snackbar göster
                     } else {
                         // üründen var sayısını azalt.
                         val quantity = cart.quantity!! - 1
@@ -205,7 +166,6 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(), LikeButtonClickListene
                             val updatedCart = cart.copy(quantity = quantity)
                             viewModel.UpdateCart(updatedCart)
                         }
-                        // todo snackbar göster
                     }
                 }
             }

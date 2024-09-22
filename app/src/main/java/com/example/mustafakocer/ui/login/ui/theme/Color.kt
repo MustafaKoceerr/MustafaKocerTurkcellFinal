@@ -13,7 +13,9 @@ val Pink40 = Color(0xFF7D5260)
 
 val Primary = Color(0xFF222831)
 val Seconday = Color(0xFF393E46)
-val Accent = Color(0xFF0092CA)
+val Accent = Color(0xFF009BD6)
 val BgColor = Color(0xFFEEEEEE)
 
-val LightBlue = Color(0xFF29B1F5)
+val BackgroundColor = Color(0xFF33A8D5)
+
+val LightBlue = Color(0xFF2481AF)

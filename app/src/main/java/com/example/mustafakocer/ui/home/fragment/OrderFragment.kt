@@ -1,11 +1,9 @@
 package com.example.mustafakocer.ui.home.fragment
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
@@ -27,18 +25,15 @@ class OrderFragment : BaseFragment<FragmentOrderBinding>() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        // // todo api'den order çekilecek
         binding.orderRecyclerView.also { recyclerView ->
             recyclerView.layoutManager =
                 GridLayoutManager(requireContext(), 1, GridLayoutManager.VERTICAL, false)
         }
         viewModel.getOrder("6")
-        // todo normalde burayı user id ile çekecektim ama api sadece id=6 olan
-        // todo kullanıcı için veri döndürdüğü için 6 numaralı user'ı aldım
+        // todo normalde burayı user id ile çekecektim ama api sadece id=6 olan kullanıcı için veri döndürdüğü için 6 numaralı user'ı aldım
         observeOrder()
 
     }
-
 
     override fun getFragmentDataBinding(
         inflater: LayoutInflater,
@@ -64,30 +59,14 @@ class OrderFragment : BaseFragment<FragmentOrderBinding>() {
                     }
 
                     is Resource.Success -> {
-                        // Update UI with products data
-                        // todo recyler view DESING YAP
-                        Toast.makeText(
-                            requireContext(),
-                            "Order Geldi",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                        Log.d("flow", "${resource.value}")
                         val temp = resource.value.carts
-                        Log.d("temp", "listem : ${temp.size}")
 
                         binding.orderRecyclerView.adapter =
                             OrderProductAdapter(temp)
-
-
                         // her veri geldiğinde db'ye bakıyor ve oradan karşılaştırıyor
                     }
 
                     is Resource.Failure -> {
-                        Toast.makeText(
-                            requireContext(),
-                            "Hata ${resource.errorCode}  ${resource.errorBody}",
-                            Toast.LENGTH_SHORT
-                        ).show()
 
                     }
 

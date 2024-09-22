@@ -43,7 +43,6 @@ class CategoryAdapter(
         // bind xml layout with our categories
 
         holder.recyclerRowCategoryBinding.root.setOnClickListener {
-            Log.d("bakalım", "bakalım,bakalım,bakalım ${categoryList.get(position)}")
             val action =
                 CategoryFragmentDirections.actionCategoryFragmentToProductsByCategoryFragment(
                     categoryList.get(position).slug

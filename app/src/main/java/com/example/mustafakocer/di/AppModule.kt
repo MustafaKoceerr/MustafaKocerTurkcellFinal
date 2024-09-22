@@ -17,6 +17,14 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class) // todo neden singleton yaptın tekrar bir göz at
 object AppModule {
 
+    // singleton diyor:
+    /*
+    singleton nesneleri yönetmek için kullanılıyor,
+    nesneleri de diğer yerlere ejdet etmek için kullanılıyor
+    sen bunu bir defa üret, lifecycle'ın ölmeden yok olmuyor, istediğin yerlerde tek bu nesneyi kullan
+
+    // her api isteği atınca ayrı ayrı IDummy api oluşturmak yerine bir tane nesne oluştur, onu kullan
+     */
     @Singleton
     @Provides
     fun provideIDummyApi(): IDummyApi{

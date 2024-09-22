@@ -1,7 +1,6 @@
 package com.example.mustafakocer.ui.login
 
 
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -51,6 +50,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.mustafakocer.R
+import com.example.mustafakocer.ui.login.ui.theme.BackgroundColor
 import com.example.mustafakocer.ui.login.ui.theme.LightBlue
 import com.example.mustafakocer.ui.login.viewmodel.LoginViewModel
 
@@ -72,13 +72,9 @@ fun LoginScreen(viewModel: LoginViewModel = viewModel()) {
         modifier = Modifier
             .fillMaxSize()
             .background(Color.White)
+            .background(BackgroundColor) // Burada renk atanıyor
     ) {
-        Image(
-            painter = painterResource(id = R.drawable.login_background), // Replace with your background image
-            contentDescription = null,
-            contentScale = ContentScale.Crop,
-            modifier = Modifier.fillMaxSize()
-        )
+
 
         Column(
             modifier = Modifier
@@ -240,7 +236,6 @@ fun LoginScreen(viewModel: LoginViewModel = viewModel()) {
                     ) {
                         Text(text = "Login", fontSize = 18.sp)
                     }
-
 
 
                     Spacer(modifier = Modifier.height(8.dp))

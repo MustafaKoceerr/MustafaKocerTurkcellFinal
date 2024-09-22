@@ -1,12 +1,10 @@
 package com.example.mustafakocer.ui.home.fragment
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.SearchView
-import android.widget.Toast
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
@@ -37,7 +35,6 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>() {
         binding.searchView.clearFocus()
         binding.searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
-                // todo api isteği at
                 query?.let {
                     viewModel.searchProducts(query)
                 }
@@ -56,9 +53,7 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>() {
 
         })
 
-
     }
-
 
     override fun getFragmentDataBinding(
         inflater: LayoutInflater,
@@ -81,23 +76,10 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>() {
 
                     is Resource.Success -> {
                         // Update UI with products data
-                        // todo recyler view DESING YAP
-                        Toast.makeText(
-                            requireContext(),
-                            "Urunler Geldi${resource.value.products}",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                        Log.d("flow", "${resource.value.products}")
-                        // Use the products data to update the UI
                         binding.searchRecyclerView.adapter = ProductAdapter(resource.value.products)
                     }
 
                     is Resource.Failure -> {
-                        Toast.makeText(
-                            requireContext(),
-                            "Hata ${resource.errorCode}  ${resource.errorBody}",
-                            Toast.LENGTH_SHORT
-                        ).show()
 
                     }
 

@@ -6,7 +6,6 @@ import androidx.room.Query
 import androidx.room.Update
 import com.example.mustafakocer.data.db.entity.Cart
 import com.example.mustafakocer.data.db.entity.LikedProduct
-import com.example.mustafakocer.data.model.Product
 
 @Dao
 interface ProductDao {
@@ -18,11 +17,9 @@ interface ProductDao {
     // LikedProduct tablosundan belirli bir kullanıcı ve ürün ID'sine göre ürünü silen suspend fonksiyon
     @Query("DELETE FROM liked_product WHERE userId = :userId AND  productId = :productId")
     suspend fun deleteLikedProduct(userId: Int, productId: Int): Int
-    // 0 dönerse failed, 0'dan farklı dönerse succes
 
     @Query("select * from liked_product where userId = :userId")
     suspend fun getAllProducts(userId: Int): List<LikedProduct>
-    // todo beğenilen ürünleri getirir. bunu beğenilen ürünlerde çağır
 
     @Query("select * from liked_product where userId = :userId and productId = :productId ")
     suspend fun getOneProduct(userId: Int, productId:Int): LikedProduct?

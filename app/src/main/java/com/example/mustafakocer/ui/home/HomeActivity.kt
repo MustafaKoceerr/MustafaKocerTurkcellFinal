@@ -2,7 +2,6 @@ package com.example.mustafakocer.ui.home
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import android.widget.ImageView
@@ -10,7 +9,6 @@ import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.Toolbar
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
@@ -25,9 +23,7 @@ import com.example.mustafakocer.databinding.ActivityHomeBinding
 import com.example.mustafakocer.ui.home.viewmodel.HomeActivityViewModel
 import com.example.mustafakocer.ui.login.LoginActivity
 import com.example.mustafakocer.util.UserId
-import com.example.mustafakocer.util.showToast
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 
@@ -43,18 +39,19 @@ class HomeActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_home)
         setContentView(binding.root)
-
-        observeUser()
         viewModel.getUser()
+        observeUser()
 
-        val toolbar = binding.toolbar as Toolbar
-        if (toolbar != null) {
-            setSupportActionBar(toolbar) // Now 'toolbar' is smart cast to Toolbar
-        }
 
-        navController =
-            (supportFragmentManager.findFragmentById(R.id.fragmentContainerView) as NavHostFragment).navController
+        setSupportActionBar(binding.toolbar)
 
+
+        val navHostFragment =
+            supportFragmentManager.findFragmentById(R.id.fragmentContainerView) as NavHostFragment
+        navController = navHostFragment.navController
+
+
+        // bottom bar'da veya drawer'da gözükecek olanları buraya koyuyoruz.
         val appBarConfiguration = AppBarConfiguration(
             setOf(
                 R.id.homeFragment,
@@ -67,57 +64,63 @@ class HomeActivity : AppCompatActivity() {
             ), drawerLayout = binding.drawerLayout
         )
 
-        setupActionBarWithNavController(navController, appBarConfiguration)
         binding.navView.setupWithNavController(navController)
+        setupActionBarWithNavController(navController, appBarConfiguration)
 
-        binding.navView.setNavigationItemSelectedListener { it: MenuItem ->
-            return@setNavigationItemSelectedListener navigationItemSelected(it)
+
+        // Kendi listenerımı eklemişim, bu eklendiği yerde de 1 kere çalışır, sonrasında destination değiştiğinde de çalışır.
+        navController.addOnDestinationChangedListener { _, destination, _ ->
+            supportActionBar?.title = when (destination.id) {
+                R.id.homeFragment -> "Home"
+                R.id.categoryFragment -> "Categories"
+                R.id.productsByCategoryFragment -> "Products by Categories"
+                R.id.searchFragment -> "Search"
+                R.id.favoriteFragment -> "Favorites"
+                R.id.orderFragment -> "Orders"
+                R.id.profileFragment -> "Profile"
+                R.id.cartFragment -> "Cart"
+                else -> "Home" // Varsayılan başlık
+            }
         }
+        /*
+        // Böyle setNavigationItemSelectedListener ile özel işlemler de tanımlayabilirsin
+        // Ben bu uygulamam için, navigationun default davranışını kullanıp, logout fragment'ını kullanıp
+        // todo:logout fragment onCreate'inde çıkış işlemlerini yapacağım.
+          binding.navView.setNavigationItemSelectedListener { menuItem: MenuItem ->
+              when (menuItem.itemId) {
+                  R.id.nav_logout -> {
+                      return@setNavigationItemSelectedListener navigationItemSelected(menuItem)
+                  }
+                  else -> {
+                      navController.navigate(menuItem.itemId)
+                      // Diğer durumlarda varsayılan navController ile navigasyonu gerçekleştirin
+                      // Örneğin, navController.navigate(menuItem.itemId) gibi bir işlem yapabilirsiniz
+                      true // true döndürerek işlemin başarıyla gerçekleştiğini belirtin
+                  }
+              }
+          }
+         */
 
         binding.navView.bringToFront()
         val toggle: ActionBarDrawerToggle = ActionBarDrawerToggle(
             this@HomeActivity,
             binding.drawerLayout,
-            toolbar,
+            binding.toolbar,
             R.string.navigation_drawer_open,
             R.string.navigation_drawer_close
         )
         binding.drawerLayout.addDrawerListener(toggle)
         toggle.syncState()
-        toolbar.setNavigationIcon(R.drawable.ic_shopping_cart)
+
+    }
+
+    // Otomatik olarak toolbar'ının yönetilmesini istiyorsan, örneğin up butonu çıksın vs, bunu kullan.
+    override fun onSupportNavigateUp(): Boolean {
+        return navController.navigateUp() || super.onSupportNavigateUp()
     }
 
     private fun navigationItemSelected(it: MenuItem): Boolean {
         when (it.itemId) {
-            R.id.nav_home -> {
-                this.showToast("home")
-                switchFragment(R.id.homeFragment)
-            }
-
-            R.id.nav_category -> {
-                switchFragment(R.id.categoryFragment)
-            }
-
-            R.id.nav_search -> {
-                switchFragment(R.id.searchFragment)
-            }
-
-            R.id.nav_favorite -> {
-                switchFragment(R.id.favoriteFragment)
-            }
-
-            R.id.nav_order -> {
-                switchFragment(R.id.orderFragment)
-            }
-
-            R.id.nav_profile -> {
-                switchFragment(R.id.profileFragment)
-            }
-
-            R.id.nav_cart -> {
-                switchFragment(R.id.cartFragment)
-            }
-
             R.id.nav_logout -> {
                 clearUserData()
                 val intent = Intent(this, LoginActivity::class.java)
@@ -134,25 +137,15 @@ class HomeActivity : AppCompatActivity() {
         return true
     }
 
-    private fun switchFragment(fragId: Int) {
-        navOptions = NavOptions.Builder()
-            .setPopUpTo(
-                fragId,
-                true
-            ) // nav_graph, navigation graph'inizin başlangıç destination'ıdır
-            .build()
-
-        navController.navigate(fragId, null, navOptions = navOptions)
-    }
-
 
     private fun observeUser() {
         this.lifecycleScope.launch {
 
             viewModel.userInfo.collect { resource ->
+
                 resource?.let {
-                    Log.d("getuser", "Buraya girdi ve resource $it")
-                    val headerView: View = binding.navView
+
+                    val headerView: View = binding.navView.getHeaderView(0)
                     val headerName = headerView.findViewById<TextView>(R.id.txtNameHeader)
                     val headerMail = headerView.findViewById<TextView>(R.id.txtMailHeader)
                     val headerImage = headerView.findViewById<ImageView>(R.id.imgViewHeader)

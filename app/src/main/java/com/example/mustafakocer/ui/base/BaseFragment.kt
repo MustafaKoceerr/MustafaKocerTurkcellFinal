@@ -6,7 +6,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.ViewDataBinding
 import androidx.fragment.app.Fragment
-import com.example.mustafakocer.databinding.ActivityHomeBinding
 
 abstract class BaseFragment<B: ViewDataBinding> : Fragment() {
 
@@ -18,7 +17,6 @@ abstract class BaseFragment<B: ViewDataBinding> : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         binding = getFragmentDataBinding(inflater,container)
-
 
         return binding.root
     }
