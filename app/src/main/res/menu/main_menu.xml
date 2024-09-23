@@ -7,27 +7,27 @@
             <group android:checkableBehavior="single">
 
                 <item
-                    android:id="@+id/nav_home"
+                    android:id="@+id/homeFragment"
                     android:icon="@drawable/home_icon"
                     android:title="Home" />
                 <item
-                    android:id="@+id/nav_category"
+                    android:id="@+id/categoryFragment"
                     android:icon="@drawable/ic_category"
                     android:title="Category" />
                 <item
-                    android:id="@+id/nav_search"
+                    android:id="@+id/searchFragment"
                     android:icon="@drawable/search_icon"
                     android:title="Search" />
                 <item
-                    android:id="@+id/nav_favorite"
+                    android:id="@+id/favoriteFragment"
                     android:icon="@drawable/ic_favorite"
                     android:title="Favorite" />
                 <item
-                    android:id="@+id/nav_order"
+                    android:id="@+id/orderFragment"
                     android:icon="@drawable/ic_order"
                     android:title="Order" />
                 <item
-                    android:id="@+id/nav_cart"
+                    android:id="@+id/cartFragment"
                     android:icon="@drawable/ic_shopping_cart"
                     android:title="Cart" />
             </group>
@@ -41,7 +41,7 @@
             <group android:checkableBehavior="single">
 
                 <item
-                    android:id="@+id/nav_profile"
+                    android:id="@+id/profileFragment"
                     android:icon="@drawable/profile_icon"
                     android:title="Profile" />
                 <item

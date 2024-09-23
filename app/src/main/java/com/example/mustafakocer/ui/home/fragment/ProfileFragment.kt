@@ -6,9 +6,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
 import com.example.mustafakocer.R
 import com.example.mustafakocer.data.model.Resource
 import com.example.mustafakocer.data.model.User
@@ -16,10 +14,12 @@ import com.example.mustafakocer.databinding.FragmentProfileBinding
 import com.example.mustafakocer.ui.base.BaseFragment
 import com.example.mustafakocer.ui.home.viewmodel.ProfileViewModel
 import com.example.mustafakocer.util.UserId
-import com.example.mustafakocer.util.visibleProgressBar
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.google.firebase.remoteconfig.remoteConfigSettings
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 
 @AndroidEntryPoint
@@ -94,7 +94,7 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding>() {
                 username = username
             )
 
-            Log.d("tempuser","tempuser deneme $tempUser")
+            Log.d("tempuser", "gönderilen user $tempUser")
             viewModel.UpdateUser(UserId.userId, tempUser)
         }
 
@@ -130,52 +130,44 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding>() {
     }
 
 
+    private fun observeNewData() {
 
-    private fun observeNewData(){
-        viewModel.updateUser.observe(viewLifecycleOwner, Observer { resource ->
-            binding.progressbar.visibleProgressBar(false)
+        CoroutineScope(Dispatchers.Main).launch {
+            viewModel.updateUser.collect { value ->
+                when(value){
+                    is Resource.Failure -> Log.d("tempuser", "Flow failure")
+                    is Resource.Loading -> Log.d("tempuser", "Flow loading")
+                    is Resource.Success -> {
+                        Log.d("tempuser", "Flow success")
+                        Log.d("tempuser", "${value.value}")
+                        updateViewUser(
+                            value.value.firstName,
+                            value.value.lastName,
+                            value.value.age,
+                            value.value.gender,
+                            value.value.email,
+                            value.value.phone,
+                            value.value.username,
+                            )
 
-            when (resource) {
-                is Resource.Loading -> {
-                    // Show loading indicator
-                    binding.progressbar.visibleProgressBar(true)
-                }
-
-                is Resource.Success -> {
-                    // Update UI with user data
-                    Toast.makeText(
-                        requireContext(),
-                        "User Updated",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                    binding.txtUsername.text = resource.value.firstName
-
-                    // Her veri geldiğinde db'ye bakıyor ve oradan karşılaştırıyor
-                }
-
-
-
-                is Resource.Waiting -> {
-                    binding.progressbar.visibleProgressBar(false)
-                }
-
-                is Resource.Failure -> {
-                    binding.progressbar.visibleProgressBar(false)
-
+                    }
+                    is Resource.Waiting -> Log.d("tempuser", "Flow waiting")
                 }
             }
-        })
+
+        }
     }
+
     private fun updateViewUser(
-        name: String,
-        lastName: String,
-        age: Int,
-        gender: String,
-        email: String,
-        phone: String,
-        username: String
+        name: String?,
+        lastName: String?,
+        age: Int?,
+        gender: String?,
+        email: String?,
+        phone: String?,
+        username: String?
     ) {
-        Log.d("tempuser","tempuser name $name")
+        Log.d("tempuser", "tempuser name $name")
 
         binding.txtFirstName.setText(name)
         binding.txtLastName.setText(lastName)

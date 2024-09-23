@@ -2,8 +2,6 @@ package com.example.mustafakocer.ui.home
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
-import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.ImageView
@@ -11,13 +9,10 @@ import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.view.ActionMode
-import androidx.appcompat.widget.Toolbar
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.NavOptions
-import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
@@ -45,18 +40,18 @@ class HomeActivity : AppCompatActivity() {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_home)
         setContentView(binding.root)
         viewModel.getUser()
-
         observeUser()
 
 
-        val toolbar = binding.toolbar as Toolbar
-        if (toolbar != null) {
-            setSupportActionBar(toolbar) // Now 'toolbar' is smart cast to Toolbar
-        }
+        setSupportActionBar(binding.toolbar)
 
-        navController =
-            (supportFragmentManager.findFragmentById(R.id.fragmentContainerView) as NavHostFragment).navController
 
+        val navHostFragment =
+            supportFragmentManager.findFragmentById(R.id.fragmentContainerView) as NavHostFragment
+        navController = navHostFragment.navController
+
+
+        // bottom bar'da veya drawer'da gözükecek olanları buraya koyuyoruz.
         val appBarConfiguration = AppBarConfiguration(
             setOf(
                 R.id.homeFragment,
@@ -69,9 +64,11 @@ class HomeActivity : AppCompatActivity() {
             ), drawerLayout = binding.drawerLayout
         )
 
-        setupActionBarWithNavController(navController, appBarConfiguration)
         binding.navView.setupWithNavController(navController)
+        setupActionBarWithNavController(navController, appBarConfiguration)
 
+
+        // Kendi listenerımı eklemişim, bu eklendiği yerde de 1 kere çalışır, sonrasında destination değiştiğinde de çalışır.
         navController.addOnDestinationChangedListener { _, destination, _ ->
             supportActionBar?.title = when (destination.id) {
                 R.id.homeFragment -> "Home"
@@ -84,18 +81,31 @@ class HomeActivity : AppCompatActivity() {
                 R.id.cartFragment -> "Cart"
                 else -> "Home" // Varsayılan başlık
             }
-
         }
-
-        binding.navView.setNavigationItemSelectedListener { it: MenuItem ->
-            return@setNavigationItemSelectedListener navigationItemSelected(it)
-        }
+        /*
+        // Böyle setNavigationItemSelectedListener ile özel işlemler de tanımlayabilirsin
+        // Ben bu uygulamam için, navigationun default davranışını kullanıp, logout fragment'ını kullanıp
+        // todo:logout fragment onCreate'inde çıkış işlemlerini yapacağım.
+          binding.navView.setNavigationItemSelectedListener { menuItem: MenuItem ->
+              when (menuItem.itemId) {
+                  R.id.nav_logout -> {
+                      return@setNavigationItemSelectedListener navigationItemSelected(menuItem)
+                  }
+                  else -> {
+                      navController.navigate(menuItem.itemId)
+                      // Diğer durumlarda varsayılan navController ile navigasyonu gerçekleştirin
+                      // Örneğin, navController.navigate(menuItem.itemId) gibi bir işlem yapabilirsiniz
+                      true // true döndürerek işlemin başarıyla gerçekleştiğini belirtin
+                  }
+              }
+          }
+         */
 
         binding.navView.bringToFront()
         val toggle: ActionBarDrawerToggle = ActionBarDrawerToggle(
             this@HomeActivity,
             binding.drawerLayout,
-            toolbar,
+            binding.toolbar,
             R.string.navigation_drawer_open,
             R.string.navigation_drawer_close
         )
@@ -104,36 +114,13 @@ class HomeActivity : AppCompatActivity() {
 
     }
 
+    // Otomatik olarak toolbar'ının yönetilmesini istiyorsan, örneğin up butonu çıksın vs, bunu kullan.
+    override fun onSupportNavigateUp(): Boolean {
+        return navController.navigateUp() || super.onSupportNavigateUp()
+    }
+
     private fun navigationItemSelected(it: MenuItem): Boolean {
         when (it.itemId) {
-            R.id.nav_home -> {
-                switchFragment(R.id.homeFragment)
-            }
-
-            R.id.nav_category -> {
-                switchFragment(R.id.categoryFragment)
-            }
-
-            R.id.nav_search -> {
-                switchFragment(R.id.searchFragment)
-            }
-
-            R.id.nav_favorite -> {
-                switchFragment(R.id.favoriteFragment)
-            }
-
-            R.id.nav_order -> {
-                switchFragment(R.id.orderFragment)
-            }
-
-            R.id.nav_profile -> {
-                switchFragment(R.id.profileFragment)
-            }
-
-            R.id.nav_cart -> {
-                switchFragment(R.id.cartFragment)
-            }
-
             R.id.nav_logout -> {
                 clearUserData()
                 val intent = Intent(this, LoginActivity::class.java)
@@ -142,24 +129,12 @@ class HomeActivity : AppCompatActivity() {
             }
 
             else -> {
-
                 return false
             }
         }
         binding.drawerLayout.closeDrawers()
 
         return true
-    }
-
-    private fun switchFragment(fragId: Int) {
-        navOptions = NavOptions.Builder()
-            .setPopUpTo(
-                fragId,
-                true
-            ) // nav_graph, navigation graph'inizin başlangıç destination'ıdır
-            .build()
-
-        navController.navigate(fragId, null, navOptions = navOptions)
     }
 
 

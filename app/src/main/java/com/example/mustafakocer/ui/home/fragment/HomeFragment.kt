@@ -33,7 +33,9 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(), LikeButtonClickListene
 
     private var isAdapterAttached = 0
 
-
+    /**
+     * Life cycle aware olmak ne demek? nasıl çalışıyor?
+     */
     private val viewModel: HomeViewModel by viewModels()
     private lateinit var productIdList: MutableList<Int>
 

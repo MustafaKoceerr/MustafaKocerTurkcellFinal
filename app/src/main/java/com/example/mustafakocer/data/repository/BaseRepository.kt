@@ -25,6 +25,8 @@ abstract class BaseRepository {
 
                 // T Login için User class'ıydı, yani Success fonksiyonun T'si de user class'ı olacak
             } catch (throwable: Throwable) {
+                Log.d("Error", "hat amesajın ${throwable.message} ")
+
                 when (throwable) {
                     is HttpException -> {
                         Resource.Failure(
