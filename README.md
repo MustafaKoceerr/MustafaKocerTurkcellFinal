@@ -32,11 +32,30 @@ With this app you can:
 <table>
   <tr>
     <th>Home Screen</th>
-    <th>Leadership Screen</th>
+    <th>Drawer Screen</th>
+    <th>Search Screen</th>
+    <th>Category Screen</th>
   </tr>
   <tr>
-    <td><img src="https://github.com/user-attachments/assets/42e498ce-5789-4c45-badd-a20e91b5dbfa" height="500"></td>
-    <td><img src="https://github.com/user-attachments/assets/e90102b8-9f1b-4185-8dae-52693fb5f512" height="500"></td>
+    <td><img src="https://github.com/user-attachments/assets/11b29685-d625-430c-8c1b-bea40cb71aba" height="500"></td>
+    <td><img src="https://github.com/user-attachments/assets/b45fed6a-ab35-4626-bdc8-4fed39a6ebb7" height="500"></td>
+    <td><img src="https://github.com/user-attachments/assets/e77b1ddc-0ac4-4a09-be16-b937e633080d" height="500"></td>
+    <td><img src="https://github.com/user-attachments/assets/7003a1c8-302e-4bdc-b1b6-626f80c3a5a1" height="500"></td>
+  </tr>
+</table>
+
+<table>
+  <tr>
+    <th>Favorite Screen</th>
+    <th>Cart Screen</th>
+    <th>Orders Screen</th>
+    <th>Profile Screen</th>
+  </tr>
+  <tr>
+    <td><img src="https://github.com/user-attachments/assets/cb586b3c-19ad-4b4a-b14c-fb7a5c8b0d9d" height="500"></td>
+    <td><img src="https://github.com/user-attachments/assets/207b5cd9-dbc3-4573-b784-01d2dddc21b9" height="500"></td>
+    <td><img src="https://github.com/user-attachments/assets/a5c0548b-f940-4241-88cd-997e4c6dc7a3" height="500"></td>
+    <td><img src="https://github.com/user-attachments/assets/ef25f001-9787-43df-97c9-827c03e8c297" height="500"></td>
   </tr>
 </table>
 </br>
