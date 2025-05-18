@@ -2,6 +2,7 @@ package com.example.mustafakocer.data.db
 
 import androidx.room.Dao
 import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
 import com.example.mustafakocer.data.db.entity.Cart
@@ -11,7 +12,7 @@ import com.example.mustafakocer.data.db.entity.LikedProduct
 interface ProductDao {
 
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertProduct(likedProduct: LikedProduct): Long // sqlite return id
 
     // LikedProduct tablosundan belirli bir kullanıcı ve ürün ID'sine göre ürünü silen suspend fonksiyon
@@ -22,11 +23,10 @@ interface ProductDao {
     suspend fun getAllProducts(userId: Int): List<LikedProduct>
 
     @Query("select * from liked_product where userId = :userId and productId = :productId ")
-    suspend fun getOneProduct(userId: Int, productId:Int): LikedProduct?
+    suspend fun getOneProduct(userId: Int, productId: Int): LikedProduct?
 
 
-
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertCart(cart: Cart): Long // sqlite return id
 
     @Query("DELETE FROM cart_list WHERE userId = :userId AND  id = :productId")
@@ -36,7 +36,7 @@ interface ProductDao {
     suspend fun getAllCarts(userId: Int): List<Cart>
 
     @Query("select * from cart_list where userId = :userId and id = :productId ")
-    suspend fun getOneCart(userId: Int, productId:Int): Cart?
+    suspend fun getOneCart(userId: Int, productId: Int): Cart?
 
     @Update
     suspend fun updateCart(cart: Cart): Int
