@@ -1,10 +1,10 @@
 package com.example.mustafakocer.data.db
 
 import androidx.room.TypeConverter
-import com.example.mustafakocer.data.model.Dimensions
-import com.example.mustafakocer.data.model.Meta
-import com.example.mustafakocer.data.model.Product
-import com.example.mustafakocer.data.model.Reviews
+import com.example.mustafakocer.data.model.dto.Dimensions
+import com.example.mustafakocer.data.model.dto.Meta
+import com.example.mustafakocer.data.model.dto.Product
+import com.example.mustafakocer.data.model.dto.Reviews
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 

@@ -5,9 +5,8 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
-import com.example.mustafakocer.data.db.entity.BasicUserInfo
-import com.example.mustafakocer.data.db.entity.Cart
-import com.example.mustafakocer.data.db.entity.LikedProduct
+import com.example.mustafakocer.data.model.entity.BasicUserInfo
+import com.example.mustafakocer.data.model.entity.Cart
 
 
 @Database(

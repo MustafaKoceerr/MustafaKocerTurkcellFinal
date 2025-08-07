@@ -6,7 +6,7 @@
     <data>
         <variable
             name="product"
-            type="com.example.mustafakocer.data.model.Product" />
+            type="com.example.mustafakocer.data.model.dto.Product" />
     </data>
 
     <com.google.android.material.card.MaterialCardView

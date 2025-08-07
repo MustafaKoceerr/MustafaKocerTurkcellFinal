@@ -5,8 +5,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
-import com.example.mustafakocer.data.db.entity.Cart
-import com.example.mustafakocer.data.db.entity.LikedProduct
+import com.example.mustafakocer.data.model.entity.Cart
 
 @Dao
 interface ProductDao {

@@ -1,11 +1,10 @@
 package com.example.mustafakocer.data.repository
 
-import com.example.mustafakocer.data.PreferenceKeys
-import com.example.mustafakocer.data.UserPreferences
+import com.example.mustafakocer.data.preferences.PreferenceKeys
+import com.example.mustafakocer.data.preferences.UserPreferences
 import com.example.mustafakocer.data.db.AppDatabase
-import com.example.mustafakocer.data.db.entity.BasicUserInfo
-import com.example.mustafakocer.data.db.entity.Cart
-import com.example.mustafakocer.data.db.entity.LikedProduct
+import com.example.mustafakocer.data.model.entity.BasicUserInfo
+import com.example.mustafakocer.data.model.entity.Cart
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 

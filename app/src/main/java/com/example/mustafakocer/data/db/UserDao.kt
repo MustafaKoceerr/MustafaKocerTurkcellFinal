@@ -1,14 +1,11 @@
 package com.example.mustafakocer.data.db
 
-import androidx.lifecycle.LiveData
 import androidx.room.Dao
-import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import com.example.mustafakocer.data.db.entity.BasicUserInfo
-import com.example.mustafakocer.data.db.entity.LOCAL_ID
-import com.example.mustafakocer.data.model.Product
+import com.example.mustafakocer.data.model.entity.BasicUserInfo
+import com.example.mustafakocer.data.model.entity.LOCAL_ID
 
 @Dao
 interface UserDao {

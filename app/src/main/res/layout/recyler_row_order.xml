@@ -7,7 +7,7 @@
     <data>
         <variable
             name="order"
-            type="com.example.mustafakocer.data.model.CartResponse" />
+            type="com.example.mustafakocer.data.model.dto.CartResponse" />
     </data>
 
     <com.google.android.material.card.MaterialCardView

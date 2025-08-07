@@ -1,7 +1,6 @@
 package com.example.mustafakocer.data.repository
 
 import android.util.Log
-import com.example.mustafakocer.data.model.Resource
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import retrofit2.HttpException

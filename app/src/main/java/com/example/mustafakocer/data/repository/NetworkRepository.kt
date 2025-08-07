@@ -1,13 +1,11 @@
 package com.example.mustafakocer.data.repository
 
-import com.example.mustafakocer.data.db.entity.CartRequest
-import com.example.mustafakocer.data.model.CartResponse
+import com.example.mustafakocer.data.model.entity.CartRequest
+import com.example.mustafakocer.data.model.dto.CartResponse
 import com.example.mustafakocer.data.model.Categories
-import com.example.mustafakocer.data.model.LoginResponse
-import com.example.mustafakocer.data.model.OrderResponse
-import com.example.mustafakocer.data.model.Products
-import com.example.mustafakocer.data.model.Resource
-import com.example.mustafakocer.data.model.User
+import com.example.mustafakocer.data.model.dto.OrderResponse
+import com.example.mustafakocer.data.model.dto.Products
+import com.example.mustafakocer.data.model.dto.User
 import com.example.mustafakocer.data.network.IDummyApi
 import javax.inject.Inject
 

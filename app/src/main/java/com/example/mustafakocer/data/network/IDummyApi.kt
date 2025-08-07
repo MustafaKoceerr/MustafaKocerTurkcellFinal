@@ -1,77 +1,50 @@
 package com.example.mustafakocer.data.network
 
-import com.example.mustafakocer.data.db.entity.CartRequest
-import com.example.mustafakocer.data.model.CartResponse
-import com.example.mustafakocer.data.model.Categories
-import com.example.mustafakocer.data.model.LoginResponse
-import com.example.mustafakocer.data.model.OrderResponse
-import com.example.mustafakocer.data.model.Products
-import com.example.mustafakocer.data.model.User
+import com.example.mustafakocer.data.model.dto.CategoriesResponseDto
+import com.example.mustafakocer.data.model.dto.ProductsResponseDto
+import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
+import kotlinx.serialization.json.Json
+import okhttp3.MediaType.Companion.toMediaType
 import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
-import retrofit2.http.Body
-import retrofit2.http.Field
-import retrofit2.http.FormUrlEncoded
 import retrofit2.http.GET
-import retrofit2.http.Headers
-import retrofit2.http.POST
-import retrofit2.http.PUT
 import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface IDummyApi {
 
-    companion object {
-        // invoke -> MoviesApi() yazınca çalışacak fonksiyondur, özel bir keydir
-        private val BASE_URL = "https://dummyjson.com/"
+    // Bu endpoint artık ProductsResponseDto bekliyor.
+    @GET("products")
+    suspend fun getProducts(): ProductsResponseDto
 
+    // Bu endpoint CategoriesResponseDto (yani List<CategoryDto>) bekliyor.
+    @GET("products/categories")
+    suspend fun getCategories(): CategoriesResponseDto
+
+    // Bu endpoint de ProductsResponseDto bekliyor.
+    @GET("products/category/{category_name}")
+    suspend fun getProductsByCategory(@Path("category_name") categoryName: String): ProductsResponseDto
+
+    // Bu endpoint de ProductsResponseDto bekliyor.
+    @GET("products/search")
+    suspend fun searchProducts(@Query("q") query: String): ProductsResponseDto
+
+    // Diğer endpoint'ler (login, cart vb.) şimdilik aynı kalabilir.
+    // Onları kendi dikey dilimlerinde refaktör edeceğiz.
+
+    companion object {
+        private const val BASE_URL = "https://dummyjson.com/"
+
+        // Hilt modülünde daha merkezi bir yerden provide edeceğiz ama
+        // şimdilik Gson'u Kotlinx Serialization ile değiştirelim.
         operator fun invoke(): IDummyApi {
+            val json = Json { ignoreUnknownKeys = true } // API'den gelen bilmediğimiz alanları görmezden gel.
+            val contentType = "application/json".toMediaType()
 
             return Retrofit.Builder()
-                .addConverterFactory(GsonConverterFactory.create())
                 .baseUrl(BASE_URL)
+                .addConverterFactory(json.asConverterFactory(contentType)) // YENİ CONVERTER
                 .build()
                 .create(IDummyApi::class.java)
         }
-        // singleton yapısı sağlıyor
     }
-
-    @GET("products")
-    suspend fun getProducts(): Products
-
-
-    @GET("products/categories")
-    suspend fun getCategories(): Categories
-
-    @GET("products/category/{category_name}")
-    suspend fun getProductsByCategory(@Path("category_name") categoryName: String): Products
-
-
-    @GET("products/search")
-    suspend fun searchProducts(@Query("q") query: String): Products
-
-
-    @Headers("Content-Type: application/json")
-    @POST("carts/add")
-    suspend fun cartInfo(@Body cartRequest: CartRequest): CartResponse
-
-
-    @FormUrlEncoded
-    @POST("auth/login")
-    suspend fun userLogin(
-        @Field("username") username: String,
-        @Field("password") password: String
-    ): LoginResponse
-
-
-    @GET("carts/user/{id}")
-    suspend fun getCartsByUser(@Path("id") id: String): OrderResponse
-
-
-    @PUT("users/{id}")
-    suspend fun updateUser(
-        @Path("id") userId: Int,
-        @Body user: User
-    ): User
-
 }
