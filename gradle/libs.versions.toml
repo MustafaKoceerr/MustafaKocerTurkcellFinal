@@ -17,15 +17,17 @@ composeBom = "2025.07.00"
 nav = "2.9.3"
 coroutines = "1.10.2"
 
-firebaseMessaging = "25.0.0"
-firebaseDatabase = "22.0.0"
-firebaseConfig = "23.0.0"
+# ... diğer versiyonlar
 googleGmsGoogleServices = "4.4.3"
+firebaseBom = "33.2.0" # YENİ: Firebase BoM versiyonunu ekle
 
 retrofit = "3.0.0"
 room = "2.7.2"
 paging = "3.3.6"
 datastore = "1.1.7"
+securityCryptoKtx = "1.1.0"
+okhttp = "4.12.0"
+
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
@@ -36,6 +38,7 @@ compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 
 [libraries]
+androidx-security-crypto-ktx = { module = "androidx.security:security-crypto-ktx", version.ref = "securityCryptoKtx" }
 kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinx-serialization" }
 retrofit-kotlinx-serialization-converter = { group = "com.jakewharton.retrofit", name = "retrofit2-kotlinx-serialization-converter", version = "1.0.0" }
 
@@ -90,11 +93,16 @@ hilt-navigation-fragment = { group = "androidx.hilt", name = "hilt-navigation-fr
 coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "coroutines" }
 
 # Firebase
-firebase-messaging = { group = "com.google.firebase", name = "firebase-messaging", version.ref = "firebaseMessaging" }
-firebase-database = { group = "com.google.firebase", name = "firebase-database", version.ref = "firebaseDatabase" }
-firebase-config = { group = "com.google.firebase", name = "firebase-config", version.ref = "firebaseConfig" }
+firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebaseBom" }
+firebase-messaging = { group = "com.google.firebase", name = "firebase-messaging-ktx" }
+firebase-database = { group = "com.google.firebase", name = "firebase-database-ktx" }
+firebase-config = { group = "com.google.firebase", name = "firebase-config-ktx" }
 
 # Test
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
+
+# YENİ: OkHttp ve Logging Interceptor kütüphaneleri
+okhttp = { group = "com.squareup.okhttp3", name = "okhttp", version.ref = "okhttp" }
+okhttp-logging-interceptor = { group = "com.squareup.okhttp3", name = "logging-interceptor", version.ref = "okhttp" }

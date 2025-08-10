@@ -6,16 +6,18 @@ plugins {
     alias(libs.plugins.ksp)
     id("androidx.navigation.safeargs.kotlin")
     alias(libs.plugins.compose.compiler)
-    alias(libs.plugins.kotlin.serialization) }
+    alias(libs.plugins.kotlin.serialization)
+    id("org.jetbrains.kotlin.plugin.parcelize")
+}
 
 android {
     namespace = "com.example.mustafakocer"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.example.mustafakocer"
         minSdk = 24
-        targetSdk = 34
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0"
 
@@ -35,15 +37,18 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 
     buildFeatures {
         viewBinding = true
         compose = true
+        buildConfig = true
     }
-
+    kotlinOptions {
+        jvmTarget = "17"
+    }
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
@@ -54,6 +59,7 @@ android {
 dependencies {
     // Kotlinx Serialization JSON parser
     implementation(libs.kotlinx.serialization.json)
+
     // Retrofit için Kotlinx Serialization Converter
     implementation(libs.retrofit.kotlinx.serialization.converter)
     implementation(libs.retrofit)
@@ -67,11 +73,12 @@ dependencies {
     implementation(libs.paging.compose)
 
     implementation(libs.androidx.datastore.preferences)
+    implementation(libs.androidx.security.crypto.ktx)
 
 
     // BOM'lar
     implementation(platform(libs.androidx.compose.bom))
-    implementation(platform("com.google.firebase:firebase-bom:33.1.0"))
+    implementation(platform(libs.firebase.bom))
 
     // Temel
     implementation(libs.androidx.core.ktx)
@@ -124,6 +131,10 @@ dependencies {
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.test.manifest)
+
+    // OKHTTP
+    implementation(libs.okhttp)
+    implementation(libs.okhttp.logging.interceptor)
 }
 
 
