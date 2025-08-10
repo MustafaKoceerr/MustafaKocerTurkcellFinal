@@ -1,19 +1,16 @@
 package com.example.mustafakocer.data.network
 
-import com.example.mustafakocer.data.db.entity.CartRequest
-import com.example.mustafakocer.data.model.CartResponse
-import com.example.mustafakocer.data.model.Categories
-import com.example.mustafakocer.data.model.LoginResponse
-import com.example.mustafakocer.data.model.OrderResponse
-import com.example.mustafakocer.data.model.Products
-import com.example.mustafakocer.data.model.User
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
+import com.example.mustafakocer.data.model.dto.CategoriesResponseDto
+import com.example.mustafakocer.data.model.dto.LoginRequestDto
+import com.example.mustafakocer.data.model.dto.LoginResponseDto
+import com.example.mustafakocer.data.model.dto.OrdersResponseDto
+import com.example.mustafakocer.data.model.dto.ProductsResponseDto
+import com.example.mustafakocer.data.model.dto.UserDetailDto
+import com.example.mustafakocer.data.model.dto.UserUpdateDto
+import retrofit2.Response
 import retrofit2.http.Body
-import retrofit2.http.Field
-import retrofit2.http.FormUrlEncoded
 import retrofit2.http.GET
-import retrofit2.http.Headers
+import retrofit2.http.Header
 import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Path
@@ -21,57 +18,57 @@ import retrofit2.http.Query
 
 interface IDummyApi {
 
-    companion object {
-        // invoke -> MoviesApi() yazınca çalışacak fonksiyondur, özel bir keydir
-        private val BASE_URL = "https://dummyjson.com/"
-
-        operator fun invoke(): IDummyApi {
-
-            return Retrofit.Builder()
-                .addConverterFactory(GsonConverterFactory.create())
-                .baseUrl(BASE_URL)
-                .build()
-                .create(IDummyApi::class.java)
-        }
-        // singleton yapısı sağlıyor
-    }
-
+    // Artık tüm fonksiyonlar Response<T> döndürüyor.
     @GET("products")
-    suspend fun getProducts(): Products
-
+    suspend fun getProducts(
+        @Query("limit") limit: Int,
+        @Query("skip") skip: Int,
+    ): Response<ProductsResponseDto>
 
     @GET("products/categories")
-    suspend fun getCategories(): Categories
+    suspend fun getCategories(): Response<CategoriesResponseDto>
 
     @GET("products/category/{category_name}")
-    suspend fun getProductsByCategory(@Path("category_name") categoryName: String): Products
-
+    suspend fun getProductsByCategory(
+        @Path("category_name") categoryName: String,
+        @Query("limit") limit: Int, // YENİ
+        @Query("skip") skip: Int,     // YENİ
+    ): Response<ProductsResponseDto>
 
     @GET("products/search")
-    suspend fun searchProducts(@Query("q") query: String): Products
+    suspend fun searchProducts(
+        @Query("q") query: String,
+        @Query("limit") limit: Int,
+        @Query("skip") skip: Int,
+    ): Response<ProductsResponseDto>
 
-
-    @Headers("Content-Type: application/json")
-    @POST("carts/add")
-    suspend fun cartInfo(@Body cartRequest: CartRequest): CartResponse
-
-
-    @FormUrlEncoded
+    /**
+     * Kullanıcı girişi için yetkilendirme isteği gönderir.
+     * @param loginRequest Kullanıcı adı ve şifreyi içeren istek gövdesi.
+     * @return Giriş başarılı olursa kullanıcı bilgilerini ve token'ı içeren bir yanıt.
+     */
     @POST("auth/login")
-    suspend fun userLogin(
-        @Field("username") username: String,
-        @Field("password") password: String
-    ): LoginResponse
+    suspend fun login(
+        @Body loginRequest: LoginRequestDto,
+    ): Response<LoginResponseDto>
 
+    @GET("auth/me")
+    suspend fun getCurrentUser(
+        @Header("Authorization") token: String,
+    ): Response<UserDetailDto> // Daha önce tasarladığımız UserDetailDto'yu kullanıyoruz.
 
-    @GET("carts/user/{id}")
-    suspend fun getCartsByUser(@Path("id") id: String): OrderResponse
-
+    @GET("carts/user/{userId}")
+    suspend fun getOrdersByUserId(
+        @Path("userId") userId: String,
+        @Query("limit") limit: Int,
+        @Query("skip") skip: Int,
+    ): Response<OrdersResponseDto>
 
     @PUT("users/{id}")
     suspend fun updateUser(
+        @Header("Authorization") token: String,
         @Path("id") userId: Int,
-        @Body user: User
-    ): User
+        @Body userUpdateDto: UserUpdateDto
+    ): Response<UserDetailDto>
 
 }

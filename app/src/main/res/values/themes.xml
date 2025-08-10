@@ -1,15 +1,19 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
-    <style name="Base.Theme.MustafaKocerTurkcellFinal" parent="Theme.MaterialComponents.Light.NoActionBar">
+    <!-- DÜZELTME: Parent tema Material 3 olarak güncellendi. -->
+    <style name="Base.Theme.MustafaKocerTurkcellFinal" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorAccent">@color/colorAccent</item>
-        <item name="colorSecondary">@color/teal200</item>
-        <item name="colorSecondaryVariant">@color/teal700</item>
-        <item name="colorOnSecondary">@color/black</item>
 
+        <!-- Material 3'te renk isimleri değişti. Eskileri yenileriyle eşleştirelim. -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryVariant">@color/colorPrimaryDark</item> <!-- colorPrimaryDark -> colorPrimaryVariant -->
+        <item name="colorSecondary">@color/colorAccent</item> <!-- colorAccent -> colorSecondary -->
+
+        <!-- Bu renkler M3'te farklı anlamlara gelebilir, gerekirse ayarlanmalı -->
+        <item name="colorSecondaryContainer">@color/teal200</item>
+        <item name="colorOnSecondaryContainer">@color/black</item>
+
+        <!-- Status bar rengi -->
         <item name="android:statusBarColor">@color/mavi</item>
     </style>
 
@@ -17,7 +21,6 @@
         <item name="colorControlNormal">@color/lightGrey</item>
         <item name="colorControlActivated">@color/duskYellow</item>
     </style>
-
 
     <style name="Theme.MustafaKocerTurkcellFinal" parent="Base.Theme.MustafaKocerTurkcellFinal" />
 </resources>

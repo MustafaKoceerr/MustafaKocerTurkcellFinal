@@ -19,11 +19,7 @@
                     android:icon="@drawable/search_icon"
                     android:title="Search" />
                 <item
-                    android:id="@+id/favoriteFragment"
-                    android:icon="@drawable/ic_favorite"
-                    android:title="Favorite" />
-                <item
-                    android:id="@+id/orderFragment"
+                    android:id="@+id/ordersFragment"
                     android:icon="@drawable/ic_order"
                     android:title="Order" />
                 <item

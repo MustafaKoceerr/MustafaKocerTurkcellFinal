@@ -6,11 +6,11 @@
 
     <activity
         android:id="@+id/homeActivity"
-        android:name="com.example.mustafakocer.ui.home.HomeActivity"
+        android:name="com.example.mustafakocer.presentation.shell.MainActivity"
         android:label="HomeActivity" />
     <activity
         android:id="@+id/loginActivity"
-        android:name="com.example.mustafakocer.ui.login.LoginActivity"
+        android:name="com.example.mustafakocer.presentation.feature_auth.AuthActivity"
         android:label="LoginActivity" >
     </activity>
 </navigation>

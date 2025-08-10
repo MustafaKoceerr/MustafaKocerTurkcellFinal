@@ -1,21 +1,23 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
-    id("kotlin-kapt")
-    id("com.google.devtools.ksp")
-    id("androidx.navigation.safeargs.kotlin")
-    id("com.google.dagger.hilt.android")
     alias(libs.plugins.google.gms.google.services)
+    alias(libs.plugins.hilt)
+    alias(libs.plugins.ksp)
+    id("androidx.navigation.safeargs.kotlin")
+    alias(libs.plugins.compose.compiler)
+    alias(libs.plugins.kotlin.serialization)
+    id("org.jetbrains.kotlin.plugin.parcelize")
 }
 
 android {
     namespace = "com.example.mustafakocer"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.example.mustafakocer"
         minSdk = 24
-        targetSdk = 34
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0"
 
@@ -35,18 +37,17 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+
+    buildFeatures {
+        viewBinding = true
+        compose = true
+        buildConfig = true
     }
     kotlinOptions {
-        jvmTarget = "1.8"
-    }
-    buildFeatures {
-        dataBinding = true
-        compose = true
-    }
-    composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.1"
+        jvmTarget = "17"
     }
     packaging {
         resources {
@@ -56,88 +57,84 @@ android {
 }
 
 dependencies {
+    // Kotlinx Serialization JSON parser
+    implementation(libs.kotlinx.serialization.json)
 
+    // Retrofit için Kotlinx Serialization Converter
+    implementation(libs.retrofit.kotlinx.serialization.converter)
+    implementation(libs.retrofit)
+
+    implementation(libs.room.runtime)
+    implementation(libs.room.ktx)
+    ksp(libs.room.compiler)
+    implementation(libs.room.paging)
+
+    implementation(libs.paging.runtime)
+    implementation(libs.paging.compose)
+
+    implementation(libs.androidx.datastore.preferences)
+    implementation(libs.androidx.security.crypto.ktx)
+
+
+    // BOM'lar
+    implementation(platform(libs.androidx.compose.bom))
+    implementation(platform(libs.firebase.bom))
+
+    // Temel
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
+    implementation(libs.androidx.activity.compose)
+    implementation("androidx.fragment:fragment-ktx:1.8.0")
     implementation(libs.material)
     implementation(libs.androidx.activity)
-    implementation(libs.androidx.constraintlayout)
-    implementation(libs.androidx.activity.compose)
-    implementation(platform(libs.androidx.compose.bom))
-    implementation(libs.androidx.ui)
-    implementation(libs.androidx.ui.graphics)
-    implementation(libs.androidx.ui.tooling.preview)
+
+    // UI - Compose
     implementation(libs.androidx.material3)
+    implementation("androidx.compose.material:material-icons-extended")
+    implementation(libs.androidx.ui)
+    implementation(libs.androidx.ui.tooling.preview)
+    debugImplementation(libs.androidx.ui.tooling)
+
+    // Lifecycle
+    implementation(libs.lifecycle.runtime.ktx)
+    implementation(libs.lifecycle.runtime.compose)
+    implementation(libs.lifecycle.viewmodel.compose)
+    implementation(libs.lifecycle.viewmodel.ktx)
+
+    // Coroutines
+    implementation(libs.coroutines.android)
+
+    // Navigation
+    implementation(libs.navigation.compose)
+    implementation(libs.navigation.fragment.ktx)
+    implementation(libs.navigation.ui.ktx)
+
+    // Hilt
+    implementation(libs.hilt.android)
+    ksp(libs.hilt.compiler)
+    implementation(libs.hilt.navigation.compose)
+    implementation(libs.hilt.navigation.fragment)
+
+    // Firebase
     implementation(libs.firebase.messaging)
     implementation(libs.firebase.database)
     implementation(libs.firebase.config)
+
+    // Coil & Glide
+    implementation("io.coil-kt:coil-compose:2.6.0")
+    implementation("com.github.bumptech.glide:glide:4.16.0")
+
+    // Test
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
-
-    implementation("androidx.compose.material:material-icons-extended:1.6.8")
-    implementation("androidx.compose.material:material:1.6.8")
-
-    // Retrofit
-    implementation("com.squareup.retrofit2:retrofit:2.11.0")
-    implementation("com.squareup.retrofit2:converter-gson:2.11.0")
-    implementation("com.google.code.gson:gson:2.11.0")
-
-    // Glide
-    implementation("com.github.bumptech.glide:glide:4.16.0")
-
-    // For Kotlin coroutines support in ViewModel
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.1")
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.ui.test.junit4)
-    debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
-
-    val lifecycle_version = "2.8.2"
-    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version")
-    implementation("androidx.lifecycle:lifecycle-livedata-ktx:$lifecycle_version")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-savedstate:$lifecycle_version")
-    kapt("androidx.lifecycle:lifecycle-compiler:$lifecycle_version")
-    implementation("androidx.lifecycle:lifecycle-runtime-compose:$lifecycle_version")
-
-    // Material Design
-    runtimeOnly("com.google.android.material:material:1.12.0")
-
-    val room_version = "2.6.1"
-    implementation("androidx.room:room-runtime:$room_version")
-    implementation("androidx.room:room-ktx:$room_version")
-    ksp("androidx.room:room-compiler:$room_version")
-
-    val nav_version = "2.7.7"
-    implementation("androidx.navigation:navigation-fragment-ktx:$nav_version")
-    implementation("androidx.navigation:navigation-ui-ktx:$nav_version")
-
-    // DataStore
-    implementation("androidx.datastore:datastore-preferences:1.1.1")
-    implementation("androidx.datastore:datastore-preferences-core:1.1.1")
-
-    // Logging Interceptor
-    implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
-
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:$lifecycle_version")
-
-    // Hilt
-    implementation("com.google.dagger:hilt-android:2.51.1")
-    kapt("com.google.dagger:hilt-android-compiler:2.51.1")
-    implementation("androidx.hilt:hilt-navigation-fragment:1.0.0")
-    implementation("androidx.fragment:fragment-ktx:1.8.0")
-    implementation("androidx.hilt:hilt-navigation-compose:1.0.0")
-
-
-    // Kotlin Script Runtime
-    implementation("org.jetbrains.kotlin:kotlin-script-runtime:1.8.0")
-    implementation(kotlin("script-runtime"))
-
-
+    // OKHTTP
+    implementation(libs.okhttp)
+    implementation(libs.okhttp.logging.interceptor)
 }
 
 
-kapt {
-    correctErrorTypes = true
-}
