@@ -1,34 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- <layout> ve <data> etiketleri kaldırıldı. -->
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="8dp"
+    app:cardCornerRadius="8dp"
+    app:cardElevation="4dp"
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="?attr/selectableItemBackground"> <!-- Tıklama efekti için -->
 
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
-
-    <data>
-
-        <variable
-            name="category"
-            type="com.example.mustafakocer.data.model.dto.Category" />
-    </data>
-
-    <androidx.cardview.widget.CardView
+    <TextView
+        android:id="@+id/rowCategoryName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="8dp"
-        app:cardCornerRadius="8dp">
+        android:drawableStart="@drawable/ic_category"
+        android:drawablePadding="16dp"
+        android:fontFamily="@font/oswald_semi_bold"
+        android:gravity="center_vertical"
+        android:padding="16dp"
+        android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
+        tools:text="Electronics" /> <!-- 'android:text' kaldırıldı, 'tools:text' eklendi -->
 
-        <TextView
-            android:id="@+id/rowCategoryName"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:drawableLeft="@drawable/ic_category"
-            android:drawablePadding="12dp"
-            android:fontFamily="@font/oswald_semi_bold"
-            android:gravity="center_vertical"
-            android:padding="16dp"
-            android:text="@{category.name}"
-            android:textColor="@android:color/black"
-            android:textSize="20sp" />
-
-    </androidx.cardview.widget.CardView>
-
-</layout>
+</com.google.android.material.card.MaterialCardView>
