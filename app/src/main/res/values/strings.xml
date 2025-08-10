@@ -6,4 +6,9 @@
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="title_activity_login">LoginActivity</string>
+
+    <string name="order_product_count_format">%1$d Ürün (%2$d Adet)</string>
+    <string name="empty_orders_message">Henüz verilmiş bir siparişiniz bulunmuyor.</string>
+
+
 </resources>
