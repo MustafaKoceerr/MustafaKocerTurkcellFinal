@@ -1,32 +1,57 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<!-- Kök element olarak daha esnek olan ConstraintLayout kullanıldı. -->
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="200dp"
-    android:backgroundTint="@color/kırık_gri"
-    android:gravity="bottom"
-    android:orientation="vertical"
-    android:padding="20dp">
+    android:background="?attr/colorPrimary"
+    android:padding="16dp">
 
-    <ImageView
-        android:id="@+id/imgViewHeader"
+    <!-- Daha modern bir görünüm için CardView içine alındı. -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/cardViewHeader"
         android:layout_width="75dp"
         android:layout_height="75dp"
-        android:src="@drawable/ic_launcher_background" />
+        app:cardCornerRadius="37.5dp"
+        app:layout_constraintBottom_toTopOf="@id/txtNameHeader"
+        app:layout_constraintStart_toStartOf="parent"
+        app:strokeColor="@android:color/white"
+        app:strokeWidth="1dp">
+
+        <ImageView
+            android:id="@+id/imgViewHeader"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop"
+            tools:src="@tools:sample/avatars" />
+
+    </com.google.android.material.card.MaterialCardView>
 
     <TextView
         android:id="@+id/txtNameHeader"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
         android:fontFamily="@font/baloo"
-        android:text="Hosgeldin!"
-        android:textSize="24sp" />
+        android:textAppearance="@style/TextAppearance.Material3.TitleLarge"
+        android:textColor="@android:color/white"
+        app:layout_constraintBottom_toTopOf="@id/txtMailHeader"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:text="Mustafa Koçer" />
 
     <TextView
         android:id="@+id/txtMailHeader"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:fontFamily="@font/aclonica"
-        android:text="mustafakocer.com.tr"
-        android:textSize="14sp" />
+        android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
+        android:textColor="@android:color/white"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:text="mustafa.kocer@example.com" />
 
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
