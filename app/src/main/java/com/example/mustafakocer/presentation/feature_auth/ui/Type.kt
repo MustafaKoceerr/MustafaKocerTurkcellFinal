@@ -1,4 +1,4 @@
-package com.example.mustafakocer.presentation.login.ui.theme
+package com.example.mustafakocer.presentation.feature_auth.ui
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle
