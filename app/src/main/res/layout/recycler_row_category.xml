@@ -1,28 +1,56 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- <layout> ve <data> etiketleri kaldırıldı. -->
-<com.google.android.material.card.MaterialCardView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="8dp"
-    app:cardCornerRadius="8dp"
-    app:cardElevation="4dp"
+    android:layout_margin="@dimen/category_item_margin"
     android:clickable="true"
     android:focusable="true"
-    android:foreground="?attr/selectableItemBackground"> <!-- Tıklama efekti için -->
+    android:foreground="?attr/selectableItemBackground"
+    android:minHeight="@dimen/category_item_min_height"
+    app:cardBackgroundColor="@color/category_item_bg"
+    app:cardCornerRadius="@dimen/category_item_corner_radius"
+    app:cardElevation="@dimen/category_item_elevation"
+    app:cardUseCompatPadding="false"
+    app:strokeColor="@color/category_item_stroke"
+    app:strokeWidth="@dimen/category_item_stroke_width">
 
-    <TextView
-        android:id="@+id/rowCategoryName"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:drawableStart="@drawable/ic_category"
-        android:drawablePadding="16dp"
-        android:fontFamily="@font/oswald_semi_bold"
-        android:gravity="center_vertical"
-        android:padding="16dp"
-        android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
-        tools:text="Electronics" /> <!-- 'android:text' kaldırıldı, 'tools:text' eklendi -->
+        android:paddingStart="@dimen/category_item_padding_h"
+        android:paddingTop="@dimen/category_item_padding_v"
+        android:paddingEnd="@dimen/category_item_padding_h"
+        android:paddingBottom="@dimen/category_item_padding_v">
 
+        <ImageView
+            android:id="@+id/imgCategory"
+            android:layout_width="@dimen/category_icon_size"
+            android:layout_height="@dimen/category_icon_size"
+            android:contentDescription="@string/cd_category_icon"
+            android:importantForAccessibility="no"
+            android:src="@drawable/ic_category_24"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:tint="@color/category_item_icon_tint" />
+
+        <TextView
+            android:id="@+id/rowCategoryName"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/category_item_text_start_margin"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
+            android:textColor="@color/category_item_text"
+            app:layout_constraintBottom_toBottomOf="@id/imgCategory"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/imgCategory"
+            app:layout_constraintTop_toTopOf="@id/imgCategory"
+            app:layout_goneMarginStart="@dimen/category_item_text_start_gone_margin"
+            tools:text="Electronics" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </com.google.android.material.card.MaterialCardView>
