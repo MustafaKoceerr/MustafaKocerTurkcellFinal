@@ -8,53 +8,61 @@
     <fragment
         android:id="@+id/homeFragment"
         android:name="com.example.mustafakocer.presentation.feature_product_list.HomeFragment"
-        android:label="fragment_home"
+        android:label="@string/title_home"
         tools:layout="@layout/fragment_home" />
+
     <fragment
         android:id="@+id/categoryFragment"
         android:name="com.example.mustafakocer.presentation.feature_product_category.CategoryFragment"
-        android:label="fragment_category"
-        tools:layout="@layout/fragment_category" >
+        android:label="@string/title_categories"
+        tools:layout="@layout/fragment_category">
         <action
             android:id="@+id/action_categoryFragment_to_productsByCategoryFragment"
             app:destination="@id/productsByCategoryFragment" />
     </fragment>
+
     <fragment
         android:id="@+id/searchFragment"
         android:name="com.example.mustafakocer.presentation.feature_product_search.SearchFragment"
-        android:label="fragment_search"
+        android:label="@string/title_search"
         tools:layout="@layout/fragment_search" />
 
     <fragment
         android:id="@+id/ordersFragment"
         android:name="com.example.mustafakocer.presentation.feature_orders.OrdersFragment"
-        android:label="fragment_order"
-        tools:layout="@layout/fragment_orders" >
+        android:label="@string/title_orders"
+        tools:layout="@layout/fragment_orders">
         <action
             android:id="@+id/action_ordersFragment_to_orderDetailsFragment"
             app:destination="@id/orderDetailsFragment" />
     </fragment>
+
     <fragment
         android:id="@+id/profileFragment"
         android:name="com.example.mustafakocer.presentation.feature_profile.ProfileFragment"
-        android:label="fragment_profile"
+        android:label="@string/title_profile"
         tools:layout="@layout/fragment_profile" />
+
     <fragment
         android:id="@+id/productsByCategoryFragment"
         android:name="com.example.mustafakocer.presentation.feature_product_category.ProductsByCategoryFragment"
-        android:label="ProductsByCategoryFragment" >
+        android:label="{categoryDisplayName}">
         <argument
             android:name="categoryName"
             app:argType="string" />
+        <argument
+            android:name="categoryDisplayName"
+            app:argType="string" />
     </fragment>
+
     <fragment
         android:id="@+id/cartFragment"
         android:name="com.example.mustafakocer.presentation.feature_cart.CartFragment"
-        android:label="CartFragment" />
+        android:label="@string/title_cart" />
+
     <fragment
         android:id="@+id/orderDetailsFragment"
         android:name="com.example.mustafakocer.presentation.feature_orders.OrderDetailsFragment"
-        android:label="Sipariş Detayı"
         tools:layout="@layout/fragment_order_details">
         <!-- YENİ ARGÜMAN -->
         <argument
