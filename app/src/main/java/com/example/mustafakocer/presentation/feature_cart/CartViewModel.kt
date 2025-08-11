@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.mustafakocer.domain.exception.AppException
 import com.example.mustafakocer.domain.model.CartItem
 import com.example.mustafakocer.domain.usecase.AddOrIncreaseCartItemUseCase
+import com.example.mustafakocer.domain.usecase.ClearCartUseCase
 import com.example.mustafakocer.domain.usecase.DecreaseOrRemoveCartItemUseCase
 import com.example.mustafakocer.domain.usecase.GetCartItemsUseCase
 import com.example.mustafakocer.domain.usecase.GetUserIdUseCase
@@ -24,6 +25,7 @@ class CartViewModel @Inject constructor(
     private val addOrIncreaseCartItemUseCase: AddOrIncreaseCartItemUseCase,
     private val decreaseOrRemoveCartItemUseCase: DecreaseOrRemoveCartItemUseCase,
     private val getUserIdUseCase: GetUserIdUseCase,
+    private val clearCartUseCase: ClearCartUseCase,
 ) : ViewModel() {
 
     // State 1: Detaylı sepet listesi (CartFragment için)
@@ -115,5 +117,18 @@ class CartViewModel @Inject constructor(
         }
         // Sonucu iki ondalık basamaklı bir string'e formatla.
         _totalPrice.value = String.format("%.2f", total)
+    }
+
+    // YENİ: Onay dialog'undan sonra çağrılacak fonksiyon.
+    fun onClearCartConfirmed() {
+        // Mevcut kullanıcı ID'si null değilse devam et.
+        currentUserId?.let { userId ->
+            viewModelScope.launch {
+                // UseCase'i çağır. Sonucu dinlememize gerek yok,
+                // çünkü `observeCart` zaten Firebase'deki değişikliği yakalayıp
+                // state'i (boş liste olarak) güncelleyecektir.
+                clearCartUseCase(userId)
+            }
+        }
     }
 }
