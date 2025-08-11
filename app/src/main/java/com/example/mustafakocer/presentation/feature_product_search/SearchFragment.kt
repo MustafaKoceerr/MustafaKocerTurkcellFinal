@@ -5,6 +5,7 @@ import android.view.View
 import android.widget.Toast
 import androidx.appcompat.widget.SearchView
 import androidx.core.view.isVisible
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -14,6 +15,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import com.example.mustafakocer.databinding.FragmentSearchBinding
 import com.example.mustafakocer.presentation.base.BaseFragment
 import com.example.mustafakocer.presentation.common.ProductListAdapter
+import com.example.mustafakocer.presentation.feature_cart.CartViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.collectLatest
@@ -25,6 +27,9 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>(FragmentSearchBinding
 
     private val viewModel: SearchViewModel by viewModels()
 
+    // YENİ: CartViewModel, Activity kapsamında paylaşılan sepet state'ini yönetir.
+    private val cartViewModel: CartViewModel by activityViewModels()
+
     // ProductSearchAdapter yerine, yeniden kullanılabilir ProductListAdapter'ı kullanıyoruz.
     private lateinit var productListAdapter: ProductListAdapter
 
@@ -35,28 +40,23 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>(FragmentSearchBinding
         setupSearchView()
         observeSearchResults()
         observeLoadState() // YENİ: Yükleme ve hata durumlarını dinle.
+        observeCartState() // YENİ: Sepet durumunu dinlemeye başla.
     }
 
     private fun setupRecyclerView() {
-        // Yeniden kullanılabilir adaptörümüzü, bu ekrana özel lambda'larla kuruyoruz.
         productListAdapter = ProductListAdapter(
             onProductClick = { product ->
                 Toast.makeText(requireContext(), "${product.title} clicked", Toast.LENGTH_SHORT)
                     .show()
+                // TODO: Ürün detay sayfasına navigasyon eklenecek.
             },
             onAddToCartClick = { product ->
-                Toast.makeText(
-                    requireContext(),
-                    "${product.title} added to cart",
-                    Toast.LENGTH_SHORT
-                ).show()
+                // DEĞİŞTİ: Tıklama olayını CartViewModel'a iletiyoruz.
+                cartViewModel.onIncreaseClicked(product.id)
             },
             onRemoveFromCartClick = { product ->
-                Toast.makeText(
-                    requireContext(),
-                    "${product.title} removed from cart",
-                    Toast.LENGTH_SHORT
-                ).show()
+                // DEĞİŞTİ: Tıklama olayını CartViewModel'a iletiyoruz.
+                cartViewModel.onDecreaseClicked(product.id)
             }
         )
 
@@ -66,6 +66,16 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>(FragmentSearchBinding
         }
     }
 
+    // YENİ: CartViewModel'daki cartMap'i dinler ve adaptörü günceller.
+    private fun observeCartState() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                cartViewModel.cartMap.collectLatest { cartMap ->
+                    productListAdapter.updateCartMap(cartMap)
+                }
+            }
+        }
+    }
 
     private fun setupSearchView() {
         binding.searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
