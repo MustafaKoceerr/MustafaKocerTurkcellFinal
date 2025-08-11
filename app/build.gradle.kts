@@ -57,6 +57,11 @@ android {
 }
 
 dependencies {
+
+    // https://mvnrepository.com/artifact/androidx.swiperefreshlayout/swiperefreshlayout
+    implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
+    // https://mvnrepository.com/artifact/com.google.android.material/material
+    implementation("com.google.android.material:material:1.12.0")
     // Kotlinx Serialization JSON parser
     implementation(libs.kotlinx.serialization.json)
 

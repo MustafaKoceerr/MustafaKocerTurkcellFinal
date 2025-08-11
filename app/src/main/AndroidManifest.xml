@@ -2,7 +2,13 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <!-- Ağ erişimi -->
     <uses-permission android:name="android.permission.INTERNET" />
+
+    <!-- Android 13+ bildirim izni (33 ve üzeri için şart) -->
+    <uses-permission
+        android:name="android.permission.POST_NOTIFICATIONS"
+        tools:targetApi="33" />
 
     <application
         android:name=".MyApplication"
@@ -13,34 +19,32 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.MustafaKocerTurkcellFinal"
-        tools:targetApi="31">
-        <activity
+        android:theme="@style/Theme.MustiShop"
+        tools:targetApi="34">
 
+        <!-- Ana kabuk (fragment'ları barındırır) -->
+        <activity
             android:name=".presentation.shell.MainActivity"
+            android:exported="true" />
 
-            android:exported="true">
-
-        </activity>
+        <!-- Giriş/AUTH akışı -->
         <activity
-
             android:name=".presentation.feature_auth.AuthActivity"
             android:exported="true"
-            android:label="@string/title_activity_login"
-
-            android:theme="@style/Theme.MustafaKocerTurkcellFinal">
+            android:label="@string/title_activity_login">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-
         </activity>
 
+        <!-- Firebase Cloud Messaging alıcısı -->
         <service
             android:name=".service.MyFirebaseMessageService"
-            android:exported="true">
+            android:exported="false">
             <intent-filter>
-                <action android:name="com.google.firebase.INSTANCE_ID_EVENT" />
+                <!-- Eski INSTANCE_ID_EVENT kaldırıldı; MESSAGING_EVENT kullanılmalı -->
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
 
