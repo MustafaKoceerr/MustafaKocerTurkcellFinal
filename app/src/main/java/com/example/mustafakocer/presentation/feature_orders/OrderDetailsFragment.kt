@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.mustafakocer.R
 import com.example.mustafakocer.databinding.FragmentOrderDetailsBinding
 import com.example.mustafakocer.domain.model.Order
 import com.example.mustafakocer.presentation.base.BaseFragment
@@ -26,8 +27,18 @@ class OrderDetailsFragment :
 
         setupRecyclerView()
         populateUi(order)
+        // YENİ: Başlığı burada manuel olarak ayarlıyoruz.
+        setupToolbarTitle(order)
+
     }
 
+    // YENİ FONKSİYON
+    private fun setupToolbarTitle(order: Order) {
+        // String kaynağını alıp, içindeki yer tutucuyu sipariş ID'si ile dolduruyoruz.
+        val dynamicTitle = getString(R.string.title_order_details, order.id)
+        // Activity'nin ActionBar'ına erişip başlığı ayarlıyoruz.
+        (activity as? AppCompatActivity)?.supportActionBar?.title = dynamicTitle
+    }
 
     private fun setupRecyclerView() {
         productListAdapter = OrderProductListAdapter()
@@ -39,9 +50,6 @@ class OrderDetailsFragment :
     }
 
     private fun populateUi(order: Order) {
-        // Toolbar başlığını sipariş numarası ile güncelleyelim.
-        (activity as? AppCompatActivity)?.supportActionBar?.title = "Sipariş No: #${order.id}"
-
         // Sipariş özeti kartını doldur.
         binding.apply {
             txtOrderId.text = order.id.toString()
