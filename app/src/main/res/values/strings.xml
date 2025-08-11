@@ -11,4 +11,12 @@
     <string name="empty_orders_message">Henüz verilmiş bir siparişiniz bulunmuyor.</string>
 
 
+    <string name="title_home">Ana Sayfa</string>
+    <string name="title_categories">Kategoriler</string>
+    <string name="title_search">Ara</string>
+    <string name="title_orders">Siparişlerim</string>
+    <string name="title_profile">Profilim</string>
+    <string name="title_cart">Sepetim</string>
+    <string name="title_order_details">Sipariş Detayı #%1$d</string>
+
 </resources>
