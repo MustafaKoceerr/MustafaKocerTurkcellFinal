@@ -1,53 +1,92 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
+<com.google.android.material.card.MaterialCardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:padding="16dp">
+    android:clickable="false"
+    android:focusable="false"
+    app:cardUseCompatPadding="false"
+    app:cardCornerRadius="@dimen/od_item_card_corner_radius"
+    app:cardElevation="@dimen/od_item_card_elevation"
+    app:cardBackgroundColor="?attr/colorSurface"
+    app:strokeColor="?attr/colorOutlineVariant"
+    app:strokeWidth="@dimen/od_item_card_stroke_width">
 
-    <com.google.android.material.imageview.ShapeableImageView
-        android:id="@+id/imgProduct"
-        android:layout_width="80dp"
-        android:layout_height="80dp"
-        android:scaleType="centerCrop"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.Medium"
-        tools:src="@tools:sample/avatars" />
-
-    <TextView
-        android:id="@+id/txtProductTitle"
-        android:layout_width="0dp"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:ellipsize="end"
-        android:maxLines="2"
-        android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/imgProduct"
-        app:layout_constraintTop_toTopOf="@id/imgProduct"
-        tools:text="iPhone 12 Silicone Case with MagSafe Plum" />
+        android:paddingStart="@dimen/od_item_padding_h"
+        android:paddingEnd="@dimen/od_item_padding_h"
+        android:paddingTop="@dimen/od_item_padding_v"
+        android:paddingBottom="@dimen/od_item_padding_v">
 
-    <TextView
-        android:id="@+id/txtQuantity"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
-        app:layout_constraintStart_toStartOf="@id/txtProductTitle"
-        app:layout_constraintTop_toBottomOf="@id/txtProductTitle"
-        tools:text="Adet: 5" />
+        <!-- Ürün görseli -->
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/imgProduct"
+            android:layout_width="@dimen/od_item_image_size"
+            android:layout_height="@dimen/od_item_image_size"
+            android:scaleType="centerCrop"
+            android:contentDescription="@string/cd_order_item_image"
+            app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.Medium"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            tools:src="@tools:sample/avatars" />
 
-    <TextView
-        android:id="@+id/txtPricePerUnit"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="@style/TextAppearance.Material3.BodyLarge"
-        android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="@id/imgProduct"
-        app:layout_constraintEnd_toEndOf="parent"
-        tools:text="$25.59" />
+        <!-- Başlık -->
+        <TextView
+            android:id="@+id/txtProductTitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/od_item_text_start_margin"
+            android:ellipsize="end"
+            android:maxLines="2"
+            android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
+            android:textColor="?attr/colorOnSurface"
+            app:layout_constraintStart_toEndOf="@id/imgProduct"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/imgProduct"
+            tools:text="iPhone 12 Silicone Case with MagSafe Plum" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <!-- Adet -->
+        <TextView
+            android:id="@+id/txtQuantity"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/od_item_quantity_top"
+            android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
+            android:textColor="?attr/colorOnSurfaceVariant"
+            app:layout_constraintStart_toStartOf="@id/txtProductTitle"
+            app:layout_constraintTop_toBottomOf="@id/txtProductTitle"
+            tools:text="Adet: 5" />
+
+        <!-- Birim fiyat -->
+        <TextView
+            android:id="@+id/txtPricePerUnit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="@style/TextAppearance.Material3.BodyLarge"
+            android:textStyle="bold"
+            android:textColor="?attr/colorOnSurface"
+            app:layout_constraintBaseline_toBaselineOf="@id/txtQuantity"
+            app:layout_constraintEnd_toEndOf="parent"
+            tools:text="₺25,59" />
+
+        <!-- Satır toplamı (YENİ) -->
+        <TextView
+            android:id="@+id/txtLineTotal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/od_item_total_top"
+            android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
+            android:textStyle="bold"
+            android:textColor="?attr/colorPrimary"
+            app:layout_constraintTop_toBottomOf="@id/txtPricePerUnit"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="@id/imgProduct"
+            tools:text="₺127,95" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</com.google.android.material.card.MaterialCardView>
