@@ -5,53 +5,186 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="8dp"
-    app:cardCornerRadius="12dp"
-    app:cardElevation="4dp">
+    android:layout_margin="@dimen/product_item_margin"
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="?attr/selectableItemBackground"
+    app:cardUseCompatPadding="false"
+    app:cardCornerRadius="@dimen/product_item_corner_radius"
+    app:cardElevation="@dimen/product_item_elevation"
+    app:cardBackgroundColor="?attr/colorSurface"
+    app:strokeColor="?attr/colorOutlineVariant"
+    app:strokeWidth="@dimen/product_item_stroke_width">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <!-- Ürün Resmi -->
-        <ImageView
+        <!-- Görsel (1:1 oran) -->
+        <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/imgProduct"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:scaleType="centerCrop"
+            android:contentDescription="@string/cd_product_image"
             app:layout_constraintDimensionRatio="1:1"
-            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
+            app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.Medium"
             tools:srcCompat="@tools:sample/backgrounds/scenic" />
 
-        <!-- İçerik Alanı -->
+        <!-- % İndirim rozeti (varsa) -->
+        <TextView
+            android:id="@+id/badgeDiscount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingStart="@dimen/badge_h"
+            android:paddingEnd="@dimen/badge_h"
+            android:paddingTop="@dimen/badge_v"
+            android:paddingBottom="@dimen/badge_v"
+            android:textAppearance="@style/TextAppearance.Material3.LabelSmall"
+            android:textStyle="bold"
+            android:textColor="?attr/colorOnPrimaryContainer"
+            android:background="@drawable/bg_badge_label"
+            android:backgroundTint="?attr/colorPrimaryContainer"
+            android:visibility="gone"
+            app:layout_constraintStart_toStartOf="@id/imgProduct"
+            app:layout_constraintTop_toTopOf="@id/imgProduct"
+            app:layout_goneMarginStart="@dimen/badge_edge_margin"
+            app:layout_goneMarginTop="@dimen/badge_edge_margin"
+            android:layout_marginStart="@dimen/badge_edge_margin"
+            android:layout_marginTop="@dimen/badge_edge_margin"
+            tools:text="%15"
+            tools:visibility="visible" />
+
+        <!-- Stok rozeti: “Tükendi” ya da “Son 3” -->
+        <TextView
+            android:id="@+id/badgeStock"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingStart="@dimen/badge_h"
+            android:paddingEnd="@dimen/badge_h"
+            android:paddingTop="@dimen/badge_v"
+            android:paddingBottom="@dimen/badge_v"
+            android:textAppearance="@style/TextAppearance.Material3.LabelSmall"
+            android:textStyle="bold"
+            android:textColor="?attr/colorOnTertiaryContainer"
+            android:background="@drawable/bg_badge_label"
+            android:backgroundTint="?attr/colorTertiaryContainer"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="@id/imgProduct"
+            app:layout_constraintTop_toTopOf="@id/imgProduct"
+            android:layout_marginEnd="@dimen/badge_edge_margin"
+            android:layout_marginTop="@dimen/badge_edge_margin"
+            tools:text="Son 3"
+            tools:visibility="gone" />
+
+        <!-- Ekle (qty==0 iken) -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnAddToCart"
+            style="@style/Widget.Material3.Button.TonalButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minHeight="@dimen/product_add_min_touch"
+            android:minWidth="0dp"
+            android:insetLeft="0dp"
+            android:insetRight="0dp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:paddingStart="@dimen/product_add_hpad"
+            android:paddingEnd="@dimen/product_add_hpad"
+            android:paddingTop="@dimen/product_add_vpad"
+            android:paddingBottom="@dimen/product_add_vpad"
+            android:text="@string/product_add_to_cart"
+            android:contentDescription="@string/cd_add_to_cart"
+            app:icon="@drawable/ic_add_24"
+            app:iconPadding="@dimen/product_add_icon_pad"
+            app:iconGravity="textStart"
+            app:layout_constraintBottom_toBottomOf="@id/imgProduct"
+            app:layout_constraintEnd_toEndOf="@id/imgProduct"
+            android:layout_marginEnd="@dimen/product_cart_overlay_margin"
+            android:layout_marginBottom="@dimen/product_cart_overlay_margin"
+            tools:visibility="visible" />
+
+        <!-- − qty + (qty>0 iken) -->
+        <LinearLayout
+            android:id="@+id/layoutCartOperations"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_cart_overlay"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingStart="@dimen/cart_overlay_hpad"
+            android:paddingEnd="@dimen/cart_overlay_hpad"
+            android:paddingTop="@dimen/cart_overlay_vpad"
+            android:paddingBottom="@dimen/cart_overlay_vpad"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="@id/imgProduct"
+            app:layout_constraintEnd_toEndOf="@id/imgProduct"
+            android:layout_marginEnd="@dimen/product_cart_overlay_margin"
+            android:layout_marginBottom="@dimen/product_cart_overlay_margin"
+            tools:visibility="gone">
+
+            <ImageButton
+                android:id="@+id/btnMinus"
+                style="@style/Widget.Material3.Button.Icon"
+                android:layout_width="@dimen/cart_btn_size"
+                android:layout_height="@dimen/cart_btn_size"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/cd_decrease"
+                app:icon="@drawable/ic_remove_24"
+                app:iconSize="@dimen/cart_btn_icon_size" />
+
+            <TextView
+                android:id="@+id/txtQuantity"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/cart_qty_gap"
+                android:layout_marginEnd="@dimen/cart_qty_gap"
+                android:textAppearance="@style/TextAppearance.Material3.TitleSmall"
+                android:textStyle="bold"
+                android:textColor="?attr/colorOnSurface"
+                tools:text="1" />
+
+            <ImageButton
+                android:id="@+id/btnPlus"
+                style="@style/Widget.Material3.Button.Icon"
+                android:layout_width="@dimen/cart_btn_size"
+                android:layout_height="@dimen/cart_btn_size"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/cd_increase"
+                app:icon="@drawable/ic_add_24"
+                app:iconSize="@dimen/cart_btn_icon_size" />
+        </LinearLayout>
+
+        <!-- İçerik -->
         <LinearLayout
             android:id="@+id/layoutContent"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="12dp"
-            app:layout_constraintEnd_toEndOf="parent"
+            android:padding="@dimen/product_content_padding"
             app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/imgProduct">
 
-            <!-- Ürün Başlığı -->
+            <!-- Başlık -->
             <TextView
                 android:id="@+id/txtTitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:ellipsize="end"
                 android:maxLines="2"
-                android:minLines="2"
+                android:ellipsize="end"
                 android:textAppearance="@style/TextAppearance.Material3.TitleSmall"
+                android:textColor="?attr/colorOnSurface"
                 tools:text="Apple iPhone 13 Pro Max 256GB Sierra Blue" />
 
-            <!-- Puan ve Stok -->
+            <!-- Puan -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
+                android:layout_marginTop="@dimen/product_rating_top"
                 android:gravity="center_vertical"
                 android:orientation="horizontal">
 
@@ -61,27 +194,27 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:numStars="5"
-                    android:stepSize="0.1"
-                    android:theme="@style/RatingBar"
+                    android:stepSize="0.5"
+                    android:progressTint="?attr/colorSecondary"
+                    android:secondaryProgressTint="?attr/colorSecondary"
+                    android:progressBackgroundTint="?attr/colorOutlineVariant"
                     tools:rating="4.8" />
 
                 <TextView
-                    android:id="@+id/txtStock"
-                    android:layout_width="0dp"
+                    android:id="@+id/txtRatingValue"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:layout_weight="1"
-                    android:gravity="end"
-                    android:textAppearance="@style/TextAppearance.Material3.LabelSmall"
-                    android:textStyle="italic"
-                    tools:text="In Stock" />
+                    android:layout_marginStart="@dimen/product_rating_value_gap"
+                    android:textAppearance="@style/TextAppearance.Material3.LabelMedium"
+                    android:textColor="?attr/colorOnSurfaceVariant"
+                    tools:text="4.8" />
             </LinearLayout>
 
             <!-- Fiyatlar -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
+                android:layout_marginTop="@dimen/product_prices_top"
                 android:gravity="bottom"
                 android:orientation="horizontal">
 
@@ -90,66 +223,19 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
-                    android:textColor="?attr/colorPrimary"
                     android:textStyle="bold"
-                    tools:text="$1099.00" />
+                    android:textColor="?attr/colorPrimary"
+                    tools:text="₺10.999" />
 
                 <TextView
                     android:id="@+id/txtPrice"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
+                    android:layout_marginStart="@dimen/product_original_price_gap_start"
                     android:textAppearance="@style/TextAppearance.Material3.BodySmall"
-                    android:textColor="?android:attr/textColorSecondary"
-                    tools:text="$1299.00" />
+                    android:textColor="?attr/colorOnSurfaceVariant"
+                    tools:text="₺12.999" />
             </LinearLayout>
-
-        </LinearLayout>
-
-        <!-- Sepet İşlemleri -->
-        <LinearLayout
-            android:id="@+id/layoutCartOperations"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
-            android:layout_marginBottom="8dp"
-            android:background="@drawable/cart_buttons_background"
-            android:elevation="2dp"
-            android:gravity="center_vertical"
-            android:orientation="horizontal"
-            android:padding="4dp"
-            app:layout_constraintBottom_toBottomOf="@id/imgProduct"
-            app:layout_constraintEnd_toEndOf="@id/imgProduct">
-
-            <ImageButton
-                android:id="@+id/btnMinus"
-                style="?attr/materialIconButtonStyle"
-                android:layout_width="32dp"
-                android:layout_height="32dp"
-                android:contentDescription="Remove one"
-                app:icon="@drawable/ic_minus"
-                app:iconSize="18dp"
-                tools:ignore="TouchTargetSizeCheck" />
-
-            <TextView
-                android:id="@+id/txtQuantity"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_marginEnd="8dp"
-                android:textAppearance="@style/TextAppearance.Material3.TitleSmall"
-                android:textStyle="bold"
-                tools:text="1" />
-
-            <ImageButton
-                android:id="@+id/btnPlus"
-                style="?attr/materialIconButtonStyle"
-                android:layout_width="32dp"
-                android:layout_height="32dp"
-                android:contentDescription="Add one"
-                app:icon="@drawable/ic_plus"
-                app:iconSize="18dp"
-                tools:ignore="TouchTargetSizeCheck" />
         </LinearLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
