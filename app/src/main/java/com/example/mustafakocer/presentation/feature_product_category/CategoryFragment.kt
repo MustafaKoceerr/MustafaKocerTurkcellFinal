@@ -1,10 +1,7 @@
 package com.example.mustafakocer.presentation.feature_product_category
 
 import android.os.Bundle
-import android.util.Log
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
@@ -14,9 +11,9 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.mustafakocer.databinding.FragmentCategoryBinding
+import com.example.mustafakocer.domain.model.Category
 import com.example.mustafakocer.domain.util.Resource
 import com.example.mustafakocer.presentation.base.BaseFragment
-import com.example.mustafakocer.util.visibleProgressBar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -30,18 +27,16 @@ class CategoryFragment : BaseFragment<FragmentCategoryBinding>(FragmentCategoryB
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         setupRecyclerView()
         observeCategories()
     }
 
     private fun setupRecyclerView() {
-        // Yeni adaptörümüzü, tıklama olayını yönetecek bir lambda ile kuruyoruz.
-        categoryListAdapter = CategoryListAdapter { categorySlug ->
-            // Adaptörden gelen 'slug' ile navigasyon işlemini gerçekleştir.
-            navigateToProductsByCategory(categorySlug)
+        // DEĞİŞTİ: Tıklama olayı artık tüm Category nesnesini alıyor.
+        categoryListAdapter = CategoryListAdapter { category ->
+            // Gelen category nesnesini kullanarak navigasyonu çağır.
+            navigateToProductsByCategory(category)
         }
-
         binding.categoryRecyclerView.apply {
             adapter = categoryListAdapter
             layoutManager = LinearLayoutManager(requireContext())
@@ -80,10 +75,12 @@ class CategoryFragment : BaseFragment<FragmentCategoryBinding>(FragmentCategoryB
         }
     }
 
-    private fun navigateToProductsByCategory(categorySlug: String) {
-        // Safe Args kullanarak ve argümanı ('categoryName') geçirerek navigasyonu tetikle.
+    // DEĞİŞTİ: Fonksiyon artık Category nesnesi alıyor.
+    private fun navigateToProductsByCategory(category: Category) {
+        // Safe Args kullanarak ve İKİ argümanı da geçirerek navigasyonu tetikle.
         val action = CategoryFragmentDirections.actionCategoryFragmentToProductsByCategoryFragment(
-            categoryName = categorySlug
+            categoryName = category.slug,
+            categoryDisplayName = category.name
         )
         findNavController().navigate(action)
     }

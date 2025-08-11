@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Toast
 import androidx.core.view.isVisible
+import androidx.fragment.app.activityViewModels // DEĞİŞTİ: activityViewModels'ı import et
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -14,6 +15,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import com.example.mustafakocer.databinding.FragmentProductsByCategoryBinding
 import com.example.mustafakocer.presentation.base.BaseFragment
 import com.example.mustafakocer.presentation.common.ProductListAdapter
+import com.example.mustafakocer.presentation.feature_cart.CartViewModel // YENİ: CartViewModel'ı import et
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -22,11 +24,13 @@ import kotlinx.coroutines.launch
 class ProductsByCategoryFragment : BaseFragment<FragmentProductsByCategoryBinding>(
     FragmentProductsByCategoryBinding::inflate
 ) {
-    // ViewModel'i Hilt ile alıyoruz. Activity-scoped değil, Fragment-scoped.
+    // CategoryViewModel, bu fragment'a özel state'i (seçilen kategori ve ürünleri) yönetir.
     private val viewModel: CategoryViewModel by viewModels()
-    private val args: ProductsByCategoryFragmentArgs by navArgs()
 
-    // ProductAdapter yerine yeniden kullanılabilir ProductListAdapter'ı kullanıyoruz.
+    // YENİ: CartViewModel, Activity kapsamında paylaşılan sepet state'ini yönetir.
+    private val cartViewModel: CartViewModel by activityViewModels()
+
+    private val args: ProductsByCategoryFragmentArgs by navArgs()
     private lateinit var productListAdapter: ProductListAdapter
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -35,14 +39,10 @@ class ProductsByCategoryFragment : BaseFragment<FragmentProductsByCategoryBindin
         setupRecyclerView()
         observeProductPagingFlow()
         observeLoadState()
+        observeCartState() // YENİ: Sepet durumunu dinlemeye başla.
 
-        // Fragment oluşturulduğunda, ViewModel'e hangi kategorinin seçildiğini bildir.
-        // Bu, PagingData akışını tetikleyecektir.
         val categoryName = args.categoryName
         viewModel.onCategorySelected(categoryName)
-
-        // Toolbar başlığını ayarlayabilirsin
-        // (activity as AppCompatActivity).supportActionBar?.title = categoryName.capitalize()
     }
 
     private fun setupRecyclerView() {
@@ -53,20 +53,12 @@ class ProductsByCategoryFragment : BaseFragment<FragmentProductsByCategoryBindin
                 // TODO: Ürün detay sayfasına navigasyon eklenecek.
             },
             onAddToCartClick = { product ->
-                Toast.makeText(
-                    requireContext(),
-                    "${product.title} added to cart",
-                    Toast.LENGTH_SHORT
-                ).show()
-                // TODO: Sepete ekleme mantığı eklenecek.
+                // DEĞİŞTİ: Tıklama olayını CartViewModel'a iletiyoruz.
+                cartViewModel.onIncreaseClicked(product.id)
             },
             onRemoveFromCartClick = { product ->
-                Toast.makeText(
-                    requireContext(),
-                    "${product.title} removed from cart",
-                    Toast.LENGTH_SHORT
-                ).show()
-                // TODO: Sepetten çıkarma mantığı eklenecek.
+                // DEĞİŞTİ: Tıklama olayını CartViewModel'a iletiyoruz.
+                cartViewModel.onDecreaseClicked(product.id)
             }
         )
 
@@ -76,12 +68,21 @@ class ProductsByCategoryFragment : BaseFragment<FragmentProductsByCategoryBindin
         }
     }
 
+    // YENİ: CartViewModel'daki cartMap'i dinler ve adaptörü günceller.
+    private fun observeCartState() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                cartViewModel.cartMap.collectLatest { cartMap ->
+                    productListAdapter.updateCartMap(cartMap)
+                }
+            }
+        }
+    }
+
     private fun observeProductPagingFlow() {
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                // ViewModel'den gelen PagingData akışını dinle.
                 viewModel.productsByCategoryFlow.collectLatest { pagingData ->
-                    // Gelen yeni PagingData'yı adaptöre gönder.
                     productListAdapter.submitData(pagingData)
                 }
             }
@@ -91,14 +92,9 @@ class ProductsByCategoryFragment : BaseFragment<FragmentProductsByCategoryBindin
     private fun observeLoadState() {
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                // Adaptörün yükleme durumlarını dinle.
                 productListAdapter.loadStateFlow.collectLatest { loadStates ->
                     val refreshState = loadStates.refresh
-
-                    // Yükleniyorsa progressBar'ı göster.
                     binding.progressbar.isVisible = refreshState is LoadState.Loading
-
-                    // Hata varsa, Toast ile göster.
                     if (refreshState is LoadState.Error) {
                         Toast.makeText(
                             requireContext(),
