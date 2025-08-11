@@ -19,4 +19,96 @@
     <string name="title_cart">Sepetim</string>
     <string name="title_order_details">Sipariş Detayı #%1$d</string>
 
+    <!-- Cart Fragment -->
+    <string name="cart_empty_message">Sepetinizde ürün bulunmuyor.</string>
+    <string name="cart_summary_total_label">Genel Toplam</string>
+    <string name="cart_checkout_button">Ödemeye Geç</string>
+
+    <!-- Order Details Fragment -->
+    <string name="order_details_summary_title">Sipariş Özeti</string>
+    <string name="order_details_order_id_label">Sipariş Numarası:</string>
+    <string name="order_details_total_amount_label">Toplam Tutar:</string>
+    <string name="order_details_products_section_title">Sipariş Edilen Ürünler</string>
+
+    <string name="cd_header_profile_image">Profil resmi</string>
+
+    <!-- Home states & actions -->
+    <string name="state_empty_title">Henüz ürün bulunamadı</string>
+    <string name="state_empty_subtitle">Filtreleri değiştirin veya daha sonra tekrar deneyin.</string>
+    <string name="state_error_title">Bir şeyler ters gitti</string>
+    <string name="action_retry">Tekrar dene</string>
+    <string name="cd_retry">Tekrar dene butonu</string>
+    <string name="action_scroll_to_top">En üste dön</string>
+    <string name="cd_scroll_to_top">Listeyi en üste kaydır</string>
+
+    <string name="category_empty_title">Kategori bulunamadı</string>
+    <string name="category_empty_subtitle">Daha sonra tekrar deneyin veya filtreleri temizleyin.</string>
+    <string name="category_error_title">Kategoriler yüklenemedi</string>
+
+    <string name="pbc_empty_title">Bu kategoride ürün bulunamadı</string>
+    <string name="pbc_empty_subtitle">Başka bir kategori seçin veya filtreleri temizleyin.</string>
+    <string name="pbc_error_title">Ürünler yüklenemedi</string>
+
+    <string name="cd_checkout">Ödeme yap butonu</string>
+
+
+    <string name="orders_error_title">Siparişler yüklenemedi</string>
+
+
+    <!-- Yeni alanlar -->
+    <string name="order_details_date_label">Tarih</string>
+    <string name="order_details_items_label">Ürün Adedi</string>
+
+    <!-- Durumlar (chip) -->
+    <string name="order_status_preparing">Hazırlanıyor</string>
+    <string name="order_status_paid">Ödendi</string>
+    <string name="order_status_shipped">Kargolandı</string>
+    <string name="order_status_delivered">Teslim edildi</string>
+
+    <!-- Hata / aksiyon -->
+    <string name="order_details_error_title">Sipariş detayı yüklenemedi</string>
+
+    <!-- Arama -->
+    <string name="search_hint">Ürün ara</string>
+    <string name="search_empty_title">Sonuç bulunamadı</string>
+    <string name="search_empty_subtitle">Farklı anahtar kelimeler deneyin ya da filtreleri temizleyin.</string>
+    <string name="search_error_title">Arama sırasında bir hata oluştu</string>
+
+    <!-- Profil -->
+    <string name="cd_profile_image">Profil resmi</string>
+    <string name="profile_change_photo">Fotoğrafı değiştir</string>
+    <string name="cd_change_photo">Profil fotoğrafını değiştir</string>
+
+    <string name="profile_first_name_hint">Ad</string>
+    <string name="profile_last_name_hint">Soyad</string>
+    <string name="profile_email_hint">E-posta</string>
+    <string name="profile_phone_hint">Telefon Numarası</string>
+    <string name="profile_age_hint">Yaş</string>
+
+    <string name="profile_update_button">Bilgileri Güncelle</string>
+    <string name="cd_update_profile">Bilgileri güncelle butonu</string>
+
+
+    <string name="cd_category_icon">Kategori simgesi</string>
+
+    <string name="order_item_id_label">Sipariş No:</string>
+    <string name="cd_go_to_order_details">Sipariş detayına git</string>
+
+    <!-- (İsteğe bağlı) Erişilebilirlik için satır özeti -->
+    <string name="a11y_order_row">Sipariş %1$s, %2$s tarihinde, %3$d ürün, toplam %4$s</string>
+
+    <string name="cd_order_item_image">Sipariş ürünü görseli</string>
+    <!-- İstersen runtime'da kullanmak için -->
+    <string name="order_details_qty_label">Adet: %1$d</string>
+
+
+    <string name="cd_product_image">Ürün görseli</string>
+    <string name="product_add_to_cart">Ekle</string>
+    <string name="cd_add_to_cart">Sepete ekle</string>
+    <string name="cd_increase">Adeti artır</string>
+    <string name="cd_decrease">Adeti azalt</string>
+    <string name="product_out_of_stock">Tükendi</string>
+    <string name="product_low_stock">Son %1$d</string> <!-- örn: Son 3 -->
+
+
 </resources>
