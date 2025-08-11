@@ -50,7 +50,6 @@ class ProductListAdapter(
             binding.txtTitle.text = product.title
             binding.txtDiscountedPrice.text = product.discountedPrice
             binding.ratingBar.rating = product.rating
-            binding.txtStock.text = "Stock: ${product.stock}"
 
             binding.txtPrice.apply {
                 text = product.price

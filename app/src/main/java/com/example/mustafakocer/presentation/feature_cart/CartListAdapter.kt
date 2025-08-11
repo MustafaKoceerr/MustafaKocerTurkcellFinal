@@ -52,7 +52,6 @@ class CartListAdapter(
             binding.txtTitle.text = product.title
             binding.txtDiscountedPrice.text = product.discountedPrice
             binding.ratingBar.rating = product.rating
-            binding.txtStock.text = "Stok: ${product.stock}"
             binding.txtQuantity.text = cartItem.quantity.toString()
 
             // Miktar her zaman 1 veya daha fazla olacağı için miktar ve eksi butonu hep görünür.
