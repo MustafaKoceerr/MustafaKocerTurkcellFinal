@@ -2,12 +2,13 @@ package com.example.mustafakocer.presentation.feature_cart
 
 import android.graphics.Paint
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.example.mustafakocer.databinding.RecylerviewRowProductGridBinding // YENİ LAYOUT BINDING'İ
+import com.example.mustafakocer.databinding.RecylerviewRowProductGridBinding
 import com.example.mustafakocer.domain.model.CartItem
 
 /**
@@ -51,8 +52,12 @@ class CartListAdapter(
             binding.txtTitle.text = product.title
             binding.txtDiscountedPrice.text = product.discountedPrice
             binding.ratingBar.rating = product.rating
-            binding.txtStock.text = "Stok: ${product.stock}" // "Stock" yerine "Stok"
-            binding.txtQuantity.text = cartItem.quantity.toString() // Miktarı göster
+            binding.txtStock.text = "Stok: ${product.stock}"
+            binding.txtQuantity.text = cartItem.quantity.toString()
+
+            // Miktar her zaman 1 veya daha fazla olacağı için miktar ve eksi butonu hep görünür.
+            binding.txtQuantity.visibility = View.VISIBLE
+            binding.btnMinus.visibility = View.VISIBLE
 
             binding.txtPrice.apply {
                 text = product.price
@@ -86,7 +91,7 @@ class CartListAdapter(
 
         override fun areContentsTheSame(oldItem: CartItem, newItem: CartItem): Boolean {
             // İçeriklerinin aynı olup olmadığını kontrol et.
-            // `CartItem` bir data class olduğu için bu, tüm alanları karşılaştırır.
+            // `CartItem` bir data class olduğu için bu, hem product hem de quantity'yi karşılaştırır.
             return oldItem == newItem
         }
     }
