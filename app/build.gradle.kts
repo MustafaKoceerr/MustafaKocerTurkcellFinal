@@ -39,6 +39,8 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
+
+        isCoreLibraryDesugaringEnabled = true
     }
 
     buildFeatures {
@@ -57,6 +59,13 @@ android {
 }
 
 dependencies {
+    implementation("androidx.viewpager2:viewpager2:1.1.0")
+
+
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.5")
+
+    // https://mvnrepository.com/artifact/com.google.android.material/material
+    implementation("com.google.android.material:material:1.12.0")
     // Kotlinx Serialization JSON parser
     implementation(libs.kotlinx.serialization.json)
 

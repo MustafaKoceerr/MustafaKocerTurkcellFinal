@@ -5,17 +5,20 @@ import androidx.lifecycle.viewModelScope
 import com.example.mustafakocer.domain.exception.AppException
 import com.example.mustafakocer.domain.model.CartItem
 import com.example.mustafakocer.domain.usecase.AddOrIncreaseCartItemUseCase
+import com.example.mustafakocer.domain.usecase.ClearCartUseCase
 import com.example.mustafakocer.domain.usecase.DecreaseOrRemoveCartItemUseCase
 import com.example.mustafakocer.domain.usecase.GetCartItemsUseCase
 import com.example.mustafakocer.domain.usecase.GetUserIdUseCase
 import com.example.mustafakocer.domain.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import java.text.DecimalFormat
 import javax.inject.Inject
 
 @HiltViewModel
@@ -23,31 +26,30 @@ class CartViewModel @Inject constructor(
     private val getCartItemsUseCase: GetCartItemsUseCase,
     private val addOrIncreaseCartItemUseCase: AddOrIncreaseCartItemUseCase,
     private val decreaseOrRemoveCartItemUseCase: DecreaseOrRemoveCartItemUseCase,
-    private val getUserIdUseCase: GetUserIdUseCase, // YENİ BAĞIMLILIK
+    private val getUserIdUseCase: GetUserIdUseCase,
+    private val clearCartUseCase: ClearCartUseCase,
 ) : ViewModel() {
 
-    private val _cartState = MutableStateFlow<Resource<List<CartItem>>>(Resource.Idle)
-    val cartState = _cartState.asStateFlow()
+    // State 1: Detaylı sepet listesi (Sadece bu ViewModel'in yönettiği ana state).
+    private val _cartState = MutableStateFlow<Resource<List<CartItem>>>(Resource.Loading)
+    val cartState: StateFlow<Resource<List<CartItem>>> = _cartState.asStateFlow()
 
-    private val _totalPrice = MutableStateFlow("0.00")
-    val totalPrice = _totalPrice.asStateFlow()
+    // State 2: Toplam fiyat (cartState'ten türetilen bir state).
+    private val _totalPrice = MutableStateFlow("$0.00")
+    val totalPrice: StateFlow<String> = _totalPrice.asStateFlow()
 
-    // Mevcut kullanıcı ID'sini tutmak için.
+    // SİLİNDİ: _cartMap ve updateCartMap fonksiyonları artık gereksiz.
+
     private var currentUserId: String? = null
 
     init {
-        // ViewModel oluşturulduğunda, önce kullanıcı ID'sini al, sonra sepeti dinle.
         viewModelScope.launch {
-            // getUserIdUseCase'den gelen Flow'dan ilk değeri (mevcut ID) al.
-            // .first() suspend bir fonksiyondur, bu yüzden launch bloğu içindeyiz.
             val userId = getUserIdUseCase().first()
             if (userId != null) {
                 currentUserId = userId.toString()
                 observeCart(currentUserId!!)
             } else {
-                // Kullanıcı ID'si bulunamadıysa, bu bir hata durumudur.
-                _cartState.value =
-                    Resource.Error(AppException.Data.ValidationError("Kullanıcı oturumu bulunamadı."))
+                _cartState.value = Resource.Error(AppException.Api.Unauthorized(null))
             }
         }
     }
@@ -77,14 +79,23 @@ class CartViewModel @Inject constructor(
         }
     }
 
+    fun onClearCartConfirmed() {
+        currentUserId?.let { userId ->
+            viewModelScope.launch {
+                clearCartUseCase(userId)
+            }
+        }
+    }
+
     private fun calculateTotalPrice(items: List<CartItem>) {
         val total = items.sumOf {
-            val priceAsDouble = it.product.discountedPrice
+            val priceAsString = it.product.discountedPrice
                 .replace("$", "")
                 .replace(",", "")
-                .toDoubleOrNull() ?: 0.0
+            val priceAsDouble = priceAsString.toDoubleOrNull() ?: 0.0
             priceAsDouble * it.quantity
         }
-        _totalPrice.value = String.format("%.2f", total)
+        val priceFormat = DecimalFormat("$#,##0.00")
+        _totalPrice.value = priceFormat.format(total)
     }
 }

@@ -8,6 +8,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.paging.LoadState
 import androidx.recyclerview.widget.GridLayoutManager
@@ -22,11 +23,9 @@ import kotlinx.coroutines.launch
 class ProductsByCategoryFragment : BaseFragment<FragmentProductsByCategoryBinding>(
     FragmentProductsByCategoryBinding::inflate
 ) {
-    // ViewModel'i Hilt ile alıyoruz. Activity-scoped değil, Fragment-scoped.
+    // Bu fragment, kendi ViewModel'ine sahip.
     private val viewModel: CategoryViewModel by viewModels()
     private val args: ProductsByCategoryFragmentArgs by navArgs()
-
-    // ProductAdapter yerine yeniden kullanılabilir ProductListAdapter'ı kullanıyoruz.
     private lateinit var productListAdapter: ProductListAdapter
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -36,39 +35,19 @@ class ProductsByCategoryFragment : BaseFragment<FragmentProductsByCategoryBindin
         observeProductPagingFlow()
         observeLoadState()
 
-        // Fragment oluşturulduğunda, ViewModel'e hangi kategorinin seçildiğini bildir.
-        // Bu, PagingData akışını tetikleyecektir.
-        val categoryName = args.categoryName
-        viewModel.onCategorySelected(categoryName)
-
-        // Toolbar başlığını ayarlayabilirsin
-        // (activity as AppCompatActivity).supportActionBar?.title = categoryName.capitalize()
+        // Navigasyon argümanından gelen kategori adını ViewModel'e bildirerek
+        // doğru ürünlerin akışını tetikliyoruz.
+        viewModel.onCategorySelected(args.categoryName)
     }
 
     private fun setupRecyclerView() {
-        productListAdapter = ProductListAdapter(
-            onProductClick = { product ->
-                Toast.makeText(requireContext(), "${product.title} clicked", Toast.LENGTH_SHORT)
-                    .show()
-                // TODO: Ürün detay sayfasına navigasyon eklenecek.
-            },
-            onAddToCartClick = { product ->
-                Toast.makeText(
-                    requireContext(),
-                    "${product.title} added to cart",
-                    Toast.LENGTH_SHORT
-                ).show()
-                // TODO: Sepete ekleme mantığı eklenecek.
-            },
-            onRemoveFromCartClick = { product ->
-                Toast.makeText(
-                    requireContext(),
-                    "${product.title} removed from cart",
-                    Toast.LENGTH_SHORT
-                ).show()
-                // TODO: Sepetten çıkarma mantığı eklenecek.
-            }
-        )
+        productListAdapter = ProductListAdapter { productId ->
+            // ProductsByCategoryFragment'e özel action'ı kullanıyoruz.
+            val action = ProductsByCategoryFragmentDirections.actionProductsByCategoryFragmentToProductDetailFragment(
+                productId = productId
+            )
+            findNavController().navigate(action)
+        }
 
         binding.productsByCategoryRecyclerView.apply {
             adapter = productListAdapter
@@ -79,9 +58,7 @@ class ProductsByCategoryFragment : BaseFragment<FragmentProductsByCategoryBindin
     private fun observeProductPagingFlow() {
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                // ViewModel'den gelen PagingData akışını dinle.
                 viewModel.productsByCategoryFlow.collectLatest { pagingData ->
-                    // Gelen yeni PagingData'yı adaptöre gönder.
                     productListAdapter.submitData(pagingData)
                 }
             }
@@ -91,14 +68,9 @@ class ProductsByCategoryFragment : BaseFragment<FragmentProductsByCategoryBindin
     private fun observeLoadState() {
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                // Adaptörün yükleme durumlarını dinle.
                 productListAdapter.loadStateFlow.collectLatest { loadStates ->
                     val refreshState = loadStates.refresh
-
-                    // Yükleniyorsa progressBar'ı göster.
                     binding.progressbar.isVisible = refreshState is LoadState.Loading
-
-                    // Hata varsa, Toast ile göster.
                     if (refreshState is LoadState.Error) {
                         Toast.makeText(
                             requireContext(),

@@ -27,4 +27,7 @@ interface ProductDao {
 
     @Query("SELECT * FROM products WHERE id IN (:ids)")
     fun getProductsByIds(ids: List<Int>): Flow<List<ProductEntity>>
+
+    @Query("SELECT * FROM products ORDER BY id DESC LIMIT 1")
+    suspend fun getLastProduct(): ProductEntity?
 }

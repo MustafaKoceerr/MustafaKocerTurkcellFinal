@@ -8,6 +8,7 @@ import com.example.mustafakocer.presentation.feature_splash.contract.SplashEvent
 import com.example.mustafakocer.presentation.feature_splash.contract.SplashUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -17,29 +18,40 @@ class SplashViewModel @Inject constructor(
 ) : BaseViewModel<SplashUiState, SplashEvent, SplashEffect>(
     initialState = SplashUiState()
 ) {
+    // YENİ: Gidilecek hedefi geçici olarak saklamak için.
+    private val _navigationTarget = MutableStateFlow<SplashEffect?>(null)
 
     init {
-        // ViewModel oluşturulduğunda oturum kontrolünü başlat.
         checkAuthStatus()
     }
 
     override fun onEvent(event: SplashEvent) {
-        // Bu ekranda UI'dan gelen bir event beklemiyoruz, o yüzden bu blok boş.
-    }
-
-    private fun checkAuthStatus() {
-        viewModelScope.launch {
-            // Splash ekranının çok hızlı geçmemesi için küçük bir gecikme ekleyelim.
-            // Bu, daha iyi bir kullanıcı deneyimi sağlar.
-            delay(1500)
-
-            val isLoggedIn = checkAuthStatusUseCase()
-            if (isLoggedIn) {
-                sendEffect(SplashEffect.NavigateToHome)
-            } else {
-                sendEffect(SplashEffect.NavigateToLogin)
+        when (event) {
+            // DEĞİŞTİ: UI "animasyon bitti" dediğinde, sakladığımız hedefi Effect olarak gönder.
+            SplashEvent.ExitAnimationFinished -> {
+                _navigationTarget.value?.let { target ->
+                    sendEffect(target)
+                }
             }
         }
     }
 
+    private fun checkAuthStatus() {
+        viewModelScope.launch {
+            delay(1100) // Logo ve animasyonun görünmesi için bekleme süresi
+
+            val isLoggedIn = checkAuthStatusUseCase()
+            val targetEffect = if (isLoggedIn) {
+                SplashEffect.NavigateToHome
+            } else {
+                SplashEffect.NavigateToLogin
+            }
+
+            // DEĞİŞTİ: Navigasyon hedefini state'imizde saklıyoruz.
+            _navigationTarget.value = targetEffect
+
+            // DEĞİŞTİ: Navigasyon komutu göndermek yerine, UI'a "animasyonu başlat" diyoruz.
+            setState { copy(isLoading = false, animateOut = true) }
+        }
+    }
 }

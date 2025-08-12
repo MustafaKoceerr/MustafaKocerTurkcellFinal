@@ -15,20 +15,19 @@ import com.example.mustafakocer.domain.model.Category
  *                        Tıklanan kategorinin 'slug' adını parametre olarak alır.
  */
 class CategoryListAdapter(
-    private val onCategoryClick: (String) -> Unit
+    private val onCategoryClick: (Category) -> Unit
 ) : ListAdapter<Category, CategoryListAdapter.CategoryViewHolder>(CategoryDiffCallback) {
 
     inner class CategoryViewHolder(private val binding: RecyclerRowCategoryBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
         init {
-            // ViewHolder oluşturulurken tıklama dinleyicisini ayarla.
             binding.root.setOnClickListener {
                 val position = bindingAdapterPosition
                 if (position != RecyclerView.NO_POSITION) {
                     val category = getItem(position)
-                    // Tıklanan kategorinin 'slug'ını callback ile dışarıya bildir.
-                    onCategoryClick(category.slug)
+                    // DEĞİŞTİ: Tıklanan kategorinin kendisini callback ile dışarıya bildir.
+                    onCategoryClick(category)
                 }
             }
         }

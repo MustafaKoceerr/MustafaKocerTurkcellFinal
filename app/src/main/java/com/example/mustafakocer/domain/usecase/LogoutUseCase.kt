@@ -13,22 +13,12 @@ import kotlinx.coroutines.flow.first
 class LogoutUseCase @Inject constructor(
     private val authRepository: AuthRepository,
     private val userRepository: UserRepository,
-    private val cartRepository: CartRepository // Sepeti temizlemek için eklendi
 ) {
     suspend operator fun invoke() {
-        // DÜZELTME: Önce silinecek sepetin sahibini bul.
-        // .first() ile Flow'dan o anki değeri alıyoruz. Bu suspend bir işlemdir.
-        val userIdToClear = authRepository.getUserId().first()
-
         // Oturum anahtarlarını (token, id) DataStore ve EncryptedPrefs'ten sil.
         authRepository.logout()
 
         // Yerel veritabanındaki kullanıcı profilini sil.
         userRepository.clearLocalUser()
-
-        // DÜZELTME: Eğer bir kullanıcı ID'si varsa, o kullanıcının sepetini Firebase'den sil.
-        userIdToClear?.let { userId ->
-            cartRepository.clearCart(userId.toString())
-        }
     }
 }

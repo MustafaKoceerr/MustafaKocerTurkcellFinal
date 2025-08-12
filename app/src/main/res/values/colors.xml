@@ -1,45 +1,47 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <color name="red">#F44336</color> <!-- Material Design Red 500 -->
+    <!-- Brand & MD3 Scheme -->
+    <color name="primary">#1F3A5F</color>
+    <color name="on_primary">#FFFFFF</color>
+    <color name="primary_container">#D6E3FF</color>
+    <color name="on_primary_container">#001A43</color>
 
-    <color name="black2">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
-    <color name="yellow">#FFFFF333</color>
+    <color name="secondary">#5B7083</color>
+    <color name="on_secondary">#FFFFFF</color>
+    <color name="secondary_container">#DFE7EF</color>
+    <color name="on_secondary_container">#14202A</color>
 
-    <color name="colorPrimary">#969EEE</color>
-    <color name="colorPrimaryDark">#555C96</color>
-    <color name="colorAccent">#969EEE</color>
+    <!-- Accent rengi tertiarya eşlenir -->
+    <color name="tertiary">#0EA5E9</color>
+    <color name="on_tertiary">#FFFFFF</color>
+    <color name="tertiary_container">#CBEFFF</color>
+    <color name="on_tertiary_container">#001F29</color>
 
-    <color name="purple200">#CE93D8</color>
-    <color name="purple500">#9C27B0</color>
-    <color name="purple700">#7B1FA2</color>
+    <!-- Hata renkleri: MD3 uyumlu -->
+    <color name="error">#B3261E</color>
+    <color name="on_error">#FFFFFF</color>
+    <color name="error_container">#F9DEDC</color>
+    <color name="on_error_container">#410E0B</color>
 
-    <color name="teal200">#80CBC4</color>
-    <color name="teal700">#00796B</color>
+    <!-- Arka plan / yüzeyler -->
+    <color name="background">#F7F8FA</color>
+    <color name="on_background">#0E1320</color>
 
+    <color name="surface">#FFFFFF</color>
+    <color name="on_surface">#0E1320</color>
+    <color name="surface_variant">#E5EAF0</color>
+    <color name="on_surface_variant">#425266</color>
 
-    <color name="holo_red_dark">#B71C1C</color>
-    <color name="darker_gray">#212121</color>
-    <color name="holo_green_dark">#388E3C</color>
-    <color name="black">#000000</color>
-    <color name="transparent">#00ffffff</color>
+    <!-- Çizgi/ayraç ve varyantları -->
+    <color name="outline">#8A98A7</color>
+    <color name="outline_variant">#C7D0DA</color>
 
-    <color name="duskYellow">#FFC107</color>
-    <color name="lightGrey">#D3D3D3</color>
-    <color name="lavender">#8692f7</color>
-
-    <color name="orange">#EB6236</color>
-    <color name="gray">#8B8C91</color>
-
-
-    <color name="dark_blue">#1A237E</color>
-    <color name="mavi">#2733AA</color>
-    <color name="dark_green">#004D40</color>
-    <color name="dark_red">#B71C1C</color>
-    <color name="purple_700">#7B1FA2</color>
-
-    <color name="kırık_gri">#D3D3D3</color>
-
+    <!-- Diğer yardımcı tonlar -->
+    <color name="surface_tint">#1F3A5F</color>
+    <color name="inverse_surface">#1F2937</color>
+    <color name="inverse_on_surface">#E5E7EB</color>
+    <color name="inverse_primary">#ABC2FF</color>
+    <color name="scrim">#000000</color>
 
 </resources>

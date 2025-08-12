@@ -5,26 +5,37 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginHorizontal="16dp"
-    android:layout_marginVertical="8dp"
-    app:cardCornerRadius="12dp"
-    app:cardElevation="4dp"
+    android:layout_marginStart="@dimen/order_item_margin_h"
+    android:layout_marginEnd="@dimen/order_item_margin_h"
+    android:layout_marginTop="@dimen/order_item_margin_v"
+    android:layout_marginBottom="@dimen/order_item_margin_v"
     android:clickable="true"
     android:focusable="true"
-    android:foreground="?attr/selectableItemBackground">
+    android:minHeight="@dimen/order_item_min_height"
+    android:foreground="?attr/selectableItemBackground"
+    app:cardUseCompatPadding="false"
+    app:cardCornerRadius="@dimen/order_item_corner_radius"
+    app:cardElevation="@dimen/order_item_elevation"
+    app:cardBackgroundColor="@color/order_item_bg"
+    app:strokeColor="@color/order_item_stroke"
+    app:strokeWidth="@dimen/order_item_stroke_width">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="16dp">
+        android:paddingStart="@dimen/order_item_padding_h"
+        android:paddingEnd="@dimen/order_item_padding_h"
+        android:paddingTop="@dimen/order_item_padding_v"
+        android:paddingBottom="@dimen/order_item_padding_v">
 
         <!-- Sipariş Numarası -->
         <TextView
             android:id="@+id/txtOrderIdLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Sipariş No:"
+            android:text="@string/order_item_id_label"
             android:textAppearance="@style/TextAppearance.Material3.LabelLarge"
+            android:textColor="?attr/colorOnSurfaceVariant"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -32,67 +43,79 @@
             android:id="@+id/txtOrderId"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
+            android:layout_marginStart="@dimen/order_item_text_start_margin"
             android:textAppearance="@style/TextAppearance.Material3.BodyLarge"
             android:textStyle="bold"
+            android:textColor="?attr/colorOnSurface"
             app:layout_constraintBaseline_toBaselineOf="@id/txtOrderIdLabel"
             app:layout_constraintStart_toEndOf="@id/txtOrderIdLabel"
-            tools:text="24" />
+            tools:text="#24" />
 
-        <!-- Ayırıcı Çizgi -->
+        <!-- Yönlendirme oku (YENİ) -->
+        <ImageView
+            android:id="@+id/imgChevron"
+            android:layout_width="@dimen/order_item_chevron_size"
+            android:layout_height="@dimen/order_item_chevron_size"
+            android:contentDescription="@string/cd_go_to_order_details"
+            android:src="@drawable/ic_chevron_right_24"
+            app:tint="?attr/colorOnSurfaceVariant"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/txtOrderIdLabel"
+            app:layout_constraintBottom_toBottomOf="@id/txtOrderIdLabel" />
+
+        <!-- Ayırıcı -->
         <View
             android:id="@+id/divider"
             android:layout_width="0dp"
             android:layout_height="1dp"
-            android:layout_marginTop="12dp"
+            android:layout_marginTop="@dimen/order_item_divider_top"
             android:background="?attr/colorOutlineVariant"
-            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/txtOrderIdLabel" />
 
-        <!-- Ürün ve Adet Bilgisi -->
-<!--
-// TODO aşağıdaki text view'e bunu ekle.
-            android:drawableStart="@drawable/ic_products"
--->
+        <!-- Ürün ve adet -->
         <TextView
             android:id="@+id/txtTotalProducts"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:layout_marginEnd="16dp"
-            android:drawablePadding="8dp"
+            android:layout_marginTop="@dimen/order_item_block_gap"
+            android:layout_marginEnd="@dimen/order_item_text_end_margin"
+            android:drawablePadding="@dimen/order_item_drawable_padding"
             android:gravity="center_vertical"
             android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
-            app:layout_constraintEnd_toStartOf="@id/txtOriginalTotal"
+            android:textColor="?attr/colorOnSurface"
+            app:drawableStartCompat="@drawable/ic_products_24"
+            app:drawableTint="?attr/colorOnSurfaceVariant"
             app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/txtOriginalTotal"
             app:layout_constraintTop_toBottomOf="@id/divider"
             tools:text="3 Ürün (10 Adet)" />
 
-        <!-- İndirimsiz Toplam Fiyat (Üstü Çizili) -->
+        <!-- İndirimsiz toplam (üstü çizili – kodda set edeceğiz) -->
         <TextView
             android:id="@+id/txtOriginalTotal"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
             android:textColor="?attr/colorOnSurfaceVariant"
-            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/imgChevron"
             app:layout_constraintTop_toTopOf="@id/txtTotalProducts"
-            tools:text="$1749.90" />
+            tools:text="₺1.749,90" />
 
-        <!-- İndirimli Ana Fiyat -->
+        <!-- İndirimli ana fiyat -->
         <TextView
             android:id="@+id/txtDiscountedTotal"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:textAppearance="@style/TextAppearance.Material3.HeadlineSmall"
-            android:textColor="?attr/colorPrimary"
+            android:layout_marginTop="@dimen/order_item_price_gap_top"
+            android:textAppearance="@style/TextAppearance.Material3.TitleLarge"
             android:textStyle="bold"
-            app:layout_constraintEnd_toEndOf="parent"
+            android:textColor="?attr/colorPrimary"
+            app:layout_constraintEnd_toStartOf="@id/imgChevron"
             app:layout_constraintTop_toBottomOf="@id/txtOriginalTotal"
             app:layout_constraintBottom_toBottomOf="parent"
-            tools:text="$1594.33" />
+            tools:text="₺1.594,33" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </com.google.android.material.card.MaterialCardView>

@@ -3,6 +3,7 @@ package com.example.mustafakocer.domain.repository
 import androidx.paging.PagingData
 import com.example.mustafakocer.domain.model.Category
 import com.example.mustafakocer.domain.model.Product
+import com.example.mustafakocer.domain.model.ProductDetail
 import com.example.mustafakocer.domain.util.Resource
 import kotlinx.coroutines.flow.Flow
 
@@ -41,4 +42,6 @@ interface ProductRepository {
      * Bu, offline-first çalışır; önce veritabanından dener, sonra ağdan çeker.
      */
     fun getProductsByIds(ids: List<Int>): Flow<Resource<List<Product>>>
+
+    fun getProductDetail(productId: Int): Flow<Resource<ProductDetail>>
 }

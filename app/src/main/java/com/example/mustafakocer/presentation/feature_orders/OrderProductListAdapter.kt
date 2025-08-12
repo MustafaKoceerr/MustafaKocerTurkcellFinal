@@ -9,11 +9,26 @@ import com.bumptech.glide.Glide
 import com.example.mustafakocer.databinding.RecyclerRowOrderProductBinding
 import com.example.mustafakocer.domain.model.OrderProduct
 
-class OrderProductListAdapter :
-    ListAdapter<OrderProduct, OrderProductListAdapter.OrderProductViewHolder>(OrderProductDiffCallback) {
+class OrderProductListAdapter(
+    private val onProductClick: (productId: Int) -> Unit,
+) : ListAdapter<OrderProduct, OrderProductListAdapter.OrderProductViewHolder>(
+    OrderProductDiffCallback
+) {
 
     inner class OrderProductViewHolder(private val binding: RecyclerRowOrderProductBinding) :
         RecyclerView.ViewHolder(binding.root) {
+
+        init {
+            binding.root.setOnClickListener {
+                val position = bindingAdapterPosition
+                if (position != RecyclerView.NO_POSITION) {
+                    // Tıklanan öğeyi al
+                    val product = getItem(position)
+                    // ve ID'sini lambda aracılığıyla dışarıya bildir.
+                    onProductClick(product.id)
+                }
+            }
+        }
 
         fun bind(product: OrderProduct) {
             binding.txtProductTitle.text = product.title

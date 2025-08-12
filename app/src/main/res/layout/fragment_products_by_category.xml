@@ -1,32 +1,127 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- <layout> ve <data> etiketleri kaldırıldı. -->
+<!-- ProductsByCategoryFragment (SwipeRefreshLayout kaldırıldı) -->
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="?attr/colorSurface"
     tools:context=".presentation.feature_product_category.ProductsByCategoryFragment">
 
+    <!-- Ürün grid listesi -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/productsByCategoryRecyclerView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:clipToPadding="false"
+        android:paddingStart="@dimen/home_content_margin"
+        android:paddingEnd="@dimen/home_content_margin"
+        android:paddingTop="@dimen/home_content_margin_top"
+        android:paddingBottom="@dimen/home_content_margin_bottom"
         app:layout_constraintTop_toTopOf="parent"
-        tools:listitem="@layout/recylerview_row_product_grid" /> <!-- Önizleme için dikey layout daha uygun olabilir -->
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        tools:listitem="@layout/recyler_row_product_grid"
+        tools:itemCount="8" />
 
-    <ProgressBar
+    <!-- Yüklenme göstergesi (ID korunur) -->
+    <com.google.android.material.progressindicator.CircularProgressIndicator
         android:id="@+id/progressbar"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:visibility="gone"
+        app:indicatorSize="32dp"
+        app:trackThickness="3dp"
+        app:indicatorInset="8dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        tools:visibility="visible" />
+
+    <!-- Empty state -->
+    <LinearLayout
+        android:id="@+id/stateEmptyGroup"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:padding="@dimen/state_padding"
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        tools:visibility="gone">
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/txtEmptyTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
+            android:textColor="?attr/colorOnSurface"
+            android:text="@string/pbc_empty_title" />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/txtEmptySubtitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/state_subtitle_top"
+            android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
+            android:textColor="?attr/colorOnSurfaceVariant"
+            android:text="@string/pbc_empty_subtitle" />
+    </LinearLayout>
+
+    <!-- Error state -->
+    <LinearLayout
+        android:id="@+id/stateErrorGroup"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:padding="@dimen/state_padding"
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        tools:visibility="gone">
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/txtErrorTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
+            android:textColor="?attr/colorOnSurface"
+            android:text="@string/pbc_error_title" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnRetry"
+            style="?attr/materialButtonOutlinedStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/state_action_top"
+            android:text="@string/action_retry"
+            android:contentDescription="@string/cd_retry" />
+    </LinearLayout>
+
+    <!-- En üste dön FAB (Home ile aynı deneyim) -->
+    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+        android:id="@+id/fabScrollTop"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:visibility="gone"
+        android:layout_margin="@dimen/fab_margin"
+        android:text="@string/action_scroll_to_top"
+        android:contentDescription="@string/cd_scroll_to_top"
+        app:icon="@drawable/ic_arrow_upward_24"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:visibility="visible"/>
+        app:backgroundTint="?attr/colorTertiaryContainer"
+        app:iconTint="?attr/colorOnTertiaryContainer"
+        android:textColor="?attr/colorOnTertiaryContainer"
+        android:visibility="gone"
+        tools:visibility="visible" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

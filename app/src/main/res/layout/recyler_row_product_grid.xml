@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="@dimen/product_item_margin"
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="?attr/selectableItemBackground"
+    app:cardUseCompatPadding="false"
+    app:cardCornerRadius="@dimen/product_item_corner_radius"
+    app:cardElevation="@dimen/product_item_elevation"
+    app:cardBackgroundColor="?attr/colorSurface"
+    app:strokeColor="?attr/colorOutlineVariant"
+    app:strokeWidth="@dimen/product_item_stroke_width">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <!-- Görsel (1:1) -->
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/imgProduct"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:scaleType="centerCrop"
+            android:contentDescription="@string/cd_product_image"
+            app:layout_constraintDimensionRatio="1:1"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.Medium"
+            tools:srcCompat="@tools:sample/backgrounds/scenic" />
+
+        <!-- % İndirim -->
+        <TextView
+            android:id="@+id/badgeDiscount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingStart="@dimen/badge_h"
+            android:paddingEnd="@dimen/badge_h"
+            android:paddingTop="@dimen/badge_v"
+            android:paddingBottom="@dimen/badge_v"
+            android:textAppearance="@style/TextAppearance.Material3.LabelSmall"
+            android:textStyle="bold"
+            android:textColor="?attr/colorOnPrimaryContainer"
+            android:background="@drawable/bg_badge_label"
+            android:backgroundTint="?attr/colorPrimaryContainer"
+            android:visibility="gone"
+            app:layout_constraintStart_toStartOf="@id/imgProduct"
+            app:layout_constraintTop_toTopOf="@id/imgProduct"
+            android:layout_marginStart="@dimen/badge_edge_margin"
+            android:layout_marginTop="@dimen/badge_edge_margin"
+            tools:text="%15"
+            tools:visibility="visible" />
+
+        <!-- Stok rozeti -->
+        <TextView
+            android:id="@+id/badgeStock"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingStart="@dimen/badge_h"
+            android:paddingEnd="@dimen/badge_h"
+            android:paddingTop="@dimen/badge_v"
+            android:paddingBottom="@dimen/badge_v"
+            android:textAppearance="@style/TextAppearance.Material3.LabelSmall"
+            android:textStyle="bold"
+            android:textColor="?attr/colorOnTertiaryContainer"
+            android:background="@drawable/bg_badge_label"
+            android:backgroundTint="?attr/colorTertiaryContainer"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="@id/imgProduct"
+            app:layout_constraintTop_toTopOf="@id/imgProduct"
+            android:layout_marginEnd="@dimen/badge_edge_margin"
+            android:layout_marginTop="@dimen/badge_edge_margin"
+            tools:text="Son 3"
+            tools:visibility="gone" />
+
+        <!-- İçerik alanı -->
+        <LinearLayout
+            android:id="@+id/layoutContent"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="@dimen/product_content_padding"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/imgProduct">
+
+            <!-- Başlık -->
+            <TextView
+                android:id="@+id/txtTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:maxLines="2"
+                android:ellipsize="end"
+                android:textAppearance="@style/TextAppearance.Material3.TitleSmall"
+                android:textColor="?attr/colorOnSurface"
+                tools:text="Apple iPhone 13 Pro Max 256GB Sierra Blue" />
+
+            <!-- Puan -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/product_rating_top"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <RatingBar
+                    android:id="@+id/ratingBar"
+                    style="?android:attr/ratingBarStyleSmall"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:numStars="5"
+                    android:stepSize="0.5"
+                    android:progressTint="?attr/colorSecondary"
+                    android:secondaryProgressTint="?attr/colorSecondary"
+                    android:progressBackgroundTint="?attr/colorOutlineVariant"
+                    tools:rating="4.8" />
+
+                <TextView
+                    android:id="@+id/txtRatingValue"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/product_rating_value_gap"
+                    android:textAppearance="@style/TextAppearance.Material3.LabelMedium"
+                    android:textColor="?attr/colorOnSurfaceVariant"
+                    tools:text="4.8" />
+            </LinearLayout>
+
+            <!-- Fiyatlar -->
+            <LinearLayout
+                android:id="@+id/rowPrices"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/product_prices_top"
+                android:gravity="bottom"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/txtDiscountedPrice"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
+                    android:textStyle="bold"
+                    android:textColor="?attr/colorPrimary"
+                    tools:text="₺10.999" />
+
+                <TextView
+                    android:id="@+id/txtPrice"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/product_original_price_gap_start"
+                    android:textAppearance="@style/TextAppearance.Material3.BodySmall"
+                    android:textColor="?attr/colorOnSurfaceVariant"
+                    tools:text="₺12.999" />
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</com.google.android.material.card.MaterialCardView>

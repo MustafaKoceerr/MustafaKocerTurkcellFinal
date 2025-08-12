@@ -1,0 +1,254 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Top App Bar yatay padding -->
+    <dimen name="toolbar_horizontal_padding">16dp</dimen>
+    <!-- Drawer hafif yükselti -->
+    <dimen name="elevation_drawer">8dp</dimen>
+
+
+    <dimen name="header_height">200dp</dimen>
+    <dimen name="header_padding">16dp</dimen>
+    <dimen name="header_spacing">12dp</dimen>
+
+    <!-- Avatar -->
+    <dimen name="header_avatar_size">76dp</dimen>
+    <dimen name="header_avatar_radius">38dp</dimen>
+    <dimen name="header_avatar_stroke">1dp</dimen>
+    <dimen name="header_avatar_elevation">2dp</dimen>
+
+    <!-- Ekran kenar boşlukları -->
+    <dimen name="home_content_margin">16dp</dimen>
+    <dimen name="home_content_margin_top">8dp</dimen>
+    <dimen name="home_content_margin_bottom">88dp</dimen> <!-- FAB/snackbar alanı -->
+
+    <!-- State layout -->
+    <dimen name="state_padding">24dp</dimen>
+    <dimen name="state_subtitle_top">4dp</dimen>
+    <dimen name="state_action_top">12dp</dimen>
+
+    <!-- FAB -->
+    <dimen name="fab_margin">16dp</dimen>
+
+
+    <!-- Category içerik insetleri -->
+    <dimen name="category_content_inset">16dp</dimen>
+    <dimen name="category_content_inset_top">8dp</dimen>
+    <dimen name="category_content_inset_bottom">16dp</dimen>
+
+
+    <!-- Boş durum ikonu aralığı -->
+    <dimen name="empty_drawable_padding">8dp</dimen>
+
+    <!-- Liste alt padding: özet karta yer aç -->
+    <dimen name="recycler_view_bottom_padding">128dp</dimen>
+
+    <!-- Özet kart -->
+    <dimen name="cart_summary_elevation">12dp</dimen>
+    <dimen name="cart_summary_corner_radius">24dp</dimen>
+    <dimen name="cart_summary_min_height">80dp</dimen>
+    <dimen name="cart_summary_padding">16dp</dimen>
+    <dimen name="cart_summary_padding_top">12dp</dimen>
+    <dimen name="cart_summary_padding_bottom">16dp</dimen>
+
+    <!-- Buton -->
+    <dimen name="cart_checkout_icon_padding">8dp</dimen>
+
+
+    <!-- Orders içerik insetleri -->
+    <dimen name="orders_content_inset">16dp</dimen>
+    <dimen name="orders_content_inset_top">8dp</dimen>
+    <dimen name="orders_content_inset_bottom">16dp</dimen>
+
+
+    <dimen name="od_content_margin">16dp</dimen>
+    <dimen name="od_card_corner_radius">16dp</dimen>
+    <dimen name="od_card_stroke_width">1dp</dimen>
+
+    <dimen name="od_card_padding">16dp</dimen>
+    <dimen name="od_card_padding_top">16dp</dimen>
+    <dimen name="od_card_padding_bottom">16dp</dimen>
+
+    <dimen name="od_row_spacing_sm">12dp</dimen>
+    <dimen name="od_row_spacing_xs">8dp</dimen>
+
+    <dimen name="od_section_spacing">16dp</dimen>
+    <dimen name="od_list_top_spacing">4dp</dimen>
+    <dimen name="od_list_bottom_padding">32dp</dimen>
+
+
+    <!-- Arama alanı ve filtreler -->
+    <dimen name="search_content_margin">16dp</dimen>
+    <dimen name="search_content_margin_top">8dp</dimen>
+    <dimen name="search_filters_margin_top">8dp</dimen>
+    <dimen name="search_field_corner_radius">28dp</dimen>
+    <dimen name="search_field_inner_padding_h">12dp</dimen>
+
+    <!-- Sonuç listesi -->
+    <dimen name="search_results_padding_top">8dp</dimen>
+    <dimen name="search_results_padding_bottom">88dp</dimen> <!-- FAB/snackbar alanı -->
+
+    <!-- İçerik boşlukları -->
+    <dimen name="profile_content_padding">16dp</dimen>
+    <dimen name="profile_content_padding_top">8dp</dimen>
+    <dimen name="profile_content_padding_bottom">24dp</dimen>
+
+    <!-- Spacing -->
+    <dimen name="spacing_xsmall">6dp</dimen>
+    <dimen name="spacing_small">12dp</dimen>
+    <dimen name="spacing_medium">16dp</dimen>
+    <dimen name="spacing_large">20dp</dimen>
+    <dimen name="spacing_xlarge">24dp</dimen>
+
+    <!-- Avatar -->
+    <dimen name="profile_image_size">104dp</dimen>
+    <dimen name="stroke_width_medium">2dp</dimen>
+
+    <!-- Buton -->
+    <dimen name="button_padding_vertical">10dp</dimen>
+
+
+    <dimen name="category_item_margin">8dp</dimen>
+    <dimen name="category_item_min_height">56dp</dimen>
+    <dimen name="category_item_corner_radius">16dp</dimen>
+    <dimen name="category_item_elevation">2dp</dimen>
+    <dimen name="category_item_stroke_width">1dp</dimen>
+
+    <dimen name="category_item_padding_h">16dp</dimen>
+    <dimen name="category_item_padding_v">12dp</dimen>
+
+    <dimen name="category_icon_size">24dp</dimen>
+    <dimen name="category_item_text_start_margin">12dp</dimen>
+    <dimen name="category_item_text_start_gone_margin">8dp</dimen>
+
+
+    <!-- Kart dış boşlukları / ölçüler -->
+    <dimen name="order_item_margin_h">16dp</dimen>
+    <dimen name="order_item_margin_v">8dp</dimen>
+    <dimen name="order_item_min_height">72dp</dimen>
+    <dimen name="order_item_corner_radius">16dp</dimen>
+    <dimen name="order_item_elevation">2dp</dimen>
+    <dimen name="order_item_stroke_width">1dp</dimen>
+
+    <!-- İç boşluklar -->
+    <dimen name="order_item_padding_h">16dp</dimen>
+    <dimen name="order_item_padding_v">12dp</dimen>
+
+    <!-- İç öğeler -->
+    <dimen name="order_item_text_start_margin">8dp</dimen>
+    <dimen name="order_item_text_end_margin">16dp</dimen>
+    <dimen name="order_item_divider_top">12dp</dimen>
+    <dimen name="order_item_block_gap">12dp</dimen>
+    <dimen name="order_item_drawable_padding">8dp</dimen>
+    <dimen name="order_item_price_gap_top">4dp</dimen>
+    <dimen name="order_item_chevron_size">20dp</dimen>
+
+
+    <!-- Order details: item kart -->
+    <dimen name="od_item_card_corner_radius">12dp</dimen>
+    <dimen name="od_item_card_elevation">0dp</dimen>
+    <dimen name="od_item_card_stroke_width">1dp</dimen>
+
+    <!-- İç boşluklar -->
+    <dimen name="od_item_padding_h">16dp</dimen>
+    <dimen name="od_item_padding_v">12dp</dimen>
+
+    <!-- Görsel ve metin -->
+    <dimen name="od_item_image_size">80dp</dimen>
+    <dimen name="od_item_text_start_margin">12dp</dimen>
+    <dimen name="od_item_quantity_top">6dp</dimen>
+    <dimen name="od_item_total_top">4dp</dimen>
+
+
+    <!-- Kart -->
+    <dimen name="product_item_margin">8dp</dimen>
+    <dimen name="product_item_corner_radius">16dp</dimen>
+    <dimen name="product_item_elevation">2dp</dimen>
+    <dimen name="product_item_stroke_width">1dp</dimen>
+
+    <!-- İçerik -->
+    <dimen name="product_content_padding">12dp</dimen>
+
+    <!-- Badge -->
+    <dimen name="badge_corner_radius">10dp</dimen>
+    <dimen name="badge_edge_margin">8dp</dimen>
+    <dimen name="badge_h">6dp</dimen>
+    <dimen name="badge_v">2dp</dimen>
+
+    <!-- Rating -->
+    <dimen name="product_rating_top">6dp</dimen>
+    <dimen name="product_rating_value_gap">6dp</dimen>
+
+    <!-- Fiyatlar -->
+    <dimen name="product_prices_top">8dp</dimen>
+    <dimen name="product_original_price_gap_start">8dp</dimen>
+
+    <!-- Sepete ekleme -->
+    <dimen name="product_cart_overlay_margin">8dp</dimen>
+    <dimen name="cart_overlay_corner_radius">20dp</dimen>
+    <dimen name="cart_overlay_hpad">8dp</dimen>
+    <dimen name="cart_overlay_vpad">6dp</dimen>
+    <dimen name="cart_qty_gap">8dp</dimen>
+
+    <!-- “Ekle” -->
+    <dimen name="product_add_hpad">10dp</dimen>
+    <dimen name="product_add_vpad">6dp</dimen>
+    <dimen name="product_add_icon_pad">6dp</dimen>
+
+    <!-- Dikey aralıklar -->
+    <dimen name="header_spacing_small">8dp</dimen>    <!-- ad ile e-posta arası -->
+    <dimen name="header_spacing_xsmall">4dp</dimen>   <!-- daha ince ayar için -->
+    <dimen name="product_actions_top">12dp</dimen>
+
+
+    <!-- Scroll + pager -->
+    <dimen name="pd_scroll_bottom_inset">88dp</dimen>
+    <dimen name="pd_indicator_margin_bottom">10dp</dimen>
+
+    <!-- Sayfa kenarları / bloklar -->
+    <dimen name="pd_content_margin">16dp</dimen>
+    <dimen name="pd_block_top">16dp</dimen>
+    <dimen name="pd_block_gap">16dp</dimen>
+
+    <!-- Kart görünümü -->
+    <dimen name="pd_card_corner_radius">16dp</dimen>
+    <dimen name="pd_card_stroke_width">1dp</dimen>
+    <dimen name="pd_card_padding_h">16dp</dimen>
+    <dimen name="pd_card_padding_v">14dp</dimen>
+
+    <!-- Meta chipleri / ek başlık aralıkları -->
+    <dimen name="pd_meta_chips_top">8dp</dimen>
+    <dimen name="pd_savings_top">6dp</dimen>
+    <dimen name="pd_desc_top">8dp</dimen>
+    <dimen name="pd_desc_toggle_top">8dp</dimen>
+    <dimen name="pd_list_top_spacing">8dp</dimen>
+    <dimen name="pd_bottom_space">24dp</dimen>
+
+    <!-- Alt sabit aksiyon barı -->
+    <dimen name="pd_actionbar_margin_h">12dp</dimen>
+    <dimen name="pd_actionbar_margin_bottom">12dp</dimen>
+    <dimen name="pd_actionbar_corner_radius">20dp</dimen>
+    <dimen name="pd_actionbar_elevation">8dp</dimen>
+    <dimen name="pd_actionbar_min_height">64dp</dimen>
+    <dimen name="pd_actionbar_padding_h">16dp</dimen>
+    <dimen name="pd_actionbar_padding_v">10dp</dimen>
+
+    <!-- “Sepete ekle” butonu (alt bar için) -->
+    <dimen name="pd_add_hpad">12dp</dimen>
+    <dimen name="pd_add_vpad">8dp</dimen>
+
+    <!-- Review kartı -->
+    <dimen name="pd_review_corner_radius">12dp</dimen>
+    <dimen name="pd_review_elevation">0dp</dimen>
+    <dimen name="pd_review_padding_h">16dp</dimen>
+    <dimen name="pd_review_padding_v">12dp</dimen>
+    <dimen name="pd_review_comment_top">8dp</dimen>
+
+    <dimen name="touch_target_48">48dp</dimen>
+    <dimen name="cart_btn_size">48dp</dimen>               <!-- önce 32/36 ise 48 yap -->
+    <dimen name="cart_btn_icon_size">24dp</dimen>          <!-- görsel aynı kalsın -->
+    <dimen name="product_add_min_touch">48dp</dimen>       <!-- add to cart min yükseklik -->
+
+    <dimen name="touch_target_min">48dp</dimen>
+
+</resources>
