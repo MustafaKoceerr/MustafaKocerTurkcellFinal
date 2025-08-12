@@ -23,6 +23,6 @@ class SearchProductsUseCase @Inject constructor(
     }
 
     companion object {
-        private const val MIN_QUERY_LENGTH = 3
+         const val MIN_QUERY_LENGTH = 3
     }
 }
