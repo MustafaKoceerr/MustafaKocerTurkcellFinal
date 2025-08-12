@@ -2,20 +2,19 @@ package com.example.mustafakocer.presentation.feature_product_search
 
 import android.os.Bundle
 import android.view.View
-import android.widget.Toast
 import androidx.appcompat.widget.SearchView
 import androidx.core.view.isVisible
-import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.fragment.findNavController
 import androidx.paging.LoadState
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.mustafakocer.databinding.FragmentSearchBinding
+import com.example.mustafakocer.domain.usecase.SearchProductsUseCase
 import com.example.mustafakocer.presentation.base.BaseFragment
 import com.example.mustafakocer.presentation.common.ProductListAdapter
-import com.example.mustafakocer.presentation.feature_cart.CartViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.collectLatest
@@ -24,13 +23,7 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalCoroutinesApi::class)
 @AndroidEntryPoint
 class SearchFragment : BaseFragment<FragmentSearchBinding>(FragmentSearchBinding::inflate) {
-
     private val viewModel: SearchViewModel by viewModels()
-
-    // YENİ: CartViewModel, Activity kapsamında paylaşılan sepet state'ini yönetir.
-    private val cartViewModel: CartViewModel by activityViewModels()
-
-    // ProductSearchAdapter yerine, yeniden kullanılabilir ProductListAdapter'ı kullanıyoruz.
     private lateinit var productListAdapter: ProductListAdapter
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -39,26 +32,18 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>(FragmentSearchBinding
         setupRecyclerView()
         setupSearchView()
         observeSearchResults()
-        observeLoadState() // YENİ: Yükleme ve hata durumlarını dinle.
-        observeCartState() // YENİ: Sepet durumunu dinlemeye başla.
+        observeLoadState()
+        observeSearchQuery() // İşte burada 'searchQuery' kullanılıyor.
     }
 
     private fun setupRecyclerView() {
-        productListAdapter = ProductListAdapter(
-            onProductClick = { product ->
-                Toast.makeText(requireContext(), "${product.title} clicked", Toast.LENGTH_SHORT)
-                    .show()
-                // TODO: Ürün detay sayfasına navigasyon eklenecek.
-            },
-            onAddToCartClick = { product ->
-                // DEĞİŞTİ: Tıklama olayını CartViewModel'a iletiyoruz.
-                cartViewModel.onIncreaseClicked(product.id)
-            },
-            onRemoveFromCartClick = { product ->
-                // DEĞİŞTİ: Tıklama olayını CartViewModel'a iletiyoruz.
-                cartViewModel.onDecreaseClicked(product.id)
-            }
-        )
+        productListAdapter = ProductListAdapter { productId ->
+            // SearchFragment'e özel action'ı kullanıyoruz.
+            val action = SearchFragmentDirections.actionSearchFragmentToProductDetailFragment(
+                productId = productId
+            )
+            findNavController().navigate(action)
+        }
 
         binding.searchRecyclerView.apply {
             adapter = productListAdapter
@@ -66,26 +51,19 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>(FragmentSearchBinding
         }
     }
 
-    // YENİ: CartViewModel'daki cartMap'i dinler ve adaptörü günceller.
-    private fun observeCartState() {
-        viewLifecycleOwner.lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                cartViewModel.cartMap.collectLatest { cartMap ->
-                    productListAdapter.updateCartMap(cartMap)
-                }
-            }
-        }
-    }
-
     private fun setupSearchView() {
+
+        binding.searchView.setOnClickListener {
+            binding.searchView.isIconified = false
+        }
         binding.searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
-                // Submit'te bir şey yapmaya gerek yok, onQueryTextChange yeterli.
-                binding.searchView.clearFocus() // Klavyeyi gizle
+                binding.searchView.clearFocus()
                 return true
             }
 
             override fun onQueryTextChange(newText: String?): Boolean {
+                // UI'dan gelen olayı ViewModel'e iletiyoruz.
                 viewModel.onSearchQueryChanged(newText.orEmpty())
                 return true
             }
@@ -95,6 +73,7 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>(FragmentSearchBinding
     private fun observeSearchResults() {
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
+                // ViewModel'den gelen PagingData<Product> akışını dinliyoruz.
                 viewModel.products.collectLatest { pagingData ->
                     productListAdapter.submitData(pagingData)
                 }
@@ -102,7 +81,25 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>(FragmentSearchBinding
         }
     }
 
-    // HomeFragment'tan kopyalanan, yükleme ve hata durumlarını yöneten fonksiyon.
+    private fun observeSearchQuery() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                // ViewModel'deki searchQuery'yi dinleyerek UI durumunu yönetiyoruz.
+                viewModel.searchQuery.collectLatest { query ->
+                    val isQueryTooShort = query.length < SearchProductsUseCase.MIN_QUERY_LENGTH
+                    // Arama metni çok kısaysa, "Aramaya başla" ekranını göster.
+                    binding.stateIdleGroup.isVisible = isQueryTooShort
+                    // Arama metni yeterince uzunsa, sonuç listesini göster.
+                    binding.searchRecyclerView.isVisible = !isQueryTooShort
+
+                    if (isQueryTooShort) {
+                        binding.stateEmptyGroup.isVisible = false
+                    }
+                }
+            }
+        }
+    }
+
     private fun observeLoadState() {
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -110,13 +107,7 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>(FragmentSearchBinding
                     val refreshState = loadStates.refresh
                     binding.progressbar.isVisible = refreshState is LoadState.Loading
 
-                    if (refreshState is LoadState.Error) {
-                        Toast.makeText(
-                            requireContext(),
-                            "Hata: ${refreshState.error.localizedMessage}",
-                            Toast.LENGTH_LONG
-                        ).show()
-                    }
+                    // Diğer UI durumlarını (boş, hata) yönetme mantığı buraya eklenebilir.
                 }
             }
         }
