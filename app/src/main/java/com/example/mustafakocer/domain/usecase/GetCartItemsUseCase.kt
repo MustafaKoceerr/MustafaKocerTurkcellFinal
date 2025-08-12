@@ -6,61 +6,46 @@ import com.example.mustafakocer.domain.repository.ProductRepository
 import com.example.mustafakocer.domain.util.Resource
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class GetCartItemsUseCase @Inject constructor(
     private val cartRepository: CartRepository,
     private val productRepository: ProductRepository,
 ) {
-    @OptIn(ExperimentalCoroutinesApi::class)
     operator fun invoke(userId: String): Flow<Resource<List<CartItem>>> {
-        // 1. Firebase'den ham sepet verisini (productId, quantity) dinle.
-        val rawCartFlow = cartRepository.getRawCartItems(userId)
-
-        // 2. Ham sepet verisi her değiştiğinde, içindeki product ID'leri al.
-        val productIdsFlow = rawCartFlow.map { resource ->
-            when (resource) {
-                is Resource.Success -> resource.data.map { it.first } // Sadece ID'leri al
-                else -> emptyList()
-            }
-        }
-
-        // 3. Bu ID'lere sahip ürünlerin detaylarını veritabanından dinle.
-        val productsFlow = productIdsFlow.flatMapLatest { ids ->
-            if (ids.isNotEmpty()) {
-                productRepository.getProductsByIds(ids)
-            } else {
-                // Sepet boşsa, boş bir ürün listesi akışı başlat.
-                flowOf(Resource.Success(emptyList()))
-            }
-        }
-
-        // 4. İki ana akışı (ham sepet ve ürün detayları) birleştir (combine).
-        return combine(rawCartFlow, productsFlow) { cartResource, productsResource ->
-            // İki akıştan biri bile hazır değilse (Loading/Error), o durumu yansıt.
-            if (cartResource !is Resource.Success || productsResource !is Resource.Success) {
-                return@combine Resource.Loading // veya gelen hatayı döndür
-            }
-
-            val rawCartItems = cartResource.data
-            val products = productsResource.data
-            val productsMap =
-                products.associateBy { it.id } // Ürünleri ID'ye göre map'le (daha hızlı erişim için)
-
-            // Ham sepet verisi ile ürün detaylarını birleştirerek son `CartItem` listesini oluştur.
-            val finalCartItems = rawCartItems.mapNotNull { (productId, quantity) ->
-                productsMap[productId]?.let { product ->
-                    CartItem(
-                        product = product,
-                        quantity = quantity
-                    )
+        return cartRepository.getRawCartItems(userId).flatMapLatest { cartResource ->
+            when (cartResource) {
+                is Resource.Loading -> kotlinx.coroutines.flow.flowOf(Resource.Loading)
+                is Resource.Error -> kotlinx.coroutines.flow.flowOf(Resource.Error(cartResource.exception))
+                is Resource.Idle -> kotlinx.coroutines.flow.flowOf(Resource.Idle)
+                is Resource.Success -> {
+                    val rawItems = cartResource.data
+                    if (rawItems.isEmpty()) {
+                        kotlinx.coroutines.flow.flowOf(Resource.Success(emptyList()))
+                    } else {
+                        val productIds = rawItems.map { it.first }
+                        productRepository.getProductsByIds(productIds).map { productsResource ->
+                            when (productsResource) {
+                                is Resource.Success -> {
+                                    val productsMap = productsResource.data.associateBy { it.id }
+                                    val finalCartItems = rawItems.mapNotNull { (productId, quantity) ->
+                                        productsMap[productId]?.let { product ->
+                                            CartItem(product = product, quantity = quantity)
+                                        }
+                                    }
+                                    Resource.Success(finalCartItems)
+                                }
+                                is Resource.Error -> Resource.Error(productsResource.exception)
+                                is Resource.Loading -> Resource.Loading
+                                is Resource.Idle -> Resource.Idle
+                            }
+                        }
+                    }
                 }
             }
-            Resource.Success(finalCartItems)
         }
     }
 }

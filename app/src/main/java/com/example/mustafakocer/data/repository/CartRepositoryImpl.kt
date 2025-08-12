@@ -1,15 +1,9 @@
 package com.example.mustafakocer.data.repository
 
-import com.example.mustafakocer.data.model.entity.CartItemEntity
 import com.example.mustafakocer.domain.exception.AppException
 import com.example.mustafakocer.domain.repository.CartRepository
 import com.example.mustafakocer.domain.util.Resource
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.DatabaseReference
-import com.google.firebase.database.MutableData
-import com.google.firebase.database.Transaction
-import com.google.firebase.database.ValueEventListener
+import com.google.firebase.database.*
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
@@ -28,17 +22,22 @@ class CartRepositoryImpl @Inject constructor(
     }
 
     override fun getRawCartItems(userId: String): Flow<Resource<List<Pair<Int, Int>>>> = callbackFlow {
-        // Bu fonksiyonun yapısı doğru ve güncel. Değişiklik yok.
         val cartRef = dbRef.child(PATH_CARTS).child(userId)
         trySend(Resource.Loading)
 
         val listener = object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
-                val rawItems = snapshot.children.mapNotNull { data ->
-                    val entity = data.getValue(CartItemEntity::class.java)
-                    if (entity?.productId != null && entity.quantity != null) {
-                        Pair(entity.productId, entity.quantity)
-                    } else { null }
+                // DEĞİŞTİ: Artık daha basit bir veri yapısını parse ediyoruz.
+                val rawItems = snapshot.children.mapNotNull { productSnapshot ->
+                    try {
+                        val productId = productSnapshot.key?.toInt()
+                        val quantity = (productSnapshot.value as? Long)?.toInt()
+                        if (productId != null && quantity != null) {
+                            Pair(productId, quantity)
+                        } else null
+                    } catch (e: Exception) {
+                        null // Hatalı veriyi (örn: key'i Int olmayan) atla
+                    }
                 }
                 trySend(Resource.Success(rawItems))
             }
@@ -56,31 +55,20 @@ class CartRepositoryImpl @Inject constructor(
     override suspend fun addOrIncreaseCartItem(userId: String, productId: Int): Resource<Unit> {
         return try {
             val itemRef = dbRef.child(PATH_CARTS).child(userId).child(productId.toString())
-            // YENİ VE DOĞRU YAPI: Coroutines 1.10.2+ için
             suspendCancellableCoroutine { continuation ->
-                // Coroutine iptal edilirse ne olacağını baştan tanımlıyoruz.
-                continuation.invokeOnCancellation { /* Firebase transaction'ı için özel bir iptal işlemi yok */ }
-
+                continuation.invokeOnCancellation { /* No-op */ }
                 itemRef.runTransaction(object : Transaction.Handler {
                     override fun doTransaction(currentData: MutableData): Transaction.Result {
-                        val currentItem = currentData.getValue(CartItemEntity::class.java)
-                        if (currentItem == null) {
-                            currentData.value = CartItemEntity(productId = productId, quantity = 1)
-                        } else {
-                            val newQuantity = (currentItem.quantity ?: 0) + 1
-                            currentData.value = currentItem.copy(quantity = newQuantity)
-                        }
+                        // DEĞİŞTİ: Artık CartItemEntity değil, direkt Long (miktar) okuyoruz.
+                        val currentQuantity = currentData.getValue(Long::class.java) ?: 0L
+                        currentData.value = currentQuantity + 1
                         return Transaction.success(currentData)
                     }
 
                     override fun onComplete(error: DatabaseError?, committed: Boolean, currentData: DataSnapshot?) {
                         if (continuation.isActive) {
-                            if (error == null) {
-                                // DEĞİŞTİ: Artık sadece tek parametreli resume() kullanılıyor.
-                                continuation.resume(Unit)
-                            } else {
-                                continuation.resumeWithException(error.toException())
-                            }
+                            if (error == null) continuation.resume(Unit)
+                            else continuation.resumeWithException(error.toException())
                         }
                     }
                 })
@@ -94,32 +82,25 @@ class CartRepositoryImpl @Inject constructor(
     override suspend fun decreaseOrRemoveCartItem(userId: String, productId: Int): Resource<Unit> {
         return try {
             val itemRef = dbRef.child(PATH_CARTS).child(userId).child(productId.toString())
-            // YENİ VE DOĞRU YAPI: Coroutines 1.10.2+ için
             suspendCancellableCoroutine { continuation ->
                 continuation.invokeOnCancellation { /* No-op */ }
-
                 itemRef.runTransaction(object : Transaction.Handler {
                     override fun doTransaction(currentData: MutableData): Transaction.Result {
-                        val currentItem = currentData.getValue(CartItemEntity::class.java)
-                        if (currentItem != null) {
-                            val newQuantity = (currentItem.quantity ?: 0) - 1
-                            if (newQuantity <= 0) {
-                                currentData.value = null
-                            } else {
-                                currentData.value = currentItem.copy(quantity = newQuantity)
-                            }
+                        val currentQuantity = currentData.getValue(Long::class.java)
+                        // Miktar 1 ise veya hiç yoksa, sil (null ata).
+                        if (currentQuantity == null || currentQuantity <= 1) {
+                            currentData.value = null
+                        } else {
+                            // Değilse, 1 azalt.
+                            currentData.value = currentQuantity - 1
                         }
                         return Transaction.success(currentData)
                     }
 
                     override fun onComplete(error: DatabaseError?, committed: Boolean, currentData: DataSnapshot?) {
                         if (continuation.isActive) {
-                            if (error == null) {
-                                // DEĞİŞTİ: Artık sadece tek parametreli resume() kullanılıyor.
-                                continuation.resume(Unit)
-                            } else {
-                                continuation.resumeWithException(error.toException())
-                            }
+                            if (error == null) continuation.resume(Unit)
+                            else continuation.resumeWithException(error.toException())
                         }
                     }
                 })
@@ -131,7 +112,6 @@ class CartRepositoryImpl @Inject constructor(
     }
 
     override suspend fun clearCart(userId: String): Resource<Unit> {
-        // Bu fonksiyon zaten doğruydu, değişiklik yok.
         return try {
             dbRef.child(PATH_CARTS).child(userId).removeValue().await()
             Resource.Success(Unit)
