@@ -20,7 +20,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <!-- Görsel (1:1 oran) -->
+        <!-- Görsel (1:1) -->
         <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/imgProduct"
             android:layout_width="0dp"
@@ -34,7 +34,7 @@
             app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.Medium"
             tools:srcCompat="@tools:sample/backgrounds/scenic" />
 
-        <!-- % İndirim rozeti (varsa) -->
+        <!-- % İndirim -->
         <TextView
             android:id="@+id/badgeDiscount"
             android:layout_width="wrap_content"
@@ -51,14 +51,12 @@
             android:visibility="gone"
             app:layout_constraintStart_toStartOf="@id/imgProduct"
             app:layout_constraintTop_toTopOf="@id/imgProduct"
-            app:layout_goneMarginStart="@dimen/badge_edge_margin"
-            app:layout_goneMarginTop="@dimen/badge_edge_margin"
             android:layout_marginStart="@dimen/badge_edge_margin"
             android:layout_marginTop="@dimen/badge_edge_margin"
             tools:text="%15"
             tools:visibility="visible" />
 
-        <!-- Stok rozeti: “Tükendi” ya da “Son 3” -->
+        <!-- Stok rozeti -->
         <TextView
             android:id="@+id/badgeStock"
             android:layout_width="wrap_content"
@@ -80,85 +78,7 @@
             tools:text="Son 3"
             tools:visibility="gone" />
 
-        <!-- Ekle (qty==0 iken) -->
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnAddToCart"
-            style="@style/Widget.Material3.Button.TonalButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:minHeight="@dimen/product_add_min_touch"
-            android:minWidth="0dp"
-            android:insetLeft="0dp"
-            android:insetRight="0dp"
-            android:insetTop="0dp"
-            android:insetBottom="0dp"
-            android:paddingStart="@dimen/product_add_hpad"
-            android:paddingEnd="@dimen/product_add_hpad"
-            android:paddingTop="@dimen/product_add_vpad"
-            android:paddingBottom="@dimen/product_add_vpad"
-            android:text="@string/product_add_to_cart"
-            android:contentDescription="@string/cd_add_to_cart"
-            app:icon="@drawable/ic_add_24"
-            app:iconPadding="@dimen/product_add_icon_pad"
-            app:iconGravity="textStart"
-            app:layout_constraintBottom_toBottomOf="@id/imgProduct"
-            app:layout_constraintEnd_toEndOf="@id/imgProduct"
-            android:layout_marginEnd="@dimen/product_cart_overlay_margin"
-            android:layout_marginBottom="@dimen/product_cart_overlay_margin"
-            tools:visibility="visible" />
-
-        <!-- − qty + (qty>0 iken) -->
-        <LinearLayout
-            android:id="@+id/layoutCartOperations"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/bg_cart_overlay"
-            android:gravity="center_vertical"
-            android:orientation="horizontal"
-            android:paddingStart="@dimen/cart_overlay_hpad"
-            android:paddingEnd="@dimen/cart_overlay_hpad"
-            android:paddingTop="@dimen/cart_overlay_vpad"
-            android:paddingBottom="@dimen/cart_overlay_vpad"
-            android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="@id/imgProduct"
-            app:layout_constraintEnd_toEndOf="@id/imgProduct"
-            android:layout_marginEnd="@dimen/product_cart_overlay_margin"
-            android:layout_marginBottom="@dimen/product_cart_overlay_margin"
-            tools:visibility="gone">
-
-            <ImageButton
-                android:id="@+id/btnMinus"
-                style="@style/Widget.Material3.Button.Icon"
-                android:layout_width="@dimen/cart_btn_size"
-                android:layout_height="@dimen/cart_btn_size"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:contentDescription="@string/cd_decrease"
-                app:icon="@drawable/ic_remove_24"
-                app:iconSize="@dimen/cart_btn_icon_size" />
-
-            <TextView
-                android:id="@+id/txtQuantity"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/cart_qty_gap"
-                android:layout_marginEnd="@dimen/cart_qty_gap"
-                android:textAppearance="@style/TextAppearance.Material3.TitleSmall"
-                android:textStyle="bold"
-                android:textColor="?attr/colorOnSurface"
-                tools:text="1" />
-
-            <ImageButton
-                android:id="@+id/btnPlus"
-                style="@style/Widget.Material3.Button.Icon"
-                android:layout_width="@dimen/cart_btn_size"
-                android:layout_height="@dimen/cart_btn_size"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:contentDescription="@string/cd_increase"
-                app:icon="@drawable/ic_add_24"
-                app:iconSize="@dimen/cart_btn_icon_size" />
-        </LinearLayout>
-
-        <!-- İçerik -->
+        <!-- İçerik alanı -->
         <LinearLayout
             android:id="@+id/layoutContent"
             android:layout_width="0dp"
@@ -212,6 +132,7 @@
 
             <!-- Fiyatlar -->
             <LinearLayout
+                android:id="@+id/rowPrices"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/product_prices_top"
@@ -236,6 +157,7 @@
                     android:textColor="?attr/colorOnSurfaceVariant"
                     tools:text="₺12.999" />
             </LinearLayout>
+
         </LinearLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
