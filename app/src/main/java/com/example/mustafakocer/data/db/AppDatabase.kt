@@ -2,7 +2,6 @@ package com.example.mustafakocer.data.db
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
-import androidx.room.TypeConverters
 import com.example.mustafakocer.data.model.entity.CategoryRemoteKeyEntity
 import com.example.mustafakocer.data.model.entity.ProductEntity
 import com.example.mustafakocer.data.model.entity.HomeRemoteKeyEntity
