@@ -81,7 +81,7 @@
 
     <string name="profile_first_name_hint">Ad</string>
     <string name="profile_last_name_hint">Soyad</string>
-    <string name="profile_email_hint">E-posta</string>
+    <string name="profile_username_hint">Kullanıcı Adı</string>
     <string name="profile_phone_hint">Telefon Numarası</string>
     <string name="profile_age_hint">Yaş</string>
 
@@ -110,5 +110,51 @@
     <string name="product_out_of_stock">Tükendi</string>
     <string name="product_low_stock">Son %1$d</string> <!-- örn: Son 3 -->
 
+
+    <string name="login_title">Tekrar Hoş Geldin</string>
+    <string name="login_subtitle">Hesabına giriş yap ve alışverişe kaldığın yerden devam et.</string>
+
+    <string name="login_username_label">Kullanıcı Adı</string>
+    <string name="login_username_placeholder">ornek_kullanici</string>
+    <string name="login_password_label">Şifre</string>
+    <string name="login_password_placeholder">••••••••</string>
+
+    <string name="login_cta">Giriş Yap</string>
+    <string name="login_forgot_password">Şifremi unuttum</string>
+    <string name="login_create_account">Hesap Oluştur</string>
+    <string name="login_terms_hint">Devam ederek, Kullanım Koşulları ve Gizlilik Politikasını kabul etmiş olursun.</string>
+
+    <string name="cd_show_password">Şifreyi göster</string>
+    <string name="cd_hide_password">Şifreyi gizle</string>
+
+    <string name="cd_app_logo">Uygulama logosu</string>
+    <string name="splash_tagline">Parmaklarının ucunda modern alışveriş.</string>
+
+    <string name="brand_name">NEXUSCART</string>
+
+    <string name="search_idle_message">Ürünleri keşfetmek için arama çubuğuna yazmaya başlayın.</string>
+
+
+    <!-- Header meta -->
+    <string name="pd_chip_brand">Marka</string>
+    <string name="pd_chip_category">Kategori</string>
+
+    <!-- Fiyat / açıklama / özellikler -->
+    <string name="pd_specs_title">Öne çıkan özellikler</string>
+    <string name="pd_description_title">Açıklama</string>
+    <string name="pd_read_more">Devamını oku</string>
+    <string name="pd_read_less">Daha az göster</string>
+
+    <!-- Yorumlar -->
+    <string name="pd_reviews_title">Değerlendirmeler</string>
+    <string name="pd_reviews_see_all">Tümünü gör</string>
+
+    <!-- Hata durumu -->
+    <string name="pd_error_title">Ürün yüklenemedi</string>
+
+    <string name="cart_remove">Kaldır</string>
+    <string name="cd_remove_item">Ürünü sepetten kaldır</string>
+
+    <string name="cd_product_gallery_image">Ürün galerisi görseli</string>```
 
 </resources>
