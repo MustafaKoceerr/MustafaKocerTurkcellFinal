@@ -14,43 +14,44 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
 class CartRepositoryImpl @Inject constructor(
-    private val dbRef: DatabaseReference
+    private val dbRef: DatabaseReference,
 ) : CartRepository {
 
     companion object {
         private const val PATH_CARTS = "carts"
     }
 
-    override fun getRawCartItems(userId: String): Flow<Resource<List<Pair<Int, Int>>>> = callbackFlow {
-        val cartRef = dbRef.child(PATH_CARTS).child(userId)
-        trySend(Resource.Loading)
+    override fun getRawCartItems(userId: String): Flow<Resource<List<Pair<Int, Int>>>> =
+        callbackFlow {
+            val cartRef = dbRef.child(PATH_CARTS).child(userId)
+            trySend(Resource.Loading)
 
-        val listener = object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                // DEĞİŞTİ: Artık daha basit bir veri yapısını parse ediyoruz.
-                val rawItems = snapshot.children.mapNotNull { productSnapshot ->
-                    try {
-                        val productId = productSnapshot.key?.toInt()
-                        val quantity = (productSnapshot.value as? Long)?.toInt()
-                        if (productId != null && quantity != null) {
-                            Pair(productId, quantity)
-                        } else null
-                    } catch (e: Exception) {
-                        null // Hatalı veriyi (örn: key'i Int olmayan) atla
+            val listener = object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    // DEĞİŞTİ: Artık daha basit bir veri yapısını parse ediyoruz.
+                    val rawItems = snapshot.children.mapNotNull { productSnapshot ->
+                        try {
+                            val productId = productSnapshot.key?.toInt()
+                            val quantity = (productSnapshot.value as? Long)?.toInt()
+                            if (productId != null && quantity != null) {
+                                Pair(productId, quantity)
+                            } else null
+                        } catch (e: Exception) {
+                            null // Hatalı veriyi (örn: key'i Int olmayan) atla
+                        }
                     }
+                    trySend(Resource.Success(rawItems))
                 }
-                trySend(Resource.Success(rawItems))
-            }
 
-            override fun onCancelled(error: DatabaseError) {
-                val exception = AppException.Unknown(error.toException())
-                trySend(Resource.Error(exception))
-                close(exception)
+                override fun onCancelled(error: DatabaseError) {
+                    val exception = AppException.Unknown(error.toException())
+                    trySend(Resource.Error(exception))
+                    close(exception)
+                }
             }
+            cartRef.addValueEventListener(listener)
+            awaitClose { cartRef.removeEventListener(listener) }
         }
-        cartRef.addValueEventListener(listener)
-        awaitClose { cartRef.removeEventListener(listener) }
-    }
 
     override suspend fun addOrIncreaseCartItem(userId: String, productId: Int): Resource<Unit> {
         return try {
@@ -65,7 +66,11 @@ class CartRepositoryImpl @Inject constructor(
                         return Transaction.success(currentData)
                     }
 
-                    override fun onComplete(error: DatabaseError?, committed: Boolean, currentData: DataSnapshot?) {
+                    override fun onComplete(
+                        error: DatabaseError?,
+                        committed: Boolean,
+                        currentData: DataSnapshot?,
+                    ) {
                         if (continuation.isActive) {
                             if (error == null) continuation.resume(Unit)
                             else continuation.resumeWithException(error.toException())
@@ -97,7 +102,11 @@ class CartRepositoryImpl @Inject constructor(
                         return Transaction.success(currentData)
                     }
 
-                    override fun onComplete(error: DatabaseError?, committed: Boolean, currentData: DataSnapshot?) {
+                    override fun onComplete(
+                        error: DatabaseError?,
+                        committed: Boolean,
+                        currentData: DataSnapshot?,
+                    ) {
                         if (continuation.isActive) {
                             if (error == null) continuation.resume(Unit)
                             else continuation.resumeWithException(error.toException())
@@ -116,6 +125,18 @@ class CartRepositoryImpl @Inject constructor(
             dbRef.child(PATH_CARTS).child(userId).removeValue().await()
             Resource.Success(Unit)
         } catch (e: Exception) {
+            Resource.Error(AppException.Unknown(e))
+        }
+    }
+
+    // YENİ FONKSİYONUN UYGULAMASI
+    override suspend fun removeCartItem(userId: String, productId: Int): Resource<Unit> {
+        return try {
+            // Firebase'de "carts -> {userId} -> {productId}" yolundaki veriyi sil.
+            dbRef.child(PATH_CARTS).child(userId).child(productId.toString()).removeValue().await()
+            Resource.Success(Unit)
+        } catch (e: Exception) {
+            // Ağ hatası veya başka bir Firebase hatası durumunda sarmala.
             Resource.Error(AppException.Unknown(e))
         }
     }
