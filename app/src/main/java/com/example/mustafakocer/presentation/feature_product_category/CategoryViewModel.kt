@@ -10,6 +10,7 @@ import com.example.mustafakocer.domain.usecase.GetCategoriesUseCase
 import com.example.mustafakocer.domain.usecase.GetProductsByCategoryUseCase
 import com.example.mustafakocer.domain.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -34,6 +35,7 @@ class CategoryViewModel @Inject constructor(
     private val _selectedCategory = MutableStateFlow<String?>(null)
 
     // 2. Kategori adı değiştikçe, yeni PagingData akışını tetikleyecek olan ana Flow.
+    @OptIn(ExperimentalCoroutinesApi::class)
     val productsByCategoryFlow: Flow<PagingData<Product>> = _selectedCategory
         .flatMapLatest { categoryName->
             // Eğer kategori adı null veya boş değilse, UseCase'i çağır.

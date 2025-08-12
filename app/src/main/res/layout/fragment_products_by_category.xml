@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- ProductsByCategoryFragment -->
+<!-- ProductsByCategoryFragment (SwipeRefreshLayout kaldırıldı) -->
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -9,29 +9,22 @@
     android:background="?attr/colorSurface"
     tools:context=".presentation.feature_product_category.ProductsByCategoryFragment">
 
-    <!-- Pull-to-refresh -->
-    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-        android:id="@+id/swipeRefreshProductsByCategory"
+    <!-- Ürün grid listesi -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/productsByCategoryRecyclerView"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:clipToPadding="false"
+        android:paddingStart="@dimen/home_content_margin"
+        android:paddingEnd="@dimen/home_content_margin"
+        android:paddingTop="@dimen/home_content_margin_top"
+        android:paddingBottom="@dimen/home_content_margin_bottom"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
-
-        <!-- Ürün grid listesi (GridLayoutManager kodda ayarlanacak) -->
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/productsByCategoryRecyclerView"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:clipToPadding="false"
-            android:paddingStart="@dimen/home_content_margin"
-            android:paddingEnd="@dimen/home_content_margin"
-            android:paddingTop="@dimen/home_content_margin_top"
-            android:paddingBottom="@dimen/home_content_margin_bottom"
-            tools:listitem="@layout/recylerview_row_product_grid"
-            tools:itemCount="8" />
-    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+        app:layout_constraintEnd_toEndOf="parent"
+        tools:listitem="@layout/recyler_row_product_grid"
+        tools:itemCount="8" />
 
     <!-- Yüklenme göstergesi (ID korunur) -->
     <com.google.android.material.progressindicator.CircularProgressIndicator
