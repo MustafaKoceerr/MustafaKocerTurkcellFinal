@@ -6,6 +6,7 @@ import com.example.mustafakocer.data.model.dto.LoginResponseDto
 import com.example.mustafakocer.data.model.dto.OrdersResponseDto
 import com.example.mustafakocer.data.model.dto.ProductsResponseDto
 import com.example.mustafakocer.data.model.dto.UserDetailDto
+import com.example.mustafakocer.data.model.dto.ProductDetailDto
 import com.example.mustafakocer.data.model.dto.UserUpdateDto
 import retrofit2.Response
 import retrofit2.http.Body
@@ -71,4 +72,8 @@ interface IDummyApi {
         @Body userUpdateDto: UserUpdateDto
     ): Response<UserDetailDto>
 
+    @GET("products/{id}")
+    suspend fun getProductById(
+        @Path("id") productId: Int
+    ): Response<ProductDetailDto>
 }

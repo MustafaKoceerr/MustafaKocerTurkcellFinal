@@ -7,20 +7,18 @@ import androidx.paging.RemoteMediator
 import androidx.room.withTransaction
 import com.example.mustafakocer.data.db.AppDatabase
 import com.example.mustafakocer.data.mapper.toEntity
-import com.example.mustafakocer.data.model.entity.ProductEntity
 import com.example.mustafakocer.data.model.entity.HomeRemoteKeyEntity
+import com.example.mustafakocer.data.model.entity.ProductEntity
 import com.example.mustafakocer.data.network.IDummyApi
 import retrofit2.HttpException
 import java.io.IOException
 
-/**
- * Offline first için gerekli.
- */
 @OptIn(ExperimentalPagingApi::class)
-class ProductRemoteMediator (
+// Hilt anotasyonu yok, bu basit bir sınıf.
+class ProductRemoteMediator(
     private val api: IDummyApi,
     private val db: AppDatabase
-): RemoteMediator<Int, ProductEntity>(){
+) : RemoteMediator<Int, ProductEntity>() {
 
     private val productDao = db.createProductDao()
     private val remoteKeyDao = db.createHomeRemoteKeyDao()
@@ -30,17 +28,17 @@ class ProductRemoteMediator (
         state: PagingState<Int, ProductEntity>
     ): MediatorResult {
         return try {
-            // 1. Hangi sayfayı çekeceğimizi belirle
             val page = when (loadType) {
                 LoadType.REFRESH -> 0
                 LoadType.PREPEND -> return MediatorResult.Success(endOfPaginationReached = true)
                 LoadType.APPEND -> {
-                    val remoteKeys = getLastRemoteKey(state)
-                    remoteKeys?.nextKey ?: return MediatorResult.Success(endOfPaginationReached = true)
+                    // DEĞİŞTİ: Anahtarı PagingState yerine doğrudan DB'den alıyoruz.
+                    val remoteKey = getRemoteKeyForLastItem()
+                    // Eğer son anahtarın bir sonraki sayfası yoksa, paginasyon bitti demektir.
+                    remoteKey?.nextKey ?: return MediatorResult.Success(endOfPaginationReached = true)
                 }
             }
 
-            // 2. API'ye isteği at
             val response = api.getProducts(
                 limit = state.config.pageSize,
                 skip = page * state.config.pageSize
@@ -48,7 +46,6 @@ class ProductRemoteMediator (
             val productsDto = response.body()?.products ?: emptyList()
             val endOfPaginationReached = productsDto.isEmpty()
 
-            // 3. Gelen veriyi ve yeni remote key'leri veritabanına kaydet
             db.withTransaction {
                 if (loadType == LoadType.REFRESH) {
                     productDao.clearAllProducts()
@@ -59,7 +56,7 @@ class ProductRemoteMediator (
                 val keys = productsDto.map {
                     HomeRemoteKeyEntity(productId = it.id!!, prevKey = prevKey, nextKey = nextKey)
                 }
-                val entities = productsDto.map { it.toEntity() } // DTO -> Entity
+                val entities = productsDto.map { it.toEntity() }
 
                 remoteKeyDao.insertAll(keys)
                 productDao.insertAll(entities)
@@ -73,8 +70,11 @@ class ProductRemoteMediator (
         }
     }
 
-    private suspend fun getLastRemoteKey(state: PagingState<Int, ProductEntity>): HomeRemoteKeyEntity? {
-        return state.pages.lastOrNull { it.data.isNotEmpty() }?.data?.lastOrNull()
-            ?.let { product -> remoteKeyDao.getRemoteKeyForProductId(product.id) }
+    // DEĞİŞTİ: Bu fonksiyon artık PagingState'e bağımlı değil.
+    private suspend fun getRemoteKeyForLastItem(): HomeRemoteKeyEntity? {
+        // Veritabanındaki son ürünü al ve onun remote key'ini döndür.
+        return productDao.getLastProduct()?.let { product ->
+            remoteKeyDao.getRemoteKeyForProductId(product.id)
+        }
     }
 }
