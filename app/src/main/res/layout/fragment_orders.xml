@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- OrdersFragment -->
+<!-- OrdersFragment (SwipeRefreshLayout kaldırıldı) -->
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -9,29 +9,22 @@
     android:background="?attr/colorSurface"
     tools:context=".presentation.feature_orders.OrdersFragment">
 
-    <!-- Pull-to-refresh -->
-    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-        android:id="@+id/swipeRefreshOrders"
+    <!-- Sipariş listesi -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/orderRecyclerView"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:clipToPadding="false"
+        android:paddingStart="@dimen/orders_content_inset"
+        android:paddingEnd="@dimen/orders_content_inset"
+        android:paddingTop="@dimen/orders_content_inset_top"
+        android:paddingBottom="@dimen/orders_content_inset_bottom"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
-
-        <!-- Sipariş listesi (LinearLayoutManager; divider önerilir) -->
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/orderRecyclerView"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:clipToPadding="false"
-            android:paddingStart="@dimen/orders_content_inset"
-            android:paddingEnd="@dimen/orders_content_inset"
-            android:paddingTop="@dimen/orders_content_inset_top"
-            android:paddingBottom="@dimen/orders_content_inset_bottom"
-            tools:listitem="@layout/recycler_row_order"
-            tools:itemCount="6" />
-    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+        app:layout_constraintEnd_toEndOf="parent"
+        tools:listitem="@layout/recycler_row_order"
+        tools:itemCount="6" />
 
     <!-- Yüklenme göstergesi (ID korunur) -->
     <com.google.android.material.progressindicator.CircularProgressIndicator
@@ -103,7 +96,7 @@
             android:contentDescription="@string/cd_retry" />
     </LinearLayout>
 
-    <!-- En üste dön FAB (opsiyonel ama tutarlı deneyim) -->
+    <!-- En üste dön FAB -->
     <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
         android:id="@+id/fabScrollTop"
         android:layout_width="wrap_content"
