@@ -144,7 +144,7 @@
                     android:id="@+id/editEmail"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="@string/profile_email_hint"
+                    android:hint="@string/profile_username_hint"
                     android:inputType="textEmailAddress"
                     android:imeOptions="actionNext"
                     android:autofillHints="emailAddress" />
