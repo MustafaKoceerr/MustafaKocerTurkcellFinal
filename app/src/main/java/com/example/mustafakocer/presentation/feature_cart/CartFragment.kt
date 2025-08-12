@@ -8,12 +8,11 @@ import android.view.View
 import android.widget.Toast
 import androidx.core.view.MenuProvider
 import androidx.core.view.isVisible
-import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.mustafakocer.R
 import com.example.mustafakocer.databinding.FragmentCartBinding
 import com.example.mustafakocer.domain.util.Resource
@@ -25,7 +24,7 @@ import kotlinx.coroutines.launch
 @AndroidEntryPoint
 class CartFragment : BaseFragment<FragmentCartBinding>(FragmentCartBinding::inflate) {
 
-    private val viewModel: CartViewModel by activityViewModels()
+    private val viewModel: CartViewModel by viewModels()
     private lateinit var cartListAdapter: CartListAdapter
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -36,88 +35,60 @@ class CartFragment : BaseFragment<FragmentCartBinding>(FragmentCartBinding::infl
         observeViewModel()
     }
 
-    // YENİ: Menüyü ve davranışlarını ayarlayan fonksiyon.
-    private fun setupMenu() {
-        requireActivity().addMenuProvider(object : MenuProvider {
-            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
-                // Menüyü burada inflate ediyoruz.
-                menuInflater.inflate(R.menu.cart_menu, menu)
-            }
+    private fun setupRecyclerView() {
+        // DEĞİŞTİ: Adapter artık tek bir 'onEvent' lambdası alıyor.
+        cartListAdapter = CartListAdapter { event ->
+            // Gelen olayın türüne göre doğru ViewModel fonksiyonunu çağırıyoruz.
+            when (event) {
+                is CartEvent.OnIncrease -> viewModel.onIncreaseClicked(event.productId)
+                is CartEvent.OnDecrease -> viewModel.onDecreaseClicked(event.productId)
+                is CartEvent.OnRemove -> {
+                    // TODO: ViewModel'de onRemoveClicked fonksiyonunu oluştur.
+                    // viewModel.onRemoveClicked(event.productId)
+                    Toast.makeText(
+                        requireContext(),
+                        "Kaldır: ${event.productId}",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
 
-            override fun onPrepareMenu(menu: Menu) {
-                // Bu metot, menü her gösterileceğinde çağrılır.
-                // İkonun görünürlüğünü ayarlamak için en doğru yer burasıdır.
-                val clearCartItem = menu.findItem(R.id.action_clear_cart)
-                val currentState = viewModel.cartState.value
-                clearCartItem?.isVisible =
-                    currentState is Resource.Success && currentState.data.isNotEmpty()
-            }
-
-            override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
-                // Tıklama olaylarını burada yönetiyoruz.
-                return when (menuItem.itemId) {
-                    R.id.action_clear_cart -> {
-                        showClearCartConfirmationDialog()
-                        true // Olayın bizim tarafımızdan işlendiğini belirtir.
-                    }
-
-                    else -> false // İşlemediğimiz diğer item'lar için false döndür.
+                is CartEvent.OnProductClick -> {
+                    // TODO: Ürün detay sayfasına navigasyon eklenecek.
+                    Toast.makeText(
+                        requireContext(),
+                        "Detay: ${event.productId}",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
             }
-        }, viewLifecycleOwner, Lifecycle.State.RESUMED) // Yaşam döngüsüne bağlıyoruz.
-    }
-
-    private fun showClearCartConfirmationDialog() {
-        MaterialAlertDialogBuilder(requireContext())
-            .setTitle("Sepeti Temizle")
-            .setMessage("Sepetinizdeki tüm ürünleri silmek istediğinize emin misiniz?")
-            .setNegativeButton("Hayır") { dialog, _ ->
-                dialog.dismiss()
-            }
-            .setPositiveButton("Evet") { dialog, _ ->
-                viewModel.onClearCartConfirmed()
-                dialog.dismiss()
-            }
-            .show()
-    }
-
-    private fun setupRecyclerView() {
-        cartListAdapter = CartListAdapter(
-            onIncreaseClick = viewModel::onIncreaseClicked,
-            onDecreaseClick = viewModel::onDecreaseClicked,
-            onProductClick = { productId ->
-                // TODO: Ürün detay sayfasına navigasyon eklenecek.
-                Toast.makeText(requireContext(), "Ürün ID: $productId tıklandı", Toast.LENGTH_SHORT)
-                    .show()
-            }
-        )
+        }
 
         binding.cartRecyclerView.apply {
             adapter = cartListAdapter
-            layoutManager = GridLayoutManager(requireContext(), 2)
+            layoutManager = LinearLayoutManager(requireContext())
         }
     }
+
+    // observeViewModel, setupMenu ve showClearCartConfirmationDialog fonksiyonları
+    // bir önceki versiyondaki gibi kalır, onlarda bir değişiklik gerekmez.
 
     private fun observeViewModel() {
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch {
                     viewModel.cartState.collect { resource ->
-                        // ... (bu blok aynı)
                         binding.progressbar.isVisible = resource is Resource.Loading
                         val isSuccessAndEmpty =
                             resource is Resource.Success && resource.data.isEmpty()
-                        binding.txtEmptyCart.isVisible =
-                            resource is Resource.Error || isSuccessAndEmpty
-                        binding.txtTotalPrice.isVisible = !isSuccessAndEmpty
-                        when (resource) {
-                            is Resource.Success -> {
-                                cartListAdapter.submitList(resource.data)
-                                if (isSuccessAndEmpty) binding.txtEmptyCart.text =
-                                    "Sepetinizde ürün bulunmuyor."
-                            }
 
+                        binding.txtEmptyCart.isVisible = isSuccessAndEmpty
+                        binding.cardSummary.isVisible =
+                            !isSuccessAndEmpty && resource !is Resource.Loading
+
+                        when (resource) {
+                            is Resource.Success -> cartListAdapter.submitList(resource.data)
                             is Resource.Error -> {
+                                binding.txtEmptyCart.isVisible = true
                                 binding.txtEmptyCart.text =
                                     resource.exception.message ?: "Bir hata oluştu."
                             }
@@ -125,18 +96,54 @@ class CartFragment : BaseFragment<FragmentCartBinding>(FragmentCartBinding::infl
                             else -> { /* Idle, Loading */
                             }
                         }
-                        // DEĞİŞTİ: invalidateOptionsMenu() artık onPrepareMenu'yü tetikleyecek.
                         requireActivity().invalidateOptionsMenu()
                     }
                 }
 
-                // 2. Toplam fiyatı dinle
                 launch {
                     viewModel.totalPrice.collect { totalPrice ->
-                        binding.txtTotalPrice.text = "Toplam: $${totalPrice}"
+                        binding.txtTotalPrice.text = totalPrice
                     }
                 }
             }
         }
+    }
+
+    private fun setupMenu() {
+        requireActivity().addMenuProvider(object : MenuProvider {
+            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+                menuInflater.inflate(R.menu.cart_menu, menu)
+            }
+
+            override fun onPrepareMenu(menu: Menu) {
+                val clearCartItem = menu.findItem(R.id.action_clear_cart)
+                val currentState = viewModel.cartState.value
+                clearCartItem?.isVisible =
+                    currentState is Resource.Success && currentState.data.isNotEmpty()
+            }
+
+            override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+                return when (menuItem.itemId) {
+                    R.id.action_clear_cart -> {
+                        showClearCartConfirmationDialog()
+                        true
+                    }
+
+                    else -> false
+                }
+            }
+        }, viewLifecycleOwner, Lifecycle.State.RESUMED)
+    }
+
+    private fun showClearCartConfirmationDialog() {
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle("Sepeti Temizle")
+            .setMessage("Sepetinizdeki tüm ürünleri silmek istediğinize emin misiniz?")
+            .setNegativeButton("Hayır") { dialog, _ -> dialog.dismiss() }
+            .setPositiveButton("Evet") { dialog, _ ->
+                viewModel.onClearCartConfirmed()
+                dialog.dismiss()
+            }
+            .show()
     }
 }
