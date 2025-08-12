@@ -1,4 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?><!-- HomeFragment -->
+<?xml version="1.0" encoding="utf-8"?>
+<!-- HomeFragment (SwipeRefreshLayout kaldırıldı) -->
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -8,30 +9,23 @@
     android:background="?attr/colorSurface"
     tools:context=".presentation.feature_product_list.HomeFragment">
 
-    <!-- Pull-to-refresh kapsayıcı -->
-    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-        android:id="@+id/swipeRefresh"
+    <!-- Ürün listesi -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/homeRecyclerView"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:clipToPadding="false"
+        android:paddingStart="@dimen/home_content_margin"
+        android:paddingTop="@dimen/home_content_margin_top"
+        android:paddingEnd="@dimen/home_content_margin"
+        android:paddingBottom="@dimen/home_content_margin_bottom"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintEnd_toEndOf="parent"
+        tools:itemCount="8" />
 
-        <!-- Ürün listesi (GridLayoutManager kodda ayarlanacak) -->
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/homeRecyclerView"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:clipToPadding="false"
-            android:paddingStart="@dimen/home_content_margin"
-            android:paddingTop="@dimen/home_content_margin_top"
-            android:paddingEnd="@dimen/home_content_margin"
-            android:paddingBottom="@dimen/home_content_margin_bottom"
-            tools:itemCount="8" />
-    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
-
-    <!-- Yüklenme göstergesi: MD3 Progress Indicator (ID korunur) -->
+    <!-- Yüklenme göstergesi (ID korunur) -->
     <com.google.android.material.progressindicator.CircularProgressIndicator
         android:id="@+id/progressbar"
         android:layout_width="48dp"
