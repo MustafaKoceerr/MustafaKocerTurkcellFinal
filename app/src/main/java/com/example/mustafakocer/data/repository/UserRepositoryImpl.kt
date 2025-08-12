@@ -65,43 +65,32 @@ class UserRepositoryImpl @Inject constructor(
 
 
     override fun updateUserProfile(userUpdateDto: UserUpdateDto): Flow<Resource<User>> = flow {
-        Log.d("ProfileDebug", "Repository.updateUserProfile çağrıldı.")
-
-        // DataStore'dan token ve userId'yi çekmeye çalışıyoruz.
+        // 1. Oturum bilgilerini al. .first() suspend olduğu için bu flow builder içinde olmalı.
         val token = authRepository.getAuthToken().first()
         val userId = authRepository.getUserId().first()
 
-        // Token ve userId'nin durumunu loglayalım.
-        Log.d("ProfileDebug", "Alınan Token: $token, Alınan UserID: $userId")
-
+        // 2. Oturum kontrolü yap.
         if (token.isNullOrBlank() || userId == null) {
-            Log.e("ProfileDebug", "HATA: Token veya UserID null! API isteği atılamayacak.")
             emit(Resource.Error(AppException.Api.Unauthorized(null)))
-            return@flow // Fonksiyondan çık
+            return@flow // Akışı sonlandır.
         }
 
-        Log.d("ProfileDebug", "Token ve UserID geçerli. safeApiCall başlatılıyor...")
-
-
+        // 3. Güvenli API çağrısını yap ve sonucu işle.
         safeApiCall {
-            // DEĞİŞTİ: API'ye artık Map yerine DTO'yu gönderiyoruz.
             api.updateUser("Bearer $token", userId, userUpdateDto)
         }.collect { resource ->
-            // API'den gelen sonucu loglayalım.
-            Log.d("ProfileDebug", "safeApiCall sonucu geldi: $resource")
-
             when (resource) {
-                is Resource.Loading -> emit(Resource.Loading)
-                is Resource.Error -> emit(Resource.Error(resource.exception))
                 is Resource.Success -> {
                     val updatedUserDto = resource.data
-                    // Başarılı yanıttan sonra veritabanını güncelle.
+                    // Önce veritabanını (Single Source of Truth) güncelle.
                     userDao.insertOrReplace(updatedUserDto.toEntity())
+                    // Sonra başarılı sonucu Domain modeliyle emit et.
                     emit(Resource.Success(updatedUserDto.toDomain()))
                 }
-
-                is Resource.Idle -> { /* No-op */
-                }
+                // Hata veya Yüklenme durumlarını doğrudan emit et.
+                is Resource.Error -> emit(resource)
+                is Resource.Loading -> emit(resource)
+                is Resource.Idle -> emit(resource)
             }
         }
     }
