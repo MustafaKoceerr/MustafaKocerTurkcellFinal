@@ -1,5 +1,6 @@
 package com.example.mustafakocer.presentation.feature_cart
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.mustafakocer.domain.exception.AppException
