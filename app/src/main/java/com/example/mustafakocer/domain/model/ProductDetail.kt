@@ -14,8 +14,7 @@ data class ProductDetail(
     val rating: Float,
     val ratingCount: Int, // Yorum sayısı
     val stock: Int,
-    val brand: String,
-    val category: String,
+    val tags: List<String>, // Marka, kategori ve diğer tüm etiketler burada toplanacak.
     val images: List<String>,
     val reviews: List<Review>
 )

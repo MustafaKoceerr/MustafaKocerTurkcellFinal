@@ -6,6 +6,7 @@ import androidx.core.view.isVisible
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.example.mustafakocer.databinding.RecylerRowProductGridBinding
 import com.example.mustafakocer.domain.model.Product // Artık CartItem değil, Product
 
@@ -41,8 +42,12 @@ class ProductListAdapter(
                 txtPrice.text = product.price
                 // TODO: Fiyatın üzerini çizme ve rozet mantıkları eklenecek.
 
-                Glide.with(root.context).load(product.thumbnailUrl).into(imgProduct)
-
+                // Görsel: animasyonu kapat, oran sabitse zıplama olmaz (XML’de ratio önerilir)
+                Glide.with(root.context)
+                    .load(product.thumbnailUrl)
+                    .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
+                    .dontAnimate()
+                    .into(imgProduct)
                 // Sepetle ilgili tüm görünümleri gizliyoruz.
                 badgeDiscount.isVisible = false // Bu mantık daha sonra eklenebilir.
                 badgeStock.isVisible = false

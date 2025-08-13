@@ -44,4 +44,7 @@
     <color name="inverse_primary">#ABC2FF</color>
     <color name="scrim">#000000</color>
 
+    <color name="cart_increase">#2E7D32</color> <!-- green 800 -->
+    <color name="cart_decrease">#C62828</color> <!-- red 800 -->
+
 </resources>

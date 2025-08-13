@@ -4,8 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?attr/colorSurface"
-    tools:context=".presentation.feature_details.ProductDetailsFragment">
+    android:background="?attr/colorSurface">
 
     <!-- İçerik: Scroll -->
     <androidx.core.widget.NestedScrollView
@@ -24,33 +23,37 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <!-- Görsel galerisi -->
-            <androidx.viewpager2.widget.ViewPager2
-                android:id="@+id/pagerImages"
+            <FrameLayout
+                android:id="@+id/pagerContainer"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
                 app:layout_constraintDimensionRatio="1:1"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                tools:listitem="@layout/item_pd_image" />
+                app:layout_constraintTop_toTopOf="parent">
 
-            <!-- Dots indicator (TabLayout) -->
-            <com.google.android.material.tabs.TabLayout
-                android:id="@+id/pagerIndicator"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="@dimen/pd_indicator_margin_bottom"
-                app:layout_constraintBottom_toBottomOf="@id/pagerImages"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:tabGravity="center"
-                app:tabIndicator="@null"
-                app:tabIndicatorAnimationMode="elastic"
-                app:tabIndicatorFullWidth="false"
-                app:tabMode="fixed"
-                app:tabSelectedTextColor="?attr/colorOnSurface"
-                app:tabTextColor="?attr/colorOnSurfaceVariant" />
+                <androidx.viewpager2.widget.ViewPager2
+                    android:id="@+id/pagerImages"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+
+                <!-- Alt scrim: dots’un arkasını yumuşat -->
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="56dp"
+                    android:layout_gravity="bottom"
+                    android:background="@drawable/bg_pd_image_bottom_scrim" />
+
+                <com.google.android.material.tabs.TabLayout
+                    android:id="@+id/pagerIndicator"
+                    style="@style/Widget.App.DotsTabLayout"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom|center_horizontal"
+                    android:layout_marginBottom="10dp"
+                    app:tabMode="scrollable" />
+            </FrameLayout>
+
 
             <!-- % indirim rozeti -->
             <TextView
@@ -69,8 +72,8 @@
                 android:textColor="?attr/colorOnPrimaryContainer"
                 android:textStyle="bold"
                 android:visibility="gone"
-                app:layout_constraintStart_toStartOf="@id/pagerImages"
-                app:layout_constraintTop_toTopOf="@id/pagerImages"
+                app:layout_constraintStart_toStartOf="@id/pagerContainer"
+                app:layout_constraintTop_toTopOf="@id/pagerContainer"
                 tools:text="%18"
                 tools:visibility="visible" />
 
@@ -91,8 +94,8 @@
                 android:textColor="?attr/colorOnTertiaryContainer"
                 android:textStyle="bold"
                 android:visibility="gone"
-                app:layout_constraintEnd_toEndOf="@id/pagerImages"
-                app:layout_constraintTop_toTopOf="@id/pagerImages"
+                app:layout_constraintEnd_toEndOf="@id/pagerContainer"
+                app:layout_constraintTop_toTopOf="@id/pagerContainer"
                 tools:text="Son 3"
                 tools:visibility="gone" />
 
@@ -108,7 +111,7 @@
                 app:cardElevation="0dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/pagerImages"
+                app:layout_constraintTop_toBottomOf="@id/pagerContainer"
                 app:strokeColor="?attr/colorOutlineVariant"
                 app:strokeWidth="@dimen/pd_card_stroke_width">
 
@@ -133,52 +136,36 @@
                         app:layout_constraintTop_toTopOf="parent"
                         tools:text="Apple iPhone 13 Pro Max 256GB Sierra Blue" />
 
-                    <!-- Marka/Kategori chipleri -->
-                    <com.google.android.material.chip.ChipGroup
-                        android:id="@+id/chipGroupMeta"
+                    <androidx.constraintlayout.helper.widget.Flow
+                        android:id="@+id/flowMeta"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/pd_meta_chips_top"
-                        app:layout_constraintEnd_toStartOf="@id/ratingContainer"
+                        app:constraint_referenced_ids="chipGroupMeta"
+                        app:flow_horizontalGap="8dp"
+                        app:flow_verticalGap="2dp"
+                        app:flow_wrapMode="chain"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/txtTitle"
-                        app:singleLine="true"
-                        tools:ignore="UselessParent">
+                        app:layout_constraintTop_toBottomOf="@id/txtTitle" />
 
-                        <!-- DÜZELTME: layout_width ve layout_height eklendi -->
-                        <com.google.android.material.chip.Chip
-                            android:id="@+id/chipBrand"
-                            style="@style/Widget.Material3.Chip.Assist"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/pd_chip_brand"
-                            tools:text="Apple" />
+                    <!-- ChipGroup'un tanımı aynı kalıyor, hala Flow tarafından yönetiliyor -->
+                    <com.google.android.material.chip.ChipGroup
+                        android:id="@+id/chipGroupMeta"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:singleLine="false"
+                        tools:ignore="MissingConstraints" />
 
-                        <!-- DÜZELTME: layout_width ve layout_height eklendi -->
-                        <com.google.android.material.chip.Chip
-                            android:id="@+id/chipCategory"
-                            style="@style/Widget.Material3.Chip.Assist"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/pd_chip_category"
-                            tools:text="Smartphones" />
-                    </com.google.android.material.chip.ChipGroup>
 
-                    <!-- Rating (sağda küçük kapsül) -->
                     <LinearLayout
                         android:id="@+id/ratingContainer"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:background="@drawable/bg_pd_rating_capsule"
+                        android:layout_marginTop="12dp"
                         android:gravity="center_vertical"
                         android:orientation="horizontal"
-                        android:paddingStart="10dp"
-                        android:paddingTop="6dp"
-                        android:paddingEnd="10dp"
-                        android:paddingBottom="6dp"
-                        app:layout_constraintBottom_toBottomOf="@id/chipGroupMeta"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toTopOf="@id/chipGroupMeta">
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/chipGroupMeta">
 
                         <ImageView
                             android:layout_width="18dp"
@@ -259,51 +246,6 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Kısa özellikler / etiketler -->
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/cardQuickSpecs"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/pd_content_margin"
-                android:layout_marginTop="@dimen/pd_block_gap"
-                android:layout_marginEnd="@dimen/pd_content_margin"
-                app:cardCornerRadius="@dimen/pd_card_corner_radius"
-                app:cardElevation="0dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/cardPrice"
-                app:strokeColor="?attr/colorOutlineVariant"
-                app:strokeWidth="@dimen/pd_card_stroke_width">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:paddingStart="@dimen/pd_card_padding_h"
-                    android:paddingTop="@dimen/pd_card_padding_v"
-                    android:paddingEnd="@dimen/pd_card_padding_h"
-                    android:paddingBottom="@dimen/pd_card_padding_v">
-
-                    <TextView
-                        android:id="@+id/txtSpecsTitle"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="@string/pd_specs_title"
-                        android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
-                        android:textColor="?attr/colorOnSurface" />
-
-                    <com.google.android.material.chip.ChipGroup
-                        android:id="@+id/chipGroupSpecs"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/pd_meta_chips_top"
-                        app:singleLine="false"
-                        app:singleSelection="false"
-                        tools:ignore="UselessParent">
-                        <!-- runtime: tag'ler, boyutlar v.s. chip olarak eklenecek -->
-                    </com.google.android.material.chip.ChipGroup>
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
 
             <!-- Açıklama -->
             <com.google.android.material.card.MaterialCardView
@@ -317,7 +259,7 @@
                 app:cardElevation="0dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/cardQuickSpecs"
+                app:layout_constraintTop_toBottomOf="@id/cardPrice"
                 app:strokeColor="?attr/colorOutlineVariant"
                 app:strokeWidth="@dimen/pd_card_stroke_width">
 
@@ -344,10 +286,9 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/pd_desc_top"
                         android:ellipsize="end"
-                        android:maxLines="4"
+                        android:maxLines="3"
                         android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
-                        android:textColor="?attr/colorOnSurface"
-                        tools:text="Ürün açıklaması burada. Malzeme kalitesi, performans özellikleri ve kullanım alanları..." />
+                        android:textColor="?attr/colorOnSurface" />
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btnToggleDescription"
@@ -394,6 +335,21 @@
                     android:contentDescription="@string/pd_reviews_see_all"
                     android:text="@string/pd_reviews_see_all" />
             </LinearLayout>
+            <!-- RecyclerView: Önizleme için max 3 yorum -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerReviews"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/pd_content_margin"
+                android:layout_marginTop="8dp"
+                android:clipToPadding="false"
+                android:nestedScrollingEnabled="false"
+                android:overScrollMode="never"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/rowReviewsHeader"
+                tools:itemCount="3"
+                tools:listitem="@layout/recycler_row_review" />
 
             <!-- Yorumlar listesi (kısa) -->
             <androidx.recyclerview.widget.RecyclerView
@@ -528,16 +484,15 @@
                 app:layout_constraintTop_toTopOf="parent"
                 tools:visibility="visible">
 
-                <!-- − -->
                 <ImageButton
                     android:id="@+id/btnMinus"
-                    style="@style/Widget.Material3.Button.Icon"
                     android:layout_width="@dimen/cart_btn_size"
                     android:layout_height="@dimen/cart_btn_size"
-                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:background="@drawable/ripple_minus"
                     android:contentDescription="@string/cd_decrease"
-                    app:icon="@drawable/ic_remove_24"
-                    app:iconSize="@dimen/cart_btn_icon_size" />
+                    app:srcCompat="@drawable/ic_remove_24"
+                    android:scaleType="center"
+                    app:tint="?attr/colorOnSurface" />
 
                 <TextView
                     android:id="@+id/txtQuantity"
@@ -546,20 +501,20 @@
                     android:layout_marginStart="@dimen/cart_qty_gap"
                     android:layout_marginEnd="@dimen/cart_qty_gap"
                     android:textAppearance="@style/TextAppearance.Material3.TitleSmall"
-                    android:textColor="?attr/colorOnSurface"
                     android:textStyle="bold"
+                    android:textColor="?attr/colorOnSurface"
                     tools:text="1" />
 
                 <!-- + -->
                 <ImageButton
                     android:id="@+id/btnPlus"
-                    style="@style/Widget.Material3.Button.Icon"
                     android:layout_width="@dimen/cart_btn_size"
                     android:layout_height="@dimen/cart_btn_size"
-                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:background="@drawable/ripple_plus"
                     android:contentDescription="@string/cd_increase"
-                    app:icon="@drawable/ic_add_24"
-                    app:iconSize="@dimen/cart_btn_icon_size" />
+                    app:srcCompat="@drawable/ic_add_24"
+                    android:scaleType="center"
+                    app:tint="?attr/colorOnSurface" />
             </LinearLayout>
 
             <!-- qty==0 iken -->

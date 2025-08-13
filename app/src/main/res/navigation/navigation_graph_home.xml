@@ -11,11 +11,13 @@
         android:label="@string/title_home"
         tools:layout="@layout/fragment_home">
 
-        <!-- BU ACTION'I EKLE -->
         <action
             android:id="@+id/action_homeFragment_to_productDetailFragment"
-            app:destination="@id/productDetailFragment" />
-
+            app:destination="@id/productDetailFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
     </fragment>
 
     <fragment
@@ -23,9 +25,14 @@
         android:name="com.example.mustafakocer.presentation.feature_product_category.CategoryFragment"
         android:label="@string/title_categories"
         tools:layout="@layout/fragment_category">
+
         <action
             android:id="@+id/action_categoryFragment_to_productsByCategoryFragment"
-            app:destination="@id/productsByCategoryFragment" />
+            app:destination="@id/productsByCategoryFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
     </fragment>
 
     <fragment
@@ -33,9 +40,14 @@
         android:name="com.example.mustafakocer.presentation.feature_product_search.SearchFragment"
         android:label="@string/title_search"
         tools:layout="@layout/fragment_search">
+
         <action
             android:id="@+id/action_searchFragment_to_ProductDetailFragment"
-            app:destination="@id/productDetailFragment" />
+            app:destination="@id/productDetailFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
     </fragment>
 
     <fragment
@@ -43,9 +55,14 @@
         android:name="com.example.mustafakocer.presentation.feature_orders.OrdersFragment"
         android:label="@string/title_orders"
         tools:layout="@layout/fragment_orders">
+
         <action
             android:id="@+id/action_ordersFragment_to_orderDetailsFragment"
-            app:destination="@id/orderDetailsFragment" />
+            app:destination="@id/orderDetailsFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
     </fragment>
 
     <fragment
@@ -66,7 +83,11 @@
             app:argType="string" />
         <action
             android:id="@+id/action_productsByCategoryFragment_to_ProductDetailFragment"
-            app:destination="@id/productDetailFragment" />
+            app:destination="@id/productDetailFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
     </fragment>
 
     <fragment
@@ -75,28 +96,34 @@
         android:label="@string/title_cart">
         <action
             android:id="@+id/action_cartFragment_to_ProductDetailFragment"
-            app:destination="@id/productDetailFragment" />
+            app:destination="@id/productDetailFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
     </fragment>
 
     <fragment
         android:id="@+id/orderDetailsFragment"
         android:name="com.example.mustafakocer.presentation.feature_orders.OrderDetailsFragment"
         tools:layout="@layout/fragment_order_details">
-        <!-- YENİ ARGÜMAN -->
         <argument
             android:name="order"
             app:argType="com.example.mustafakocer.domain.model.Order" />
         <action
             android:id="@+id/action_orderDetailsFragment_to_productDetailFragment"
-            app:destination="@id/productDetailFragment" />
+            app:destination="@id/productDetailFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
     </fragment>
-    <!-- YENİ: ProductDetailFragment hedefi -->
+
     <fragment
         android:id="@+id/productDetailFragment"
         android:name="com.example.mustafakocer.presentation.feature_details.ProductDetailFragment"
         android:label="Ürün Detayı"
         tools:layout="@layout/fragment_product_detail">
-        <!-- Bu fragment'ın bir productId argümanı alacağını belirtiyoruz. -->
         <argument
             android:name="productId"
             app:argType="integer" />

@@ -1,5 +1,6 @@
 package com.example.mustafakocer.presentation.feature_cart
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.mustafakocer.domain.exception.AppException
@@ -9,6 +10,7 @@ import com.example.mustafakocer.domain.usecase.ClearCartUseCase
 import com.example.mustafakocer.domain.usecase.DecreaseOrRemoveCartItemUseCase
 import com.example.mustafakocer.domain.usecase.GetCartItemsUseCase
 import com.example.mustafakocer.domain.usecase.GetUserIdUseCase
+import com.example.mustafakocer.domain.usecase.RemoveCartItemUseCase
 import com.example.mustafakocer.domain.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -28,6 +30,7 @@ class CartViewModel @Inject constructor(
     private val decreaseOrRemoveCartItemUseCase: DecreaseOrRemoveCartItemUseCase,
     private val getUserIdUseCase: GetUserIdUseCase,
     private val clearCartUseCase: ClearCartUseCase,
+    private val removeCartItemUseCase: RemoveCartItemUseCase
 ) : ViewModel() {
 
     // State 1: Detaylı sepet listesi (Sadece bu ViewModel'in yönettiği ana state).
@@ -75,6 +78,20 @@ class CartViewModel @Inject constructor(
         currentUserId?.let { userId ->
             viewModelScope.launch {
                 decreaseOrRemoveCartItemUseCase(userId, productId)
+            }
+        }
+    }
+
+    // YENİ FONKSİYON: Fragment'tan gelen "Kaldır" olayını işler.
+    fun onRemoveItemConfirmed(productId: Int) {
+        currentUserId?.let { userId ->
+            // Bu bir suspend fonksiyon olduğu için coroutine içinde çağırıyoruz.
+            viewModelScope.launch {
+                // İlgili UseCase'i çağırarak iş kuralını tetikliyoruz.
+                removeCartItemUseCase(userId, productId)
+                // Not: Burada dönen sonucu (Resource) işlememize gerek yok.
+                // Çünkü `observeCart` metodu Firebase'deki değişikliği zaten dinliyor
+                // ve UI'ı otomatik olarak güncelleyecektir. Bu, reaktif programlamanın gücüdür.
             }
         }
     }

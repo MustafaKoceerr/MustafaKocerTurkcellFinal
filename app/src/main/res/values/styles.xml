@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- styles.xml -->
+    <style name="Widget.App.DotsTabLayout" parent="Widget.Material3.TabLayout">
+        <item name="android:background">@android:color/transparent</item>
+        <item name="tabRippleColor">@android:color/transparent</item>
+        <item name="tabIndicatorHeight">0dp</item>
+
+        <item name="tabPaddingStart">2dp</item>
+        <item name="tabPaddingEnd">2dp</item>
+        <item name="tabPaddingTop">0dp</item>
+        <item name="tabPaddingBottom">0dp</item>
+        <item name="tabMinWidth">0dp</item>
+        <item name="tabMaxWidth">0dp</item>
+    </style>
+
+
+    <!-- App seviyesinde özelleştirilmiş Tag Chip -->
+    <style name="App.Chip.Tag" parent="Widget.Material3.Chip.Assist.Elevated">
+        <!-- Metin ve ikon davranışları -->
+        <item name="android:textAllCaps">false</item>
+        <item name="android:ellipsize">end</item>
+        <item name="ensureMinTouchTargetSize">false</item>
+
+        <!-- Start ikonu isterseniz bir drawable koyun; yoksa görünmez bırakın -->
+        <item name="chipIconVisible">false</item>
+
+        <!-- Kapatma ikonu: yalnızca seçiliyken göster -->
+        <item name="closeIconVisible">false</item>
+        <item name="closeIconTint">?attr/colorOnSurface</item>
+
+        <!-- Seçim/Check desteği -->
+        <item name="android:checkable">true</item>
+        <item name="checkedIconVisible">false</item>
+
+        <!-- Renkler: durumlara göre state list -->
+        <item name="chipBackgroundColor">@color/chip_tag_bg</item>
+        <item name="android:textColor">@color/chip_tag_text</item>
+        <item name="chipStrokeColor">@color/chip_tag_stroke</item>
+        <item name="chipStrokeWidth">1dp</item>
+
+        <!-- İç boşluklar ve “pill” görünüm -->
+        <item name="chipStartPadding">10dp</item>
+        <item name="chipEndPadding">6dp</item>
+        <item name="iconStartPadding">6dp</item>
+        <item name="iconEndPadding">2dp</item>
+
+        <!-- Yuvarlak köşeler -->
+        <item name="shapeAppearance">@style/App.Shape.Pill.16</item>
+    </style>
+
+    <!-- 16dp yarıçaplı “pill” -->
+    <style name="App.Shape.Pill.16" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">16dp</item>
+    </style>
+
+    <style name="ShapeAppearanceOverlay.MyMediumCorners" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">12dp</item>
+    </style>
+
+
+</resources>
+

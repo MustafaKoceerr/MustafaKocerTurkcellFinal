@@ -10,15 +10,37 @@ import java.time.format.DateTimeFormatter
 import java.util.Locale
 
 // DTO -> Domain Model
-
 fun ProductDetailDto.toDomain(): ProductDetail {
+    // --- Fiyat Hesaplamaları ---
     val originalPrice = this.price ?: 0.0
     val discountPercentage = this.discountPercentage ?: 0.0
     val calculatedDiscountedPrice = originalPrice * (1 - (discountPercentage / 100.0))
-
     val priceFormat = DecimalFormat("$#,##0.00")
     val savingsFormat = DecimalFormat("#'%'")
 
+    // --- Etiketleri Oluşturma Mantığı ---
+    // Tekrar edenleri engellemek için bir Set kullanıyoruz.
+    val tagSet = mutableSetOf<String>()
+
+    // Metinleri formatlamak için yeniden kullanılabilir bir lambda.
+    val formatTag: (String) -> String = { tag ->
+        tag.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }
+    }
+
+    // 1. Markayı al, formatla ve Set'e ekle.
+    this.brand?.takeIf { it.isNotBlank() }?.let { tagSet.add(formatTag(it)) }
+
+    // 2. Kategoriyi al, formatla ve Set'e ekle.
+    this.category?.takeIf { it.isNotBlank() }?.let { tagSet.add(formatTag(it)) }
+
+    // 3. API'den gelen "tags" dizisindeki tüm etiketleri formatla ve Set'e ekle.
+    this.tags?.forEach { tag ->
+        if (tag.isNotBlank()) {
+            tagSet.add(formatTag(tag))
+        }
+    }
+
+    // --- Domain Modelini Oluşturma ---
     return ProductDetail(
         id = this.id ?: 0,
         title = this.title.orEmpty(),
@@ -29,12 +51,13 @@ fun ProductDetailDto.toDomain(): ProductDetail {
         rating = (this.rating ?: 0.0).toFloat(),
         ratingCount = this.reviews?.size ?: 0,
         stock = this.stock ?: 0,
-        brand = this.brand.orEmpty(),
-        category = this.category.orEmpty(),
+        // Set'i nihai bir List'e çevirip atıyoruz.
+        tags = tagSet.toList(),
         images = this.images ?: emptyList(),
         reviews = this.reviews?.map { it.toDomain() } ?: emptyList()
     )
 }
+
 
 fun ReviewDto.toDomain(): Review {
     // API'den gelen tarih formatı: "2024-05-23T08:56:21.629Z" (ISO_ZONED_DATE_TIME)

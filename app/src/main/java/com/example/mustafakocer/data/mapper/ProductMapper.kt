@@ -1,5 +1,6 @@
 package com.example.mustafakocer.data.mapper
 
+import com.example.mustafakocer.data.model.dto.ProductDetailDto
 import com.example.mustafakocer.data.model.dto.ProductDto
 import com.example.mustafakocer.data.model.entity.ProductEntity
 import com.example.mustafakocer.domain.model.Product
@@ -52,5 +53,34 @@ fun ProductEntity.toDomain(): Product {
         thumbnailUrl = this.thumbnailUrl,
         rating = this.rating.toFloat(), // YENİ ALAN EKLENDİ
         stock = this.stock              // YENİ ALAN EKLENDİ
+    )
+}
+
+
+fun ProductDetailDto.toDomainProduct(): Product {
+    val safeId = this.id ?: throw IllegalArgumentException("Product ID from API cannot be null")
+
+    val originalPrice = this.price ?: 0.0
+    val discountPercentage = this.discountPercentage ?: 0.0
+    val discountedPriceValue = if (discountPercentage > 0) {
+        originalPrice * (1 - discountPercentage / 100)
+    } else {
+        originalPrice
+    }
+
+    val priceFormat = DecimalFormat("$#,##0.00")
+    val formattedPrice = priceFormat.format(originalPrice)
+    val formattedDiscountedPrice = priceFormat.format(discountedPriceValue)
+
+    // 4. BİRLEŞTİRME:
+    // Tüm verileri temiz Product modelinde birleştir.
+    return Product(
+        id = safeId,
+        title = this.title ?: "Unnamed Product",
+        price = formattedPrice,
+        discountedPrice = formattedDiscountedPrice,
+        thumbnailUrl = this.thumbnail ?: "",
+        rating = (this.rating?.toFloat() ?: 0.0f),
+        stock = this.stock ?: 0
     )
 }

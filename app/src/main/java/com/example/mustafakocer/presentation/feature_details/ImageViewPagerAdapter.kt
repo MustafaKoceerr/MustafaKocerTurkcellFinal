@@ -40,4 +40,6 @@ class ImageViewPagerAdapter(
         // Listenin boyutunu döndür.
         return images.size
     }
+
+
 }

@@ -19,7 +19,7 @@ class ProductDetailViewModel @Inject constructor(
     private val addOrIncreaseCartItemUseCase: AddOrIncreaseCartItemUseCase,
     private val decreaseOrRemoveCartItemUseCase: DecreaseOrRemoveCartItemUseCase,
     private val getUserIdUseCase: GetUserIdUseCase,
-    savedStateHandle: SavedStateHandle
+    savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
     private val _productDetailState = MutableStateFlow<Resource<ProductDetail>>(Resource.Loading)
@@ -29,6 +29,14 @@ class ProductDetailViewModel @Inject constructor(
     val quantityInCart: StateFlow<Int> = _quantityInCart.asStateFlow()
 
     private val productId: Int = savedStateHandle.get<Int>("productId")!!
+
+    // YENİ: Açıklamanın durumunu tutan StateFlow
+    private val _isDescriptionExpanded = MutableStateFlow(false)
+    val isDescriptionExpanded: StateFlow<Boolean> = _isDescriptionExpanded.asStateFlow()
+
+    fun onToggleDescription() {
+        _isDescriptionExpanded.value = !_isDescriptionExpanded.value
+    }
 
     init {
         getProductDetail()

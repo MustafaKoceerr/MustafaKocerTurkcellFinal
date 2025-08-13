@@ -22,7 +22,7 @@ local.properties
 .gradle/
 build/
 
-
+.idea/deploymentTargetSelector.xml
 
 # Log/OS Files
 *.log

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ripple xmlns:android="http://schemas.android.com/apk/res/android"
+    android:color="@color/ripple_plus_color">
+    <!-- Mask: sadece alpha kullanılır; merkezden kenara şeffaflaşır -->
+    <item android:id="@android:id/mask">
+        <shape android:shape="oval">
+            <gradient
+                android:type="radial"
+                android:gradientRadius="@dimen/cart_btn_ripple_radius"
+                android:centerX="50%"
+                android:centerY="50%"
+                android:startColor="#FF000000"
+            android:endColor="#00000000"/>   <!-- tamamen şeffaf -->
+        </shape>
+    </item>
+    <!-- Normal durumda görünmez, sadece klik alanını tanımlar -->
+    <item>
+        <shape android:shape="oval">
+            <solid android:color="@android:color/transparent"/>
+        </shape>
+    </item>
+</ripple>

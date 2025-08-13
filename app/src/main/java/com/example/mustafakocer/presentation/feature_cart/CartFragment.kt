@@ -5,13 +5,13 @@ import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
-import android.widget.Toast
 import androidx.core.view.MenuProvider
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.mustafakocer.R
 import com.example.mustafakocer.databinding.FragmentCartBinding
@@ -43,22 +43,16 @@ class CartFragment : BaseFragment<FragmentCartBinding>(FragmentCartBinding::infl
                 is CartEvent.OnIncrease -> viewModel.onIncreaseClicked(event.productId)
                 is CartEvent.OnDecrease -> viewModel.onDecreaseClicked(event.productId)
                 is CartEvent.OnRemove -> {
-                    // TODO: ViewModel'de onRemoveClicked fonksiyonunu oluştur.
-                    // viewModel.onRemoveClicked(event.productId)
-                    Toast.makeText(
-                        requireContext(),
-                        "Kaldır: ${event.productId}",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    showRemoveItemConfirmationDialog(event.productId)
                 }
 
                 is CartEvent.OnProductClick -> {
-                    // TODO: Ürün detay sayfasına navigasyon eklenecek.
-                    Toast.makeText(
-                        requireContext(),
-                        "Detay: ${event.productId}",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    // 1. Safe Args ile action'ı oluştur ve productId'yi parametre olarak geç.
+                    val action = CartFragmentDirections.actionCartFragmentToProductDetailFragment(
+                        productId = event.productId
+                    )
+                    // 2. NavController'ı kullanarak navigasyonu gerçekleştir.
+                    findNavController().navigate(action)
                 }
             }
         }
@@ -142,6 +136,20 @@ class CartFragment : BaseFragment<FragmentCartBinding>(FragmentCartBinding::infl
             .setNegativeButton("Hayır") { dialog, _ -> dialog.dismiss() }
             .setPositiveButton("Evet") { dialog, _ ->
                 viewModel.onClearCartConfirmed()
+                dialog.dismiss()
+            }
+            .show()
+    }
+
+    // YENİ FONKSİYON: Tek bir ürünü silmek için onay diyaloğu gösterir.
+    private fun showRemoveItemConfirmationDialog(productId: Int) {
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle("Ürünü Kaldır")
+            .setMessage("Bu ürünü sepetinizden tamamen kaldırmak istediğinize emin misiniz?")
+            .setNegativeButton("Hayır") { dialog, _ -> dialog.dismiss() }
+            .setPositiveButton("Evet") { dialog, _ ->
+                // Kullanıcı "Evet" derse, ViewModel'deki ilgili fonksiyonu çağır.
+                viewModel.onRemoveItemConfirmed(productId)
                 dialog.dismiss()
             }
             .show()

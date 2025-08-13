@@ -245,10 +245,14 @@
     <dimen name="pd_review_comment_top">8dp</dimen>
 
     <dimen name="touch_target_48">48dp</dimen>
-    <dimen name="cart_btn_size">48dp</dimen>               <!-- önce 32/36 ise 48 yap -->
-    <dimen name="cart_btn_icon_size">24dp</dimen>          <!-- görsel aynı kalsın -->
-    <dimen name="product_add_min_touch">48dp</dimen>       <!-- add to cart min yükseklik -->
+    <dimen name="cart_btn_size">36dp</dimen>
+    <dimen name="cart_btn_icon_size">24dp</dimen>
+    <dimen name="product_add_min_touch">48dp</dimen>
 
     <dimen name="touch_target_min">48dp</dimen>
+    <dimen name="pd_pager_dot_size">6dp</dimen>
+    <dimen name="pd_pager_dot_spacing">2dp</dimen>
+    <dimen name="cart_btn_ripple_radius">28dp</dimen>
+
 
 </resources>
