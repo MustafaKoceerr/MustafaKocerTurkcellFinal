@@ -41,7 +41,7 @@ interface ProductRepository {
      * Verilen ID listesine sahip ürünlerin detaylarını getirir.
      * Bu, offline-first çalışır; önce veritabanından dener, sonra ağdan çeker.
      */
-    fun getProductsByIds(ids: List<Int>): Flow<Resource<List<Product>>>
+    fun getSingleProduct(productId: Int): Flow<Resource<Product>>
 
     fun getProductDetail(productId: Int): Flow<Resource<ProductDetail>>
 }
