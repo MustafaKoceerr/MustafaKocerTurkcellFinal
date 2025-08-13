@@ -4,6 +4,7 @@ import CategoryProductRemoteMediator
 import androidx.paging.*
 import com.example.mustafakocer.data.db.AppDatabase
 import com.example.mustafakocer.data.mapper.toDomain
+import com.example.mustafakocer.data.mapper.toDomainProduct
 import com.example.mustafakocer.data.network.IDummyApi
 import com.example.mustafakocer.data.network.util.safeApiCall
 import com.example.mustafakocer.data.paging.ProductPagingSource
@@ -75,13 +76,15 @@ class ProductRepositoryImpl @Inject constructor(
         }
     }
 
-    override fun getProductsByIds(ids: List<Int>): Flow<Resource<List<Product>>> {
-        // Bu fonksiyon, networkBoundResource kullanarak hem offline hem online çalışabilir.
-        // Şimdilik basit bir implementasyon yapalım: Sadece veritabanından çeksin.
-        // Çünkü ürünlerin zaten RemoteMediator ile veritabanına güncel olarak çekildiğini varsayıyoruz.
-        return db.createProductDao().getProductsByIds(ids).map { entities ->
-            Resource.Success(entities.map { it.toDomain() })
-        }
+    override fun getSingleProduct(productId: Int): Flow<Resource<Product>> {
+        return safeApiCall { api.getProductById(productId) }
+            // 2. Dönen akış üzerinde map operatörünü kullan.
+            .map { resource ->
+                // 3. Sadece Success durumunda, içindeki DTO'yu Domain modeline çevir.
+                resource.mapSuccess { singleProduct ->
+                    singleProduct.toDomainProduct()
+                }
+            }
     }
 
 
