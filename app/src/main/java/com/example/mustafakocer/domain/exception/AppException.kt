@@ -17,19 +17,30 @@ sealed class AppException(
     /**
      * İnternet bağlantısı, zaman aşımı gibi altyapısal ağ sorunlarını temsil eder.
      */
-    sealed class Network(message: String?, cause: Throwable? = null) : AppException(message, cause) {
-        data class NoInternet(override val cause: Throwable? = null) : Network("İnternet bağlantısı yok", cause)
-        data class Timeout(override val cause: Throwable? = null) : Network("İstek zaman aşımına uğradı", cause)
+    sealed class Network(message: String?, cause: Throwable? = null) :
+        AppException(message, cause) {
+        data class NoInternet(override val cause: Throwable? = null) :
+            Network("İnternet bağlantısı yok", cause)
+
+        data class Timeout(override val cause: Throwable? = null) :
+            Network("İstek zaman aşımına uğradı", cause)
     }
 
     /**
      * Sunucunun HTTP yanıtlarından kaynaklanan hataları temsil eder.
      */
-    sealed class Api(val httpCode: Int, message: String?, cause: Throwable? = null) : AppException(message, cause) {
+    sealed class Api(val httpCode: Int, message: String?, cause: Throwable? = null) :
+        AppException(message, cause) {
         data class Unauthorized(override val cause: Throwable? = null) : Api(401, "Yetkisiz", cause)
         data class NotFound(override val cause: Throwable? = null) : Api(404, "Bulunamadı", cause)
-        data class ServerError(val code: Int, override val cause: Throwable? = null) : Api(code, "Sunucu Hatası", cause)
-        data class HttpError(val code: Int, override val message: String?, override val cause: Throwable? = null) : Api(code, message, cause)
+        data class ServerError(val code: Int, override val cause: Throwable? = null) :
+            Api(code, "Sunucu Hatası", cause)
+
+        data class HttpError(
+            val code: Int,
+            override val message: String?,
+            override val cause: Throwable? = null,
+        ) : Api(code, message, cause)
     }
 
     /**
@@ -38,6 +49,7 @@ sealed class AppException(
     sealed class Data(message: String, cause: Throwable? = null) : AppException(message, cause) {
         data object EmptyResponse : Data("Sunucudan boş yanıt alındı", null)
         data class Parse(override val cause: Throwable?) : Data("Veri ayrıştırma hatası", cause)
+
         /**
          * İş kurallarına uymayan girdiler (input) için kullanılır.
          * Örn: Boş e-posta, geçersiz şifre formatı.
@@ -48,5 +60,12 @@ sealed class AppException(
     /**
      * Yukarıdaki kategorilere girmeyen, beklenmedik tüm hatalar için kullanılır.
      */
-    data class Unknown(override val cause: Throwable? = null) : AppException("Bilinmeyen bir hata oluştu", cause)
+    data class Unknown(override val cause: Throwable? = null) :
+        AppException("Bilinmeyen bir hata oluştu", cause)
+
+    data class Firebase(
+        override val message: String?,
+        override val cause: Throwable? = null,
+    ) : AppException(message, cause)
+
 }

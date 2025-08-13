@@ -6,6 +6,7 @@ import com.example.mustafakocer.data.network.error.ErrorMapper
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import retrofit2.Response
+import kotlin.coroutines.cancellation.CancellationException
 
 /**
  * Retrofit API çağrılarını güvenli bir şekilde yürüten ve bunları bir Resource akışına
@@ -36,6 +37,9 @@ fun <T> safeApiCall(apiCall: suspend () -> Response<T>): Flow<Resource<T>> = flo
     } catch (e: Exception) {
         // Çağrı sırasında bir istisna fırlatılırsa (örn: internet yok),
         // bunu da ErrorMapper'a çevirmesi için gönder
+        if (e is CancellationException) {
+            throw e
+        }
         emit(Resource.Error(ErrorMapper.map(e)))
     }
 }
