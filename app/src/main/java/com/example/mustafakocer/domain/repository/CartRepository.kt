@@ -15,4 +15,5 @@ interface CartRepository {
     suspend fun decreaseOrRemoveCartItem(userId: String, productId: Int): Resource<Unit>
     suspend fun clearCart(userId: String): Resource<Unit>
     suspend fun removeCartItem(userId: String, productId: Int): Resource<Unit>
+
 }

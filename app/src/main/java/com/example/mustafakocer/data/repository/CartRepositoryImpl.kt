@@ -23,33 +23,50 @@ class CartRepositoryImpl @Inject constructor(
 
     override fun getRawCartItems(userId: String): Flow<Resource<List<Pair<Int, Int>>>> =
         callbackFlow {
+            // 1. Dinlenecek doğru Firebase yolunu belirle.
             val cartRef = dbRef.child(PATH_CARTS).child(userId)
+
+            // 2. Dinleyiciye ilk bağlandığında Yükleniyor durumunu gönder.
             trySend(Resource.Loading)
 
+            // 3. Firebase'in ValueEventListener'ını oluştur. Bu, veri her değiştiğinde tetiklenir.
             val listener = object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
-                    // DEĞİŞTİ: Artık daha basit bir veri yapısını parse ediyoruz.
+                    // Gelen veriyi List<Pair<Int, Int>> formatına dönüştür.
                     val rawItems = snapshot.children.mapNotNull { productSnapshot ->
                         try {
+                            // key: "114", value: 5L (Long)
                             val productId = productSnapshot.key?.toInt()
                             val quantity = (productSnapshot.value as? Long)?.toInt()
+
+                            // Sadece geçerli ve düzgün formatlanmış veriyi al.
                             if (productId != null && quantity != null) {
                                 Pair(productId, quantity)
-                            } else null
+                            } else {
+                                null // Hatalı veriyi (örn: key'i Int olmayan) atla.
+                            }
                         } catch (e: Exception) {
-                            null // Hatalı veriyi (örn: key'i Int olmayan) atla
+                            // Parse etme sırasında bir hata olursa bu satırı atla.
+                            null
                         }
                     }
+                    // 4. Başarıyla parse edilen listeyi Flow'a gönder.
                     trySend(Resource.Success(rawItems))
                 }
 
                 override fun onCancelled(error: DatabaseError) {
-                    val exception = AppException.Unknown(error.toException())
+                    // 5. Dinleyici iptal edilirse veya bir izin hatası olursa, Hata durumunu gönder.
+                    val exception = AppException.Firebase(error.message, error.toException())
                     trySend(Resource.Error(exception))
-                    close(exception)
+                    close(exception) // Flow'u hatayla sonlandır.
                 }
             }
+
+            // 6. Dinleyiciyi Firebase referansına bağla.
             cartRef.addValueEventListener(listener)
+
+            // 7. Bu Flow dinlenmeyi bıraktığında (coroutine iptal olduğunda),
+            // memory leak olmaması için listener'ı mutlaka kaldır.
             awaitClose { cartRef.removeEventListener(listener) }
         }
 
