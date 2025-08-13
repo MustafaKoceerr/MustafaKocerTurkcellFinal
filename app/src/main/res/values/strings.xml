@@ -36,8 +36,6 @@
     <string name="state_empty_title">Henüz ürün bulunamadı</string>
     <string name="state_empty_subtitle">Filtreleri değiştirin veya daha sonra tekrar deneyin.</string>
     <string name="state_error_title">Bir şeyler ters gitti</string>
-    <string name="action_retry">Tekrar dene</string>
-    <string name="cd_retry">Tekrar dene butonu</string>
     <string name="action_scroll_to_top">En üste dön</string>
     <string name="cd_scroll_to_top">Listeyi en üste kaydır</string>
 
@@ -69,10 +67,6 @@
     <string name="order_details_error_title">Sipariş detayı yüklenemedi</string>
 
     <!-- Arama -->
-    <string name="search_hint">Ürün ara</string>
-    <string name="search_empty_title">Sonuç bulunamadı</string>
-    <string name="search_empty_subtitle">Farklı anahtar kelimeler deneyin ya da filtreleri temizleyin.</string>
-    <string name="search_error_title">Arama sırasında bir hata oluştu</string>
 
     <!-- Profil -->
     <string name="cd_profile_image">Profil resmi</string>
@@ -132,8 +126,6 @@
 
     <string name="brand_name">NEXUSCART</string>
 
-    <string name="search_idle_message">Ürünleri keşfetmek için arama çubuğuna yazmaya başlayın.</string>
-
 
     <!-- Header meta -->
     <string name="pd_chip_brand">Marka</string>
@@ -155,6 +147,21 @@
     <string name="cart_remove">Kaldır</string>
     <string name="cd_remove_item">Ürünü sepetten kaldır</string>
 
-    <string name="cd_product_gallery_image">Ürün galerisi görseli</string>```
+    <string name="cd_product_gallery_image">Ürün galerisi görseli</string>
+
+    <!-- Product Detail Sayfası -->
+    <string name="pd_action_read_more">Devamını Oku</string>
+    <string name="pd_action_show_less">Gizle</string>
+    <string name="content_desc_rating">Product rating</string>
+
+    <string name="search_hint">Ürün ara</string>
+    <string name="search_idle_message">Arama yapmak için yazmaya başlayın</string>
+
+    <string name="search_empty_title">Sonuç bulunamadı</string>
+    <string name="search_empty_subtitle">“%1$s” için eşleşen ürün bulunamadı. Lütfen farklı anahtar kelimeler deneyin.</string>
+
+    <string name="search_error_title">Bir sorun oluştu</string>
+    <string name="action_retry">Tekrar dene</string>
+    <string name="cd_retry">Tekrar dene</string>
 
 </resources>
