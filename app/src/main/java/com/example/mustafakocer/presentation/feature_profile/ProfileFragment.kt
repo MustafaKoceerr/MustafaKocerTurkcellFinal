@@ -8,6 +8,8 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import com.bumptech.glide.Glide
+import com.example.mustafakocer.R
 import com.example.mustafakocer.databinding.FragmentProfileBinding
 import com.example.mustafakocer.domain.model.User
 import com.example.mustafakocer.presentation.base.BaseFragment
@@ -93,10 +95,10 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding>(FragmentProfileBind
             // Başlık kısmını doldur
             txtFullName.text = user.fullName
             txtCurrentUsername.text = "@${user.username}"
-//            Glide.with(requireContext())
-//                .load(user.imageUrl)
-//                .placeholder(R.drawable.ic_person) // Yüklenirken gösterilecek varsayılan ikon
-//                .into(imgProfile)
+            Glide.with(requireContext())
+                .load(user.imageUrl)
+                .placeholder(R.drawable.ic_person_24) // Yüklenirken gösterilecek varsayılan ikon
+                .into(imgProfile)
 
             // EditText alanlarını doldur
             editFirstName.setText(user.firstName)
