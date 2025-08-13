@@ -1,0 +1,6 @@
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <gradient
+        android:angle="270"
+        android:startColor="@android:color/transparent"
+        android:endColor="#40000000"/> <!-- %25 siyah -->
+</shape>
