@@ -1,12 +1,12 @@
 package com.example.mustafakocer.data.repository
 
-import CategoryProductRemoteMediator
 import androidx.paging.*
 import com.example.mustafakocer.data.db.AppDatabase
 import com.example.mustafakocer.data.mapper.toDomain
 import com.example.mustafakocer.data.mapper.toDomainProduct
 import com.example.mustafakocer.data.network.IDummyApi
 import com.example.mustafakocer.data.network.util.safeApiCall
+import com.example.mustafakocer.data.paging.CategoryProductRemoteMediator
 import com.example.mustafakocer.data.paging.ProductPagingSource
 import com.example.mustafakocer.data.paging.ProductRemoteMediator
 import com.example.mustafakocer.domain.model.Category
@@ -15,6 +15,7 @@ import com.example.mustafakocer.domain.model.ProductDetail
 import com.example.mustafakocer.domain.repository.ProductRepository
 import com.example.mustafakocer.domain.util.Resource
 import com.example.mustafakocer.domain.util.mapSuccess
+import com.example.mustafakocer.util.PagingConstants
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
@@ -23,6 +24,7 @@ import javax.inject.Inject
 class ProductRepositoryImpl @Inject constructor(
     private val api: IDummyApi,
     private val db: AppDatabase,
+    private val categoryMediatorFactory: CategoryProductRemoteMediator.Factory,
 ) : ProductRepository {
 
     companion object {
@@ -45,8 +47,12 @@ class ProductRepositoryImpl @Inject constructor(
     @OptIn(ExperimentalPagingApi::class)
     override fun getPaginatedProductsByCategory(categoryName: String): Flow<PagingData<Product>> {
         return Pager(
-            config = PagingConfig(pageSize = PAGE_SIZE, enablePlaceholders = false),
-            remoteMediator = CategoryProductRemoteMediator(categoryName, api, db),
+            config = PagingConfig(
+                pageSize = PagingConstants.PRODUCT_PAGE_SIZE,
+                enablePlaceholders = false
+            ),
+            // DEĞİŞTİ: Artık 'new' ile yaratmıyoruz, factory'yi kullanıyoruz.
+            remoteMediator = categoryMediatorFactory.create(categoryName),
             pagingSourceFactory = {
                 db.createProductDao().getProductsByCategoryPagingSource(categoryName)
             }

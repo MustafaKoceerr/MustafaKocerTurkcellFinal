@@ -1,3 +1,5 @@
+package com.example.mustafakocer.data.paging
+
 import androidx.paging.ExperimentalPagingApi
 import androidx.paging.LoadType
 import androidx.paging.PagingState
@@ -8,19 +10,26 @@ import com.example.mustafakocer.data.mapper.toEntity
 import com.example.mustafakocer.data.model.entity.CategoryRemoteKeyEntity
 import com.example.mustafakocer.data.model.entity.ProductEntity
 import com.example.mustafakocer.data.network.IDummyApi
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import retrofit2.HttpException
 import java.io.IOException
 
 @OptIn(ExperimentalPagingApi::class)
-class CategoryProductRemoteMediator(
-    private val categoryName: String,
-    private val api: IDummyApi,
-    private val db: AppDatabase
+class CategoryProductRemoteMediator @AssistedInject constructor(
+    @Assisted private val categoryName: String, // Dinamik parametre
+    private val api: IDummyApi, // Hilt tarafından sağlanacak
+    private val db: AppDatabase // Hilt tarafından sağlanacak
 ) : RemoteMediator<Int, ProductEntity>() {
 
     private val productDao = db.createProductDao()
     private val categoryRemoteKeyDao = db.createCategoryRemoteKeyDao()
-
+    // Factory arayüzü, Hilt'e bu sınıfı nasıl yaratacağını söyler.
+    @AssistedFactory
+    interface Factory {
+        fun create(categoryName: String): CategoryProductRemoteMediator
+    }
     override suspend fun load(
         loadType: LoadType,
         state: PagingState<Int, ProductEntity>

@@ -15,7 +15,7 @@ import com.example.mustafakocer.data.model.entity.UserEntity
         HomeRemoteKeyEntity::class,
         CategoryRemoteKeyEntity::class,
     ],
-    version = 4, // Şema değiştiği için versiyonu artır
+    version = 5,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
