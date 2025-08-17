@@ -19,8 +19,8 @@ class GetCartItemsUseCase @Inject constructor(
     private val cartRepository: CartRepository,
     private val productRepository: ProductRepository,
 ) {
-    operator fun invoke(userId: String): Flow<Resource<List<CartItem>>> {
-        return cartRepository.getRawCartItems(userId).map { rawResource ->
+    operator fun invoke(): Flow<Resource<List<CartItem>>> {
+        return cartRepository.getRawCartItems().map { rawResource ->
             when (rawResource) {
                 is Resource.Loading -> Resource.Loading
                 is Resource.Error -> Resource.Error(rawResource.exception)

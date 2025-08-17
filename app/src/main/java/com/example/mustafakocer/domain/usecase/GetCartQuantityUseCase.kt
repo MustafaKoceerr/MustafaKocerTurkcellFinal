@@ -10,11 +10,11 @@ import javax.inject.Inject
  * Belirtilen bir ürünün sepetteki miktarını dinleyen iş kuralı.
  */
 class GetCartQuantityUseCase @Inject constructor(
-    private val cartRepository: CartRepository
+    private val cartRepository: CartRepository,
 ) {
-    operator fun invoke(userId: String, productId: Int): Flow<Int> {
+    operator fun invoke(productId: Int): Flow<Int> {
         // Ham sepet verisini dinle
-        return cartRepository.getRawCartItems(userId).map { resource ->
+        return cartRepository.getRawCartItems().map { resource ->
             when (resource) {
                 is Resource.Success -> {
                     // Başarılı durumda, listede bizim ürünümüzü bul ve miktarını döndür.
