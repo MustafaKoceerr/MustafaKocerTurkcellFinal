@@ -16,7 +16,7 @@ class GetOrdersUseCase @Inject constructor(
      * @param userId Siparişleri getirilecek kullanıcının ID'si.
      * @return Kullanıcının siparişlerini içeren bir PagingData akışı.
      */
-    operator fun invoke(userId: String): Flow<PagingData<Order>> {
-        return orderRepository.getPaginatedOrdersByUserId(userId)
+    operator fun invoke(): Flow<PagingData<Order>> {
+        return orderRepository.getPaginatedOrdersByUserId()
     }
 }

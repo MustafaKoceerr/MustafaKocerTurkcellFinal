@@ -7,36 +7,35 @@ import androidx.paging.map
 import com.example.mustafakocer.data.mapper.toDomain
 import com.example.mustafakocer.data.network.IDummyApi
 import com.example.mustafakocer.data.paging.OrderPagingSource // Henüz oluşturmadık, bir sonraki adımda oluşturacağız.
+import com.example.mustafakocer.data.preferences.SessionManager
 import com.example.mustafakocer.domain.model.Order
 import com.example.mustafakocer.domain.repository.OrderRepository
+import com.example.mustafakocer.util.PagingConstants
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class OrderRepositoryImpl @Inject constructor(
     private val api: IDummyApi,
-    // Bu repository'nin veritabanına ihtiyacı yok, çünkü offline-first yapmıyoruz.
+    private val sessionManager: SessionManager,
 ) : OrderRepository {
 
-    override fun getPaginatedOrdersByUserId(userId: String): Flow<PagingData<Order>> {
-        return Pager(
-            config = PagingConfig(
-                pageSize = PAGE_SIZE,
-                enablePlaceholders = false
-            ),
-            pagingSourceFactory = {
-                // Bu PagingSource'u bir sonraki adımda oluşturacağız.
-                OrderPagingSource(api = api, userId = userId)
-            }
-        ).flow.map { pagingData ->
-            // Gelen PagingData<OrderDto>'yu PagingData<Order>'a çeviriyoruz.
-            pagingData.map { orderDto ->
-                orderDto.toDomain()
+    override fun getPaginatedOrdersByUserId(): Flow<PagingData<Order>> {
+        val userId = sessionManager.userId.value
+
+        userId?.let {
+            return Pager(
+                config = PagingConfig(
+                    pageSize = PagingConstants.ORDER_PAGE_SIZE,
+                    enablePlaceholders = false
+                ),
+                pagingSourceFactory = { OrderPagingSource(api = api, userId = userId.toString()) }
+            ).flow.map { pagingData ->
+                pagingData.map { it.toDomain() }
             }
         }
-    }
 
-    companion object {
-        private const val PAGE_SIZE = 10 // Siparişler için sayfa boyutu
+        return flowOf(PagingData.empty())
     }
 }

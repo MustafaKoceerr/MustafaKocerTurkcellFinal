@@ -9,5 +9,5 @@ import kotlinx.coroutines.flow.Flow
  */
 interface OrderRepository {
 
-    fun getPaginatedOrdersByUserId(userId: String): Flow<PagingData<Order>>
+    fun getPaginatedOrdersByUserId(): Flow<PagingData<Order>>
 }
