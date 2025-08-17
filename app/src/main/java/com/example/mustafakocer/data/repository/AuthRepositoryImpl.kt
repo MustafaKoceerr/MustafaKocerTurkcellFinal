@@ -1,61 +1,52 @@
 package com.example.mustafakocer.data.repository
 
-
 import com.example.mustafakocer.data.model.dto.LoginRequestDto
-import com.example.mustafakocer.data.model.dto.LoginResponseDto
 import com.example.mustafakocer.data.network.IDummyApi
 import com.example.mustafakocer.data.network.util.safeApiCall
-import com.example.mustafakocer.data.preferences.SessionStorage
-import com.example.mustafakocer.data.preferences.UserPreferences
+import com.example.mustafakocer.data.preferences.SessionManager
+import com.example.mustafakocer.data.preferences.toAuthSession
+import com.example.mustafakocer.domain.model.AuthSession
 import com.example.mustafakocer.domain.repository.AuthRepository
 import com.example.mustafakocer.domain.util.Resource
+import com.example.mustafakocer.domain.util.mapSuccess
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 
 class AuthRepositoryImpl @Inject constructor(
     private val api: IDummyApi,
-    private val userPreferences: UserPreferences,
-    private val sessionStorage: SessionStorage,
+    private val sessionManager: SessionManager, // Artık tek bağımlılık bu
 ) : AuthRepository {
 
-    /**
-     * Sadece API'ye giriş isteği atar ve sonucu DTO olarak döndürür.
-     * Herhangi bir mapping veya kaydetme işlemi yapmaz.
-     */
-    override fun login(username: String, password: String): Flow<Resource<LoginResponseDto>> {
+    override fun login(username: String, password: String): Flow<Resource<AuthSession>> {
         return safeApiCall {
             api.login(LoginRequestDto(username = username, password = password))
+        }.onEach { resource ->
+            // If the login is successful, update the session via the SessionManager.
+            if (resource is Resource.Success) {
+                val sessionData = resource.data
+                sessionManager.updateSession(token = sessionData.token, id = sessionData.id)
+            }
+        }.map { resource ->
+            resource.mapSuccess { loginResponseDto ->
+                loginResponseDto.toAuthSession()
+            }
         }
     }
 
-    /**
-     * Gelen token ve userId'yi ilgili güvenli depolama alanlarına kaydeder.
-     */
-    override suspend fun saveSession(token: String, userId: Int) {
-        sessionStorage.saveAuthToken(token)
-        userPreferences.saveUserId(userId)
-    }
-
-    /**
-     * Şifrelenmiş depolamadan token akışını döndürür.
-     */
     override fun getAuthToken(): Flow<String?> {
-        return sessionStorage.authTokenFlow
+        // Delegate directly to the SessionManager's in-memory flow.
+        return sessionManager.authToken
     }
 
-    /**
-     * DataStore'dan userId akışını döndürür.
-     */
     override fun getUserId(): Flow<Int?> {
-        return userPreferences.userId
+        // Delegate directly to the SessionManager's in-memory flow.
+        return sessionManager.userId
     }
 
-    /**
-     * Sadece oturumla ilgili depolama alanlarını temizler.
-     * Kullanıcı profili veritabanına dokunmaz.
-     */
     override suspend fun logout() {
-        sessionStorage.clear()
-        userPreferences.clear()
+        // Delegate the entire logout logic to the SessionManager.
+        sessionManager.clearSession()
     }
 }

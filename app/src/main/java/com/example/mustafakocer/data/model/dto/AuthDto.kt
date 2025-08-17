@@ -7,8 +7,10 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class LoginRequestDto(
     @SerialName("username") val username: String,
-    @SerialName("password") val password: String
-)
+    @SerialName("password") val password: String,
+    @SerialName("expiresInMins") val expiresInMins: Int = 60,
+
+    )
 
 // Kullanıcı login olurken bize gelen cevap
 @Serializable
@@ -21,5 +23,6 @@ data class LoginResponseDto(
     @SerialName("lastName") val lastName: String? = null,
     @SerialName("gender") val gender: String? = null,
     @SerialName("image") val image: String? = null,
-    @SerialName("accessToken") val token: String
+    @SerialName("accessToken") val token: String,
+    @SerialName("refreshToken") val refreshToken: String,
 )
