@@ -24,6 +24,10 @@ import com.google.firebase.database.DatabaseReference
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import com.example.mustafakocer.BuildConfig
+import com.example.mustafakocer.data.network.util.Authenticated
+import com.example.mustafakocer.data.preferences.SessionManager
+import okhttp3.Interceptor
+import retrofit2.Invocation
 
 
 @Module
@@ -42,14 +46,6 @@ object AppModule {
         }
     }
 
-    // YENİ FONKSİYON: Interceptor'ı içeren özel OkHttpClient'ı sağlar.
-    @Provides
-    @Singleton
-    fun provideOkHttpClient(loggingInterceptor: HttpLoggingInterceptor): OkHttpClient {
-        return OkHttpClient.Builder()
-            .addInterceptor(loggingInterceptor)
-            .build()
-    }
 
     // YENİ FONKSİYON: Retrofit instance'ını sağlar. Artık kendi OkHttpClient'ımızı kullanıyor.
     @Provides
@@ -96,13 +92,44 @@ object AppModule {
     }
 
     @Provides
-    fun provideProductDao(db: AppDatabase): ProductDao {
-        return db.createProductDao()
+    @Singleton
+    fun provideRealtimeDatabase(): DatabaseReference =
+        Firebase.database.reference
+
+
+    @Provides
+    @Singleton
+    fun provideAuthInterceptor(sessionManager: SessionManager): Interceptor {
+        return Interceptor { chain ->
+            val request = chain.request()
+            val builder = request.newBuilder()
+
+            // Check if the request is annotated with @Authenticated
+            val invocation = request.tag(Invocation::class.java)
+            val isAuthenticated =
+                invocation?.method()?.isAnnotationPresent(Authenticated::class.java) ?: false
+
+            if (isAuthenticated) {
+                // Read the token from the in-memory StateFlow, NOT from disk.
+                val token = sessionManager.authToken.value
+                if (!token.isNullOrBlank()) {
+                    builder.header("Authorization", "Bearer $token")
+                }
+            }
+            chain.proceed(builder.build())
+        }
     }
 
     @Provides
     @Singleton
-    fun provideRealtimeDatabase(): DatabaseReference =
-        Firebase.database.reference
+    fun provideOkHttpClient(
+        loggingInterceptor: HttpLoggingInterceptor,
+        authInterceptor: Interceptor,
+    ): OkHttpClient {
+        return OkHttpClient.Builder()
+            .addInterceptor(loggingInterceptor)
+            .addInterceptor(authInterceptor)
+            .build()
+    }
 
 }
