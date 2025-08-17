@@ -13,6 +13,7 @@ import androidx.paging.LoadState
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.mustafakocer.databinding.FragmentOrdersBinding
 import com.example.mustafakocer.presentation.base.BaseFragment
+import com.example.mustafakocer.presentation.common.PagingLoadStateAdapter
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -30,23 +31,24 @@ class OrdersFragment : BaseFragment<FragmentOrdersBinding>(FragmentOrdersBinding
         observeOrderFlow()
         observeLoadState()
 
-        // Oturum açmış kullanıcının ID'sini ViewModel'e bildirerek veri akışını tetikle.
-        // Gerçek bir uygulamada bu ID, AuthRepository veya benzeri bir yerden alınır.
-        // Şimdilik test için statik bir ID veya UserId objesini kullanabiliriz.
-        // TODO: Gerçek bir user id ile değiştir, user id'yi ya datastore'dan al ya da farklı bir çözüm bul.
-        viewModel.onUserIdSet("6")
+        // DEĞİŞTİ: Artık ViewModel'e userId göndermemize gerek yok.
+        // ViewModel, oluşturulduğu anda doğru kullanıcı için veri akışını
+        // kendi kendine başlatır. Fragment'ın bu detayı bilmesine gerek kalmadı.
+        // viewModel.onUserIdSet("6") satırı ve tüm ilgili yorumlar kaldırıldı.
     }
 
     private fun setupRecyclerView() {
         orderListAdapter = OrderListAdapter { order ->
-            // Tıklanan 'order' nesnesini kullanarak Safe Args ile action oluştur.
             val action = OrdersFragmentDirections.actionOrdersFragmentToOrderDetailsFragment(order)
-            // Navigasyonu tetikle.
             findNavController().navigate(action)
         }
 
         binding.orderRecyclerView.apply {
-            adapter = orderListAdapter
+            // Paging 3'ün LoadState'lerini göstermek için bir footer adaptörü eklemek
+            // kullanıcı deneyimini iyileştirir (örn: sayfa yükleniyor spinner'ı).
+            adapter = orderListAdapter.withLoadStateFooter(
+                footer = PagingLoadStateAdapter { orderListAdapter.retry() }
+            )
             layoutManager = LinearLayoutManager(requireContext())
         }
     }
@@ -66,28 +68,31 @@ class OrdersFragment : BaseFragment<FragmentOrdersBinding>(FragmentOrdersBinding
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 orderListAdapter.loadStateFlow.collectLatest { loadStates ->
-                    val refreshState = loadStates.refresh
-
-                    // Yüklenme durumunu yönet
-                    binding.progressbar.isVisible = refreshState is LoadState.Loading
+                    // Yüklenme durumunu sadece ilk yükleme (refresh) için yönetiyoruz.
+                    binding.progressbar.isVisible = loadStates.refresh is LoadState.Loading
 
                     // Hata durumunu yönet
-                    if (refreshState is LoadState.Error) {
-                        binding.txtEmptyOrders.isVisible = true
-                        binding.txtEmptyOrders.text = "Siparişler yüklenirken bir hata oluştu."
+                    val errorState = loadStates.refresh as? LoadState.Error
+                        ?: loadStates.append as? LoadState.Error
+                        ?: loadStates.prepend as? LoadState.Error
+
+                    errorState?.let {
                         Toast.makeText(
                             requireContext(),
-                            "Hata: ${refreshState.error.localizedMessage}",
+                            "Hata: ${it.error.localizedMessage}",
                             Toast.LENGTH_LONG
                         ).show()
                     }
 
                     // Boş durumunu yönet (Listenin ilk yüklemesi bittiğinde ve liste boşsa)
                     val isListEmpty =
-                        refreshState is LoadState.NotLoading && orderListAdapter.itemCount == 0
+                        loadStates.refresh is LoadState.NotLoading && orderListAdapter.itemCount == 0
                     binding.txtEmptyOrders.isVisible = isListEmpty
                     if (isListEmpty) {
                         binding.txtEmptyOrders.text = "Henüz verilmiş bir siparişiniz bulunmuyor."
+                    } else {
+                        // Eğer liste doluysa, hata mesajı yerine boş metin göster.
+                        binding.txtEmptyOrders.isVisible = false
                     }
                 }
             }
