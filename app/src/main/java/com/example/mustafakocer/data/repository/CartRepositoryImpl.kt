@@ -1,8 +1,10 @@
 package com.example.mustafakocer.data.repository
 
+import com.example.mustafakocer.data.preferences.SessionManager
 import com.example.mustafakocer.domain.exception.AppException
 import com.example.mustafakocer.domain.repository.CartRepository
 import com.example.mustafakocer.domain.util.Resource
+import com.example.mustafakocer.util.FirebaseConstants
 import com.google.firebase.database.*
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
@@ -15,69 +17,60 @@ import kotlin.coroutines.resumeWithException
 
 class CartRepositoryImpl @Inject constructor(
     private val dbRef: DatabaseReference,
+    private val sessionManager: SessionManager,
 ) : CartRepository {
 
-    companion object {
-        private const val PATH_CARTS = "carts"
+    // Helper function to get the current user's cart reference.
+    // Throws an exception if the user is not logged in.
+    private fun getUserCartRef(): DatabaseReference {
+        val userId = sessionManager.userId.value
+            ?: throw AppException.Session.MissingSessionData("User is not logged in to access the cart.")
+        return dbRef.child(FirebaseConstants.PATH_CARTS).child(userId.toString())
     }
 
-    override fun getRawCartItems(userId: String): Flow<Resource<List<Pair<Int, Int>>>> =
-        callbackFlow {
-            // 1. Dinlenecek doğru Firebase yolunu belirle.
-            val cartRef = dbRef.child(PATH_CARTS).child(userId)
+    override fun getRawCartItems(): Flow<Resource<List<Pair<Int, Int>>>> = callbackFlow {
+        try {
+            val cartRef = getUserCartRef()
+            send(Resource.Loading)
 
-            // 2. Dinleyiciye ilk bağlandığında Yükleniyor durumunu gönder.
-            trySend(Resource.Loading)
-
-            // 3. Firebase'in ValueEventListener'ını oluştur. Bu, veri her değiştiğinde tetiklenir.
             val listener = object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
-                    // Gelen veriyi List<Pair<Int, Int>> formatına dönüştür.
                     val rawItems = snapshot.children.mapNotNull { productSnapshot ->
                         try {
-                            // key: "114", value: 5L (Long)
                             val productId = productSnapshot.key?.toInt()
                             val quantity = (productSnapshot.value as? Long)?.toInt()
-
-                            // Sadece geçerli ve düzgün formatlanmış veriyi al.
-                            if (productId != null && quantity != null) {
-                                Pair(productId, quantity)
-                            } else {
-                                null // Hatalı veriyi (örn: key'i Int olmayan) atla.
-                            }
+                            if (productId != null && quantity != null) Pair(
+                                productId,
+                                quantity
+                            ) else null
                         } catch (e: Exception) {
-                            // Parse etme sırasında bir hata olursa bu satırı atla.
-                            null
+                            null // Skip malformed data
                         }
                     }
-                    // 4. Başarıyla parse edilen listeyi Flow'a gönder.
                     trySend(Resource.Success(rawItems))
                 }
 
                 override fun onCancelled(error: DatabaseError) {
-                    // 5. Dinleyici iptal edilirse veya bir izin hatası olursa, Hata durumunu gönder.
                     val exception = AppException.Firebase(error.message, error.toException())
                     trySend(Resource.Error(exception))
-                    close(exception) // Flow'u hatayla sonlandır.
+                    close(exception)
                 }
             }
-
-            // 6. Dinleyiciyi Firebase referansına bağla.
             cartRef.addValueEventListener(listener)
-
-            // 7. Bu Flow dinlenmeyi bıraktığında (coroutine iptal olduğunda),
-            // memory leak olmaması için listener'ı mutlaka kaldır.
             awaitClose { cartRef.removeEventListener(listener) }
-        }
 
-    override suspend fun addOrIncreaseCartItem(userId: String, productId: Int): Resource<Unit> {
+        } catch (e: AppException) {
+            send(Resource.Error(e))
+            close(e)
+        }
+    }
+
+    override suspend fun addOrIncreaseCartItem(productId: Int): Resource<Unit> {
         return try {
-            val itemRef = dbRef.child(PATH_CARTS).child(userId).child(productId.toString())
-            suspendCancellableCoroutine { continuation ->
-                continuation.invokeOnCancellation { /* No-op */ }
+            val itemRef = getUserCartRef().child(productId.toString())
+            suspendCancellableCoroutine<Unit> { continuation ->
                 itemRef.runTransaction(object : Transaction.Handler {
                     override fun doTransaction(currentData: MutableData): Transaction.Result {
-                        // DEĞİŞTİ: Artık CartItemEntity değil, direkt Long (miktar) okuyoruz.
                         val currentQuantity = currentData.getValue(Long::class.java) ?: 0L
                         currentData.value = currentQuantity + 1
                         return Transaction.success(currentData)
@@ -86,34 +79,35 @@ class CartRepositoryImpl @Inject constructor(
                     override fun onComplete(
                         error: DatabaseError?,
                         committed: Boolean,
-                        currentData: DataSnapshot?,
+                        data: DataSnapshot?,
                     ) {
                         if (continuation.isActive) {
-                            if (error == null) continuation.resume(Unit)
-                            else continuation.resumeWithException(error.toException())
+                            if (error == null) {
+                                continuation.resume(Unit) // Başarılı, coroutine'i devam ettir.
+                            } else {
+                                continuation.resumeWithException(error.toException()) // Hata, coroutine'i exception ile devam ettir.
+                            }
                         }
                     }
                 })
             }
             Resource.Success(Unit)
         } catch (e: Exception) {
-            Resource.Error(AppException.Unknown(e))
+            Resource.Error(AppException.Firebase("Failed to update item", e))
         }
     }
 
-    override suspend fun decreaseOrRemoveCartItem(userId: String, productId: Int): Resource<Unit> {
+    override suspend fun decreaseOrRemoveCartItem(productId: Int): Resource<Unit> {
         return try {
-            val itemRef = dbRef.child(PATH_CARTS).child(userId).child(productId.toString())
-            suspendCancellableCoroutine { continuation ->
-                continuation.invokeOnCancellation { /* No-op */ }
+            val itemRef = getUserCartRef().child(productId.toString())
+            // DÜZELTME: Callback'i coroutine'e çevirmek için suspendCancellableCoroutine kullanıyoruz.
+            suspendCancellableCoroutine<Unit> { continuation ->
                 itemRef.runTransaction(object : Transaction.Handler {
                     override fun doTransaction(currentData: MutableData): Transaction.Result {
                         val currentQuantity = currentData.getValue(Long::class.java)
-                        // Miktar 1 ise veya hiç yoksa, sil (null ata).
                         if (currentQuantity == null || currentQuantity <= 1) {
                             currentData.value = null
                         } else {
-                            // Değilse, 1 azalt.
                             currentData.value = currentQuantity - 1
                         }
                         return Transaction.success(currentData)
@@ -122,39 +116,39 @@ class CartRepositoryImpl @Inject constructor(
                     override fun onComplete(
                         error: DatabaseError?,
                         committed: Boolean,
-                        currentData: DataSnapshot?,
+                        data: DataSnapshot?,
                     ) {
                         if (continuation.isActive) {
-                            if (error == null) continuation.resume(Unit)
-                            else continuation.resumeWithException(error.toException())
+                            if (error == null) {
+                                continuation.resume(Unit) // Başarılı
+                            } else {
+                                continuation.resumeWithException(error.toException()) // Hata
+                            }
                         }
                     }
                 })
             }
             Resource.Success(Unit)
         } catch (e: Exception) {
-            Resource.Error(AppException.Unknown(e))
+            Resource.Error(AppException.Firebase("Failed to update item", e))
         }
     }
 
-    override suspend fun clearCart(userId: String): Resource<Unit> {
+    override suspend fun clearCart(): Resource<Unit> {
         return try {
-            dbRef.child(PATH_CARTS).child(userId).removeValue().await()
+            getUserCartRef().removeValue().await()
             Resource.Success(Unit)
         } catch (e: Exception) {
-            Resource.Error(AppException.Unknown(e))
+            Resource.Error(AppException.Firebase("Failed to clear cart", e))
         }
     }
 
-    // YENİ FONKSİYONUN UYGULAMASI
-    override suspend fun removeCartItem(userId: String, productId: Int): Resource<Unit> {
+    override suspend fun removeCartItem(productId: Int): Resource<Unit> {
         return try {
-            // Firebase'de "carts -> {userId} -> {productId}" yolundaki veriyi sil.
-            dbRef.child(PATH_CARTS).child(userId).child(productId.toString()).removeValue().await()
+            getUserCartRef().child(productId.toString()).removeValue().await()
             Resource.Success(Unit)
         } catch (e: Exception) {
-            // Ağ hatası veya başka bir Firebase hatası durumunda sarmala.
-            Resource.Error(AppException.Unknown(e))
+            Resource.Error(AppException.Firebase("Failed to remove item", e))
         }
     }
 }

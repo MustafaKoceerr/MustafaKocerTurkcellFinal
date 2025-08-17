@@ -8,12 +8,11 @@ interface CartRepository {
     /**
      * Kullanıcının sepetindeki ham veriyi (productId ve quantity) dinler.
      */
-    fun getRawCartItems(userId: String): Flow<Resource<List<Pair<Int, Int>>>>
+    fun getRawCartItems(): Flow<Resource<List<Pair<Int, Int>>>>
 
-    // ... add, decrease, clear fonksiyonları aynı kalabilir ...
-    suspend fun addOrIncreaseCartItem(userId: String, productId: Int): Resource<Unit>
-    suspend fun decreaseOrRemoveCartItem(userId: String, productId: Int): Resource<Unit>
-    suspend fun clearCart(userId: String): Resource<Unit>
-    suspend fun removeCartItem(userId: String, productId: Int): Resource<Unit>
+    suspend fun addOrIncreaseCartItem(productId: Int): Resource<Unit>
+    suspend fun decreaseOrRemoveCartItem(productId: Int): Resource<Unit>
+    suspend fun clearCart(): Resource<Unit>
+    suspend fun removeCartItem(productId: Int): Resource<Unit>
 
 }
