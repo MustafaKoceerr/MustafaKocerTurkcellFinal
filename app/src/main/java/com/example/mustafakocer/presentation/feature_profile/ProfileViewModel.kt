@@ -1,6 +1,7 @@
 package com.example.mustafakocer.presentation.feature_profile
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.mustafakocer.domain.model.User
 import com.example.mustafakocer.domain.usecase.GetUserProfileUseCase
 import com.example.mustafakocer.domain.usecase.UpdateUserProfileUseCase
@@ -12,10 +13,8 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import javax.inject.Inject
-import androidx.lifecycle.viewModelScope
-import com.example.mustafakocer.data.model.dto.UserUpdateDto
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
@@ -40,13 +39,10 @@ class ProfileViewModel @Inject constructor(
     val toastMessage = _toastMessage.asSharedFlow()
 
     init {
-        // ViewModel oluşturulduğunda, mevcut kullanıcı profilini çek.
         fetchUserProfile()
     }
 
     private fun fetchUserProfile() {
-        // Bu fonksiyon, veritabanını dinleyen ve gerektiğinde ağı tetikleyen
-        // `networkBoundResource`'u kullandığı için, `user` akışını sürekli güncel tutar.
         getUserProfileUseCase(forceRefresh = true).onEach { resource ->
             when (resource) {
                 is Resource.Loading -> _isLoading.value = true
@@ -81,23 +77,24 @@ class ProfileViewModel @Inject constructor(
     ) {
         val currentUser = _user.value ?: return
 
-        // DEĞİŞTİ: Map oluşturmak yerine, DTO'yu oluşturuyoruz.
-        val userUpdateDto = UserUpdateDto(
-            firstName = if (firstName != currentUser.firstName) firstName else null,
-            lastName = if (lastName != currentUser.lastName) lastName else null,
-            email = if (email != currentUser.email) email else null,
-            phone = if (phone != currentUser.phone) phone else null,
-            age = if (age != currentUser.age.toString()) age.toIntOrNull() else null
+        // DÜZELTME 1: Artık DTO değil, tam bir User domain nesnesi oluşturuyoruz.
+        val updatedUser = currentUser.copy(
+            firstName = firstName,
+            lastName = lastName,
+            email = email,
+            phone = phone,
+            age = age.toIntOrNull() ?: currentUser.age
         )
 
-        // Eğer hiçbir alan değiştirilmediyse, DTO'nun tüm alanları null olacaktır.
-        // Bunu kontrol etmenin daha temiz bir yolu.
-        if (userUpdateDto.firstName == null && userUpdateDto.lastName == null &&
-            userUpdateDto.email == null && userUpdateDto.phone == null && userUpdateDto.age == null) {
+        // DÜZELTME 2: Gereksiz DTO oluşturma ve null kontrol mantığı kaldırıldı.
+        // Bunun yerine, data class'ların yapısal eşitlik kontrolünü kullanıyoruz.
+        if (updatedUser == currentUser) {
             viewModelScope.launch { _toastMessage.emit("Değişiklik yapılmadı.") }
             return
         }
-        updateUserProfileUseCase(userUpdateDto).onEach { resource ->
+
+        // DÜZELTME 3: UseCase'e artık doğru tip olan `updatedUser` nesnesini gönderiyoruz.
+        updateUserProfileUseCase(updatedUser).onEach { resource ->
             when (resource) {
                 is Resource.Loading -> _isUpdating.value = true
                 is Resource.Error -> {
@@ -107,8 +104,8 @@ class ProfileViewModel @Inject constructor(
 
                 is Resource.Success -> {
                     _isUpdating.value = false
-                    // Başarılı olunca veritabanı zaten güncellendi. `fetchUserProfile`'ın dinlediği
-                    // Flow otomatik olarak tetiklenip `_user` StateFlow'unu güncelleyecektir.
+                    // `getUserProfileUseCase`'in dinlediği Flow, veritabanındaki
+                    // değişiklikten sonra `_user` StateFlow'unu otomatik olarak güncelleyecektir.
                     _toastMessage.emit("Profil başarıyla güncellendi!")
                 }
 
@@ -118,4 +115,3 @@ class ProfileViewModel @Inject constructor(
         }.launchIn(viewModelScope)
     }
 }
-
