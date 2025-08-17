@@ -14,11 +14,9 @@ import javax.inject.Inject
 @HiltViewModel
 class ProductDetailViewModel @Inject constructor(
     private val getProductDetailUseCase: GetProductDetailUseCase,
-    // YENİ: Sepetle ilgili UseCase'ler
     private val getCartQuantityUseCase: GetCartQuantityUseCase,
     private val addOrIncreaseCartItemUseCase: AddOrIncreaseCartItemUseCase,
     private val decreaseOrRemoveCartItemUseCase: DecreaseOrRemoveCartItemUseCase,
-    private val getUserIdUseCase: GetUserIdUseCase,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
@@ -28,19 +26,20 @@ class ProductDetailViewModel @Inject constructor(
     private val _quantityInCart = MutableStateFlow(0)
     val quantityInCart: StateFlow<Int> = _quantityInCart.asStateFlow()
 
-    private val productId: Int = savedStateHandle.get<Int>("productId")!!
-
-    // YENİ: Açıklamanın durumunu tutan StateFlow
     private val _isDescriptionExpanded = MutableStateFlow(false)
     val isDescriptionExpanded: StateFlow<Boolean> = _isDescriptionExpanded.asStateFlow()
 
-    fun onToggleDescription() {
-        _isDescriptionExpanded.value = !_isDescriptionExpanded.value
-    }
+    // productId'yi sınıf seviyesinde bir değişkende tutmaya devam ediyoruz.
+    private val productId: Int = savedStateHandle.get<Int>("productId")
+        ?: throw IllegalStateException("productId must be passed to ProductDetailViewModel")
 
     init {
         getProductDetail()
         observeCartQuantity()
+    }
+
+    fun onToggleDescription() {
+        _isDescriptionExpanded.value = !_isDescriptionExpanded.value
     }
 
     fun getProductDetail() {
@@ -50,33 +49,24 @@ class ProductDetailViewModel @Inject constructor(
     }
 
     private fun observeCartQuantity() {
-        viewModelScope.launch {
-            // Önce kullanıcı ID'sini al
-            val userId = getUserIdUseCase().first()?.toString()
-            if (userId != null) {
-                // Sonra bu kullanıcı ve ürün için miktarı dinlemeye başla
-                getCartQuantityUseCase(userId, productId).collect { quantity ->
-                    _quantityInCart.value = quantity
-                }
-            }
-        }
+        // Artık userId'yi beklemeye gerek yok, doğrudan miktarı dinliyoruz.
+        // UseCase, oturum kapalıysa 0 döndürecek şekilde güncellenmelidir.
+        getCartQuantityUseCase(productId).onEach { quantity ->
+            _quantityInCart.value = quantity
+        }.launchIn(viewModelScope)
     }
 
     fun onIncreaseClicked() {
+        // Artık userId'yi almamıza gerek yok.
         viewModelScope.launch {
-            val userId = getUserIdUseCase().first()?.toString()
-            userId?.let {
-                addOrIncreaseCartItemUseCase(it, productId)
-            }
+            addOrIncreaseCartItemUseCase(productId)
         }
     }
 
     fun onDecreaseClicked() {
+        // Artık userId'yi almamıza gerek yok.
         viewModelScope.launch {
-            val userId = getUserIdUseCase().first()?.toString()
-            userId?.let {
-                decreaseOrRemoveCartItemUseCase(it, productId)
-            }
+            decreaseOrRemoveCartItemUseCase(productId)
         }
     }
 }
