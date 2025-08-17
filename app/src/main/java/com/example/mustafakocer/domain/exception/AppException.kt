@@ -68,4 +68,12 @@ sealed class AppException(
         override val cause: Throwable? = null,
     ) : AppException(message, cause)
 
+    sealed class Session(message: String, cause: Throwable? = null) :
+        AppException(message, cause) {
+
+        data class CorruptedSession(override val cause: Throwable? = null) :
+            Session("Oturum verisi bozuk veya okunamıyor.", cause)
+
+        data class MissingSessionData(val reason: String) : Session(reason, null)
+    }
 }
