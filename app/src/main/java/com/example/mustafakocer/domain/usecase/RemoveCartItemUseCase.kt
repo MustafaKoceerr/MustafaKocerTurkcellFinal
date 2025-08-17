@@ -13,7 +13,7 @@ class RemoveCartItemUseCase @Inject constructor(
     /**
      * Bu UseCase'i bir fonksiyon gibi çağrılabilir hale getirir.
      */
-    suspend operator fun invoke(userId: String, productId: Int): Resource<Unit> {
-        return cartRepository.removeCartItem(userId, productId)
+    suspend operator fun invoke( productId: Int): Resource<Unit> {
+        return cartRepository.removeCartItem( productId)
     }
 }
