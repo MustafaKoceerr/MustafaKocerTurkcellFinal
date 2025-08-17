@@ -1,6 +1,5 @@
 package com.example.mustafakocer.presentation.feature_cart
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.mustafakocer.domain.exception.AppException
@@ -9,14 +8,12 @@ import com.example.mustafakocer.domain.usecase.AddOrIncreaseCartItemUseCase
 import com.example.mustafakocer.domain.usecase.ClearCartUseCase
 import com.example.mustafakocer.domain.usecase.DecreaseOrRemoveCartItemUseCase
 import com.example.mustafakocer.domain.usecase.GetCartItemsUseCase
-import com.example.mustafakocer.domain.usecase.GetUserIdUseCase
 import com.example.mustafakocer.domain.usecase.RemoveCartItemUseCase
 import com.example.mustafakocer.domain.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -28,79 +25,65 @@ class CartViewModel @Inject constructor(
     private val getCartItemsUseCase: GetCartItemsUseCase,
     private val addOrIncreaseCartItemUseCase: AddOrIncreaseCartItemUseCase,
     private val decreaseOrRemoveCartItemUseCase: DecreaseOrRemoveCartItemUseCase,
-    private val getUserIdUseCase: GetUserIdUseCase,
     private val clearCartUseCase: ClearCartUseCase,
     private val removeCartItemUseCase: RemoveCartItemUseCase
+    // GetUserIdUseCase bağımlılığı kaldırıldı.
 ) : ViewModel() {
 
-    // State 1: Detaylı sepet listesi (Sadece bu ViewModel'in yönettiği ana state).
+    // State 1: Detaylı sepet listesi.
     private val _cartState = MutableStateFlow<Resource<List<CartItem>>>(Resource.Loading)
     val cartState: StateFlow<Resource<List<CartItem>>> = _cartState.asStateFlow()
 
-    // State 2: Toplam fiyat (cartState'ten türetilen bir state).
+    // State 2: Toplam fiyat.
     private val _totalPrice = MutableStateFlow("$0.00")
     val totalPrice: StateFlow<String> = _totalPrice.asStateFlow()
 
-    // SİLİNDİ: _cartMap ve updateCartMap fonksiyonları artık gereksiz.
-
-    private var currentUserId: String? = null
+    // `currentUserId` değişkeni kaldırıldı.
 
     init {
-        viewModelScope.launch {
-            val userId = getUserIdUseCase().first()
-            if (userId != null) {
-                currentUserId = userId.toString()
-                observeCart(currentUserId!!)
-            } else {
-                _cartState.value = Resource.Error(AppException.Api.Unauthorized(null))
-            }
-        }
+        // Artık userId'yi beklemeye gerek yok, doğrudan sepeti dinlemeye başlıyoruz.
+        observeCart()
     }
 
-    private fun observeCart(userId: String) {
-        getCartItemsUseCase(userId).onEach { resource ->
+    private fun observeCart() {
+        // UseCase artık parametre almıyor.
+        getCartItemsUseCase().onEach { resource ->
             _cartState.value = resource
             if (resource is Resource.Success) {
                 calculateTotalPrice(resource.data)
+            } else if (resource is Resource.Error) {
+                // Eğer sepeti alırken bir hata oluşursa (örn: oturum kapalı),
+                // toplam fiyatı sıfırla.
+                _totalPrice.value = "$0.00"
             }
         }.launchIn(viewModelScope)
     }
 
     fun onIncreaseClicked(productId: Int) {
-        currentUserId?.let { userId ->
-            viewModelScope.launch {
-                addOrIncreaseCartItemUseCase(userId, productId)
-            }
+        // Artık `currentUserId` kontrolüne gerek yok.
+        viewModelScope.launch {
+            addOrIncreaseCartItemUseCase(productId)
         }
     }
 
     fun onDecreaseClicked(productId: Int) {
-        currentUserId?.let { userId ->
-            viewModelScope.launch {
-                decreaseOrRemoveCartItemUseCase(userId, productId)
-            }
+        // Artık `currentUserId` kontrolüne gerek yok.
+        viewModelScope.launch {
+            decreaseOrRemoveCartItemUseCase(productId)
         }
     }
 
-    // YENİ FONKSİYON: Fragment'tan gelen "Kaldır" olayını işler.
     fun onRemoveItemConfirmed(productId: Int) {
-        currentUserId?.let { userId ->
-            // Bu bir suspend fonksiyon olduğu için coroutine içinde çağırıyoruz.
-            viewModelScope.launch {
-                // İlgili UseCase'i çağırarak iş kuralını tetikliyoruz.
-                removeCartItemUseCase(userId, productId)
-                // Not: Burada dönen sonucu (Resource) işlememize gerek yok.
-                // Çünkü `observeCart` metodu Firebase'deki değişikliği zaten dinliyor
-                // ve UI'ı otomatik olarak güncelleyecektir. Bu, reaktif programlamanın gücüdür.
-            }
+        // Artık `currentUserId` kontrolüne gerek yok.
+        viewModelScope.launch {
+            removeCartItemUseCase(productId)
         }
     }
 
     fun onClearCartConfirmed() {
-        currentUserId?.let { userId ->
-            viewModelScope.launch {
-                clearCartUseCase(userId)
-            }
+        // Artık `currentUserId` kontrolüne gerek yok.
+        viewModelScope.launch {
+            clearCartUseCase()
         }
     }
 
