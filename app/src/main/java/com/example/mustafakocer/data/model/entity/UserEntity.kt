@@ -13,5 +13,6 @@ data class UserEntity(
     val image: String,
     val phone: String,
     val birthDate: String,
-    val age: Int // YENİ EKLENDİ
+    val age: Int,
+    val gender: String
 )
