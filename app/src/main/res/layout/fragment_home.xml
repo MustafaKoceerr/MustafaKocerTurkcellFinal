@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- HomeFragment (SwipeRefreshLayout kaldırıldı) -->
+<?xml version="1.0" encoding="utf-8"?><!-- HomeFragment (SwipeRefreshLayout kaldırıldı) -->
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -11,7 +10,7 @@
 
     <!-- Ürün listesi -->
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/homeRecyclerView"
+        android:id="@+id/contentView"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:clipToPadding="false"
@@ -19,92 +18,48 @@
         android:paddingTop="@dimen/home_content_margin_top"
         android:paddingEnd="@dimen/home_content_margin"
         android:paddingBottom="@dimen/home_content_margin_bottom"
-        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
         tools:itemCount="8" />
 
-    <!-- Yüklenme göstergesi (ID korunur) -->
-    <com.google.android.material.progressindicator.CircularProgressIndicator
-        android:id="@+id/progressbar"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
+    <!-- 2. Yüklenme Durumu (Merkezde) -->
+    <ViewStub
+        android:id="@+id/viewLoadingStub"
+        android:layout="@layout/layout_state_loading"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:visibility="gone"
-        app:indicatorInset="8dp"
-        app:indicatorSize="32dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:trackThickness="3dp"
         tools:visibility="visible" />
 
-    <!-- Empty state -->
-    <LinearLayout
-        android:id="@+id/stateEmptyGroup"
-        android:layout_width="0dp"
+    <!-- 3. Hata Durumu (Merkezde) -->
+    <ViewStub
+        android:id="@+id/viewErrorStub"
+        android:layout="@layout/layout_state_error"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:gravity="center"
-        android:orientation="vertical"
-        android:padding="@dimen/state_padding"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:visibility="gone">
+        app:layout_constraintTop_toTopOf="parent" />
 
-        <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/txtEmptyTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/state_empty_title"
-            android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
-            android:textColor="?attr/colorOnSurface" />
-
-        <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/txtEmptySubtitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/state_subtitle_top"
-            android:text="@string/state_empty_subtitle"
-            android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
-            android:textColor="?attr/colorOnSurfaceVariant" />
-    </LinearLayout>
-
-    <!-- Error state -->
-    <LinearLayout
-        android:id="@+id/stateErrorGroup"
-        android:layout_width="0dp"
+    <!-- 4. Boş Durumu (Merkezde) -->
+    <ViewStub
+        android:id="@+id/viewEmptyStub"
+        android:layout="@layout/layout_state_empty"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:gravity="center"
-        android:orientation="vertical"
-        android:padding="@dimen/state_padding"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:visibility="gone">
-
-        <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/txtErrorTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/state_error_title"
-            android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
-            android:textColor="?attr/colorOnSurface" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnRetry"
-            style="?attr/materialButtonOutlinedStyle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/state_action_top"
-            android:contentDescription="@string/cd_retry"
-            android:text="@string/action_retry" />
-    </LinearLayout>
+        app:layout_constraintTop_toTopOf="parent" />
 
     <!-- En üste dön FAB -->
     <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton

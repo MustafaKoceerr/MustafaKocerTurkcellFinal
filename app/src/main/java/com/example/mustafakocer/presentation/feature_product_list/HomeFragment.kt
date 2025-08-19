@@ -2,7 +2,6 @@ package com.example.mustafakocer.presentation.feature_product_list
 
 import android.os.Bundle
 import android.view.View
-import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
@@ -12,13 +11,19 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.paging.LoadState
 import androidx.recyclerview.widget.GridLayoutManager
+import com.example.mustafakocer.R
 import com.example.mustafakocer.databinding.FragmentHomeBinding
+import com.example.mustafakocer.databinding.LayoutStateEmptyBinding
+import com.example.mustafakocer.domain.mapper.ErrorMapper
 import com.example.mustafakocer.presentation.base.BaseFragment
+import com.example.mustafakocer.presentation.common.PagingLoadStateAdapter
 import com.example.mustafakocer.presentation.common.ProductListAdapter
+import com.example.mustafakocer.presentation.common.UiErrorMapper
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::inflate) {
@@ -26,7 +31,22 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
     private val viewModel: HomeViewModel by viewModels()
     private lateinit var productListAdapter: ProductListAdapter
 
-    // YENİ: Geri tuşuna basılma zamanını takip etmek için değişken.
+    @Inject
+    lateinit var errorMapper: ErrorMapper
+
+    @Inject
+    lateinit var injectedUiErrorMapper: UiErrorMapper
+
+    // --- BaseFragment Implementasyonu ---
+    override val uiErrorMapper: UiErrorMapper by lazy { injectedUiErrorMapper }
+
+    override fun onRetry() {
+        productListAdapter.retry()
+    }
+    // ------------------------------------
+
+    // ViewStub'lar inflate edildikten sonra binding'lerini tutmak için.
+    private var emptyBinding: LayoutStateEmptyBinding? = null
     private var lastBackPressedTime = 0L
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -35,20 +55,19 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
         setupRecyclerView()
         observeProductPagingFlow()
         observeLoadState()
-        setupBackButtonHandler() // YENİ: Geri tuşu dinleyicisini kur.
+        setupBackButtonHandler()
     }
 
     private fun setupRecyclerView() {
         productListAdapter = ProductListAdapter { productId ->
-            // HomeFragment'e özel action'ı kullanıyoruz.
-            val action = HomeFragmentDirections.actionHomeFragmentToProductDetailFragment(
-                productId = productId
-            )
+            val action = HomeFragmentDirections.actionHomeFragmentToProductDetailFragment(productId)
             findNavController().navigate(action)
         }
 
-        binding.homeRecyclerView.apply {
-            adapter = productListAdapter
+        binding.contentView.apply {
+            adapter = productListAdapter.withLoadStateFooter(
+                footer = PagingLoadStateAdapter { productListAdapter.retry() }
+            )
             layoutManager = GridLayoutManager(requireContext(), 2)
         }
     }
@@ -56,9 +75,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
     private fun observeProductPagingFlow() {
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                // ViewModel'den gelen PagingData<Product> akışını dinle
                 viewModel.productsFlow.collectLatest { pagingData ->
-                    // ve doğrudan adaptöre gönder. Fragment'ın başka bir şey yapmasına gerek yok.
                     productListAdapter.submitData(pagingData)
                 }
             }
@@ -70,41 +87,52 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 productListAdapter.loadStateFlow.collectLatest { loadStates ->
                     val refreshState = loadStates.refresh
+                    val isListEmpty = productListAdapter.itemCount == 0
 
-                    // Yükleniyorsa progressBar'ı göster.
-                    binding.progressbar.isVisible = refreshState is LoadState.Loading
+                    // Durumları belirle
+                    val isLoading = refreshState is LoadState.Loading && isListEmpty
+                    val isError = refreshState is LoadState.Error && isListEmpty
+                    val isTrulyEmpty = refreshState is LoadState.NotLoading && isListEmpty
 
-                    // Hata varsa, Toast ile göster.
-                    if (refreshState is LoadState.Error) {
-                        Toast.makeText(
-                            requireContext(),
-                            "Hata: ${refreshState.error.localizedMessage}",
-                            Toast.LENGTH_LONG
-                        ).show()
+                    // Görünürlükleri yönet
+                    binding.viewLoadingStub.isVisible = isLoading
+                    binding.contentView.isVisible = !isLoading && !isError
+
+                    // Hata durumunu işle
+                    if (isError) {
+                        val appException = errorMapper.map((refreshState as LoadState.Error).error)
+                        handleErrorState(binding.viewErrorStub, appException)
+                    } else {
+                        hideErrorState()
+                    }
+
+                    // Boş durumunu işle
+                    if (isTrulyEmpty) {
+                        if (emptyBinding == null) {
+                            emptyBinding = LayoutStateEmptyBinding.bind(binding.viewEmptyStub.inflate())
+                        }
+                        emptyBinding?.root?.isVisible = true
+                        emptyBinding?.txtEmptyTitle?.setText(R.string.empty_products_title)
+                        emptyBinding?.txtEmptySubtitle?.setText(R.string.empty_products_subtitle)
+                    } else {
+                        emptyBinding?.root?.isVisible = false
                     }
                 }
             }
         }
     }
 
-    // YENİ FONKSİYON: Geri tuşu davranışını yönetir.
     private fun setupBackButtonHandler() {
         val callback = object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
-                // Son basıştan bu yana 2 saniyeden fazla geçtiyse
                 if (System.currentTimeMillis() - lastBackPressedTime > 2000) {
-                    // DEĞİŞTİ: Toast yerine Snackbar gösteriyoruz.
-                    // binding.root, Snackbar'ın hangi layout içinde gösterileceğini belirtir.
-                    Snackbar.make(binding.root, "Çıkmak için tekrar basın", Snackbar.LENGTH_SHORT)
-                        .show()
+                    Snackbar.make(binding.root, "Çıkmak için tekrar basın", Snackbar.LENGTH_SHORT).show()
                     lastBackPressedTime = System.currentTimeMillis()
                 } else {
                     requireActivity().finish()
                 }
             }
         }
-        // Callback'i, bu fragment'ın yaşam döngüsüne bağlı olarak dispatcher'a ekle.
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, callback)
     }
-
 }

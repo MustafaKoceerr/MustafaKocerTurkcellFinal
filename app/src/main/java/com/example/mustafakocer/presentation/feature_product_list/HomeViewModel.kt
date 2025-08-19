@@ -13,7 +13,6 @@ import kotlinx.coroutines.flow.Flow
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val getProductsUseCase: GetProductsUseCase,
-    // TODO: Sepet UseCase'leri buraya eklenecek
 ) : ViewModel() {
 
     // Paging3 state yönetimini kendisi yapar.
