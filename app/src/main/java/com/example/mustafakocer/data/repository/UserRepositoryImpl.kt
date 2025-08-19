@@ -12,6 +12,7 @@ import com.example.mustafakocer.data.network.util.safeApiCall
 import com.example.mustafakocer.data.preferences.SessionManager
 import com.example.mustafakocer.data.util.networkBoundResource
 import com.example.mustafakocer.domain.exception.AppException
+import com.example.mustafakocer.domain.mapper.ErrorMapper
 import com.example.mustafakocer.domain.model.User
 import com.example.mustafakocer.domain.repository.AuthRepository
 import com.example.mustafakocer.domain.repository.UserRepository
@@ -32,6 +33,7 @@ class UserRepositoryImpl @Inject constructor(
     private val api: IDummyApi,
     private val userDao: UserDao,
     private val sessionManager: SessionManager,
+    private val errorMapper: ErrorMapper,
 ) : UserRepository {
 
     override fun getUserProfile(forceRefresh: Boolean): Flow<Resource<User>> = channelFlow {
@@ -60,20 +62,13 @@ class UserRepositoryImpl @Inject constructor(
             if (response.isSuccessful && response.body() != null) {
                 userDao.insertOrReplace(response.body()!!.toEntity())
             } else if (wasDbEmpty) {
-                send(
-                    Resource.Error(
-                        AppException.Api.HttpError(
-                            response.code(),
-                            response.message(),
-                            null
-                        )
-                    )
-                )
+                // Hata durumunda, manuel olarak HttpException oluşturup map'leyebiliriz.
+                send(Resource.Error(errorMapper.map(HttpException(response))))
             }
         } catch (e: Exception) {
             Log.e("UserRepository", "Network error fetching profile", e)
             if (wasDbEmpty) {
-                send(Resource.Error(AppException.Network.NoInternet(e)))
+                send(Resource.Error(errorMapper.map(e)))
             }
         }
     }
@@ -81,15 +76,13 @@ class UserRepositoryImpl @Inject constructor(
     override fun updateUserProfile(user: User): Flow<Resource<User>> = flow {
         emit(Resource.Loading)
         val userId = sessionManager.userId.value
-
         if (userId == null) {
-            val error =
-                AppException.Session.MissingSessionData("User ID not found for update operation.")
-            emit(Resource.Error(error))
+            emit(Resource.Error(AppException.Session.MissingSessionData("...")))
             return@flow
         }
 
-        safeApiCall {
+        // safeApiCall'u burada doğrudan kullanmak, kodu sadeleştirir.
+        safeApiCall(errorMapper) { // Parametre olarak verildi
             val userUpdateDto = user.toUpdateDto()
             api.updateUser(userId, userUpdateDto)
         }.collect { resource ->
@@ -101,7 +94,8 @@ class UserRepositoryImpl @Inject constructor(
                 }
 
                 is Resource.Error -> emit(resource)
-                else -> Unit
+                else -> { /* No-op */
+                }
             }
         }
     }

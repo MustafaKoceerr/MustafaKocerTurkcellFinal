@@ -44,14 +44,16 @@ class CartRepositoryImpl @Inject constructor(
                                 quantity
                             ) else null
                         } catch (e: Exception) {
-                            null // Skip malformed data
+                            null
                         }
                     }
                     trySend(Resource.Success(rawItems))
                 }
 
                 override fun onCancelled(error: DatabaseError) {
-                    val exception = AppException.Firebase(error.message, error.toException())
+                    // DÜZELTME: Firebase hatasını genel bir "Unknown" hatasına map'liyoruz.
+                    // Orijinal hatayı 'cause' olarak saklıyoruz.
+                    val exception = AppException.Unknown(error.toException())
                     trySend(Resource.Error(exception))
                     close(exception)
                 }
@@ -64,6 +66,9 @@ class CartRepositoryImpl @Inject constructor(
             close(e)
         }
     }
+
+// Diğer tüm fonksiyonlardaki `catch` bloklarını da güncelliyoruz.
+// `AppException.Firebase(...)` yerine `AppException.Unknown(e)` kullanacağız.
 
     override suspend fun addOrIncreaseCartItem(productId: Int): Resource<Unit> {
         return try {
@@ -82,25 +87,22 @@ class CartRepositoryImpl @Inject constructor(
                         data: DataSnapshot?,
                     ) {
                         if (continuation.isActive) {
-                            if (error == null) {
-                                continuation.resume(Unit) // Başarılı, coroutine'i devam ettir.
-                            } else {
-                                continuation.resumeWithException(error.toException()) // Hata, coroutine'i exception ile devam ettir.
-                            }
+                            if (error == null) continuation.resume(Unit)
+                            else continuation.resumeWithException(error.toException())
                         }
                     }
                 })
             }
             Resource.Success(Unit)
         } catch (e: Exception) {
-            Resource.Error(AppException.Firebase("Failed to update item", e))
+            // DÜZELTME
+            Resource.Error(AppException.Unknown(e))
         }
     }
 
     override suspend fun decreaseOrRemoveCartItem(productId: Int): Resource<Unit> {
         return try {
             val itemRef = getUserCartRef().child(productId.toString())
-            // DÜZELTME: Callback'i coroutine'e çevirmek için suspendCancellableCoroutine kullanıyoruz.
             suspendCancellableCoroutine<Unit> { continuation ->
                 itemRef.runTransaction(object : Transaction.Handler {
                     override fun doTransaction(currentData: MutableData): Transaction.Result {
@@ -119,18 +121,16 @@ class CartRepositoryImpl @Inject constructor(
                         data: DataSnapshot?,
                     ) {
                         if (continuation.isActive) {
-                            if (error == null) {
-                                continuation.resume(Unit) // Başarılı
-                            } else {
-                                continuation.resumeWithException(error.toException()) // Hata
-                            }
+                            if (error == null) continuation.resume(Unit)
+                            else continuation.resumeWithException(error.toException())
                         }
                     }
                 })
             }
             Resource.Success(Unit)
         } catch (e: Exception) {
-            Resource.Error(AppException.Firebase("Failed to update item", e))
+            // DÜZELTME
+            Resource.Error(AppException.Unknown(e))
         }
     }
 
@@ -139,7 +139,8 @@ class CartRepositoryImpl @Inject constructor(
             getUserCartRef().removeValue().await()
             Resource.Success(Unit)
         } catch (e: Exception) {
-            Resource.Error(AppException.Firebase("Failed to clear cart", e))
+            // DÜZELTME
+            Resource.Error(AppException.Unknown(e))
         }
     }
 
@@ -148,7 +149,8 @@ class CartRepositoryImpl @Inject constructor(
             getUserCartRef().child(productId.toString()).removeValue().await()
             Resource.Success(Unit)
         } catch (e: Exception) {
-            Resource.Error(AppException.Firebase("Failed to remove item", e))
+            // DÜZELTME
+            Resource.Error(AppException.Unknown(e))
         }
     }
 }

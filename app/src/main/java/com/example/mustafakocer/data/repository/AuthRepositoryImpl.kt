@@ -5,6 +5,7 @@ import com.example.mustafakocer.data.network.IDummyApi
 import com.example.mustafakocer.data.network.util.safeApiCall
 import com.example.mustafakocer.data.preferences.SessionManager
 import com.example.mustafakocer.data.preferences.toAuthSession
+import com.example.mustafakocer.domain.mapper.ErrorMapper
 import com.example.mustafakocer.domain.model.AuthSession
 import com.example.mustafakocer.domain.repository.AuthRepository
 import com.example.mustafakocer.domain.util.Resource
@@ -17,10 +18,11 @@ import javax.inject.Inject
 class AuthRepositoryImpl @Inject constructor(
     private val api: IDummyApi,
     private val sessionManager: SessionManager, // Artık tek bağımlılık bu
+    private val errorMapper: ErrorMapper // Enjekte edildi
 ) : AuthRepository {
 
     override fun login(username: String, password: String): Flow<Resource<AuthSession>> {
-        return safeApiCall {
+        return safeApiCall(errorMapper) {
             api.login(LoginRequestDto(username = username, password = password))
         }.onEach { resource ->
             // If the login is successful, update the session via the SessionManager.
