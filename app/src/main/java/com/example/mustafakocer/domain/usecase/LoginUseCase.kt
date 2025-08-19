@@ -11,13 +11,17 @@ import javax.inject.Inject
 class LoginUseCase @Inject constructor(
     private val authRepository: AuthRepository,
 ) {
-    // DÖNÜŞ TİPİ DEĞİŞTİ: Artık DTO değil, domain modeli olan AuthSession döndürüyor.
     operator fun invoke(username: String, password: String): Flow<Resource<AuthSession>> {
+        // Girdi (input) doğrulaması
         if (username.isBlank() || password.isBlank()) {
             return flow {
-                emit(Resource.Error(AppException.Data.ValidationError("Kullanıcı adı veya şifre boş olamaz.")))
+                // DÜZELTME: Yeni ve doğru hata tipini kullanıyoruz.
+                val error = AppException.Data.InputError("Kullanıcı adı veya şifre boş olamaz.")
+                emit(Resource.Error(error))
             }
         }
+
+        // Girdiler geçerliyse, Repository'ye git.
         return authRepository.login(username, password)
     }
 }

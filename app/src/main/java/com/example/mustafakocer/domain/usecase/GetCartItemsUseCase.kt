@@ -1,9 +1,8 @@
 package com.example.mustafakocer.domain.usecase
 
 import android.util.Log
-import com.example.mustafakocer.data.network.error.ErrorMapper
+import com.example.mustafakocer.domain.mapper.ErrorMapper
 import com.example.mustafakocer.domain.model.CartItem
-import com.example.mustafakocer.domain.model.Product
 import com.example.mustafakocer.domain.repository.CartRepository
 import com.example.mustafakocer.domain.repository.ProductRepository
 import com.example.mustafakocer.domain.util.Resource
@@ -11,13 +10,13 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class GetCartItemsUseCase @Inject constructor(
     private val cartRepository: CartRepository,
     private val productRepository: ProductRepository,
+    private val errorMapper: ErrorMapper,
 ) {
     operator fun invoke(): Flow<Resource<List<CartItem>>> {
         return cartRepository.getRawCartItems().map { rawResource ->
@@ -36,25 +35,30 @@ class GetCartItemsUseCase @Inject constructor(
         }
         return try {
             val cartItems = coroutineScope {
-                val deferreds = rawItems.map { (productId, quantity) ->
+                rawItems.map { (productId, quantity) ->
                     async {
-                        val productResource = productRepository.getSingleProduct(productId)
-                            .firstOrNull { it is Resource.Success } as? Resource.Success<Product>
-
-                        if (productResource != null) {
-                            CartItem(product = productResource.data, quantity = quantity)
-                        } else {
-                            Log.w("GetCartItemsUseCase", "Product with ID $productId could not be fetched.")
+                        try {
+                            // DEĞİŞTİ: Artık basit bir suspend fonksiyonu çağırıyoruz.
+                            val product = productRepository.getProduct(productId)
+                            CartItem(product = product, quantity = quantity)
+                        } catch (e: Exception) {
+                            // Eğer tek bir ürün alınamazsa (silinmiş olabilir),
+                            // bunu loglayıp sepet listesinden atlıyoruz.
+                            Log.w(
+                                "GetCartItemsUseCase",
+                                "Product with ID $productId could not be fetched for cart.",
+                                e
+                            )
                             null
                         }
                     }
-                }
-                deferreds.awaitAll().filterNotNull()
+                }.awaitAll().filterNotNull()
             }
             Resource.Success(cartItems)
         } catch (e: Exception) {
+            // Bu, coroutineScope'un kendisinde bir sorun olursa diye bir güvenlik ağıdır.
             Log.e("GetCartItemsUseCase", "An unexpected error occurred during product fetching.", e)
-            Resource.Error(ErrorMapper.map(e))
+            Resource.Error(errorMapper.map(e))
         }
     }
 }
