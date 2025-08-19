@@ -15,17 +15,36 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.mustafakocer.R
 import com.example.mustafakocer.databinding.FragmentCartBinding
+import com.example.mustafakocer.databinding.LayoutStateEmptyBinding
 import com.example.mustafakocer.domain.util.Resource
 import com.example.mustafakocer.presentation.base.BaseFragment
+import com.example.mustafakocer.presentation.common.UiErrorMapper
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class CartFragment : BaseFragment<FragmentCartBinding>(FragmentCartBinding::inflate) {
 
     private val viewModel: CartViewModel by viewModels()
     private lateinit var cartListAdapter: CartListAdapter
+
+    @Inject
+    lateinit var injectedUiErrorMapper: UiErrorMapper
+
+    // --- BaseFragment Implementasyonu ---
+    override val uiErrorMapper: UiErrorMapper by lazy { injectedUiErrorMapper }
+
+    override fun onRetry() {
+        // Sepet verisi Firebase'den reaktif olarak geldiği için,
+        // ViewModel'de manuel bir tetikleme fonksiyonu yok.
+        // Bu yüzden bu fonksiyon şimdilik boş kalabilir.
+    }
+    // ------------------------------------
+
+    // ViewStub'lar inflate edildikten sonra binding'lerini tutmak için.
+    private var emptyBinding: LayoutStateEmptyBinding? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -36,64 +55,64 @@ class CartFragment : BaseFragment<FragmentCartBinding>(FragmentCartBinding::infl
     }
 
     private fun setupRecyclerView() {
-        // DEĞİŞTİ: Adapter artık tek bir 'onEvent' lambdası alıyor.
         cartListAdapter = CartListAdapter { event ->
-            // Gelen olayın türüne göre doğru ViewModel fonksiyonunu çağırıyoruz.
             when (event) {
                 is CartEvent.OnIncrease -> viewModel.onIncreaseClicked(event.productId)
                 is CartEvent.OnDecrease -> viewModel.onDecreaseClicked(event.productId)
-                is CartEvent.OnRemove -> {
-                    showRemoveItemConfirmationDialog(event.productId)
-                }
-
+                is CartEvent.OnRemove -> showRemoveItemConfirmationDialog(event.productId)
                 is CartEvent.OnProductClick -> {
-                    // 1. Safe Args ile action'ı oluştur ve productId'yi parametre olarak geç.
-                    val action = CartFragmentDirections.actionCartFragmentToProductDetailFragment(
-                        productId = event.productId
-                    )
-                    // 2. NavController'ı kullanarak navigasyonu gerçekleştir.
+                    val action = CartFragmentDirections.actionCartFragmentToProductDetailFragment(event.productId)
                     findNavController().navigate(action)
                 }
             }
         }
-
-        binding.cartRecyclerView.apply {
+        binding.contentView.apply {
             adapter = cartListAdapter
             layoutManager = LinearLayoutManager(requireContext())
         }
     }
 
-    // observeViewModel, setupMenu ve showClearCartConfirmationDialog fonksiyonları
-    // bir önceki versiyondaki gibi kalır, onlarda bir değişiklik gerekmez.
-
     private fun observeViewModel() {
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
+                // 1. Ana sepet durumunu dinle
                 launch {
                     viewModel.cartState.collect { resource ->
-                        binding.progressbar.isVisible = resource is Resource.Loading
-                        val isSuccessAndEmpty =
-                            resource is Resource.Success && resource.data.isEmpty()
+                        val isLoading = resource is Resource.Loading
+                        val isError = resource is Resource.Error
+                        val isSuccessAndEmpty = resource is Resource.Success && resource.data.isEmpty()
 
-                        binding.txtEmptyCart.isVisible = isSuccessAndEmpty
-                        binding.cardSummary.isVisible =
-                            !isSuccessAndEmpty && resource !is Resource.Loading
+                        // Görünürlükleri yönet
+                        binding.viewLoadingStub.isVisible = isLoading
+                        binding.contentView.isVisible = resource is Resource.Success && !isSuccessAndEmpty
+                        binding.cardSummary.isVisible = resource is Resource.Success && !isSuccessAndEmpty
 
-                        when (resource) {
-                            is Resource.Success -> cartListAdapter.submitList(resource.data)
-                            is Resource.Error -> {
-                                binding.txtEmptyCart.isVisible = true
-                                binding.txtEmptyCart.text =
-                                    resource.exception.message ?: "Bir hata oluştu."
-                            }
-
-                            else -> { /* Idle, Loading */
-                            }
+                        if (isError) {
+                            handleErrorState(binding.viewErrorStub, (resource as Resource.Error).exception)
+                        } else {
+                            hideErrorState()
                         }
+
+                        if (isSuccessAndEmpty) {
+                            if (emptyBinding == null) {
+                                emptyBinding = LayoutStateEmptyBinding.bind(binding.viewEmptyStub.inflate())
+                            }
+                            emptyBinding?.root?.isVisible = true
+                            emptyBinding?.txtEmptyTitle?.setText(R.string.cart_empty_title)
+                            emptyBinding?.txtEmptySubtitle?.setText(R.string.cart_empty_subtitle)
+                        } else {
+                            emptyBinding?.root?.isVisible = false
+                        }
+
+                        if (resource is Resource.Success) {
+                            cartListAdapter.submitList(resource.data)
+                        }
+
                         requireActivity().invalidateOptionsMenu()
                     }
                 }
 
+                // 2. Toplam fiyatı dinle
                 launch {
                     viewModel.totalPrice.collect { totalPrice ->
                         binding.txtTotalPrice.text = totalPrice
