@@ -5,13 +5,28 @@ import com.example.mustafakocer.data.model.dto.ProductDto
 import com.example.mustafakocer.data.model.entity.ProductEntity
 import com.example.mustafakocer.domain.model.Product
 import java.text.DecimalFormat
+import java.text.DecimalFormatSymbols
+import java.util.Locale
 
-// DTO -> Domain Model
-fun ProductDto.toDomain(): Product { // 'isLiked' parametresini şimdilik kaldırabiliriz.
+/**
+ * A centralized, locale-independent price formatter.
+ * It ensures that prices are always formatted as Strings with a dollar sign prefix ($)
+ * and a dot (.) as the decimal separator, regardless of the device's locale.
+ * This is crucial for reliable calculations later on.
+ * Example: $1234.56
+ */
+// DEĞİŞTİ: Format desenine '$' eklendi.
+private val priceFormat = DecimalFormat("'$'0.00", DecimalFormatSymbols(Locale.US))
+
+// --- DTO to Domain ---
+
+/**
+ * Maps a [ProductDto] (from a list) to a [Product] domain model.
+ */
+fun ProductDto.toDomain(): Product {
     val originalPrice = this.price ?: 0.0
     val discount = this.discountPercentage ?: 0.0
     val calculatedDiscountedPrice = originalPrice * (1 - (discount / 100.0))
-    val priceFormat = DecimalFormat("$#,##0.00")
 
     return Product(
         id = this.id ?: 0,
@@ -19,18 +34,41 @@ fun ProductDto.toDomain(): Product { // 'isLiked' parametresini şimdilik kaldı
         price = priceFormat.format(originalPrice),
         discountedPrice = priceFormat.format(calculatedDiscountedPrice),
         thumbnailUrl = this.thumbnail.orEmpty(),
-        rating = (this.rating ?: 0.0).toFloat(), // YENİ ALAN EKLENDİ
-        stock = this.stock ?: 0                 // YENİ ALAN EKLENDİ
+        rating = (this.rating ?: 0.0).toFloat(),
+        stock = this.stock ?: 0
     )
 }
 
-// DTO -> Entity (DÜZELTİLDİ)
+/**
+ * Maps a [ProductDetailDto] (from a detail screen API call) to a [Product] domain model.
+ */
+fun ProductDetailDto.toDomainProduct(): Product {
+    val originalPrice = this.price ?: 0.0
+    val discount = this.discountPercentage ?: 0.0
+    val calculatedDiscountedPrice = originalPrice * (1 - (discount / 100.0))
+
+    return Product(
+        id = this.id ?: 0,
+        title = this.title.orEmpty(),
+        price = priceFormat.format(originalPrice),
+        discountedPrice = priceFormat.format(calculatedDiscountedPrice),
+        thumbnailUrl = this.thumbnail.orEmpty(),
+        rating = (this.rating ?: 0.0).toFloat(),
+        stock = this.stock ?: 0
+    )
+}
+
+// --- DTO to Entity ---
+
+/**
+ * Maps a [ProductDto] to a [ProductEntity] for database storage.
+ */
 fun ProductDto.toEntity(): ProductEntity {
     return ProductEntity(
         id = this.id ?: 0,
         title = this.title.orEmpty(),
         description = this.description.orEmpty(),
-        category = this.category.orEmpty(), // DÜZELTME: Eksik olan category alanı eklendi.
+        category = this.category.orEmpty(),
         price = this.price ?: 0.0,
         discountPercentage = this.discountPercentage ?: 0.0,
         rating = this.rating ?: 0.0,
@@ -40,10 +78,13 @@ fun ProductDto.toEntity(): ProductEntity {
     )
 }
 
-// Entity -> Domain Model
+// --- Entity to Domain ---
+
+/**
+ * Maps a [ProductEntity] from the database to a [Product] domain model.
+ */
 fun ProductEntity.toDomain(): Product {
     val calculatedDiscountedPrice = this.price * (1 - (this.discountPercentage / 100.0))
-    val priceFormat = DecimalFormat("$#,##0.00")
 
     return Product(
         id = this.id,
@@ -51,36 +92,7 @@ fun ProductEntity.toDomain(): Product {
         price = priceFormat.format(this.price),
         discountedPrice = priceFormat.format(calculatedDiscountedPrice),
         thumbnailUrl = this.thumbnailUrl,
-        rating = this.rating.toFloat(), // YENİ ALAN EKLENDİ
-        stock = this.stock              // YENİ ALAN EKLENDİ
-    )
-}
-
-
-fun ProductDetailDto.toDomainProduct(): Product {
-    val safeId = this.id ?: throw IllegalArgumentException("Product ID from API cannot be null")
-
-    val originalPrice = this.price ?: 0.0
-    val discountPercentage = this.discountPercentage ?: 0.0
-    val discountedPriceValue = if (discountPercentage > 0) {
-        originalPrice * (1 - discountPercentage / 100)
-    } else {
-        originalPrice
-    }
-
-    val priceFormat = DecimalFormat("$#,##0.00")
-    val formattedPrice = priceFormat.format(originalPrice)
-    val formattedDiscountedPrice = priceFormat.format(discountedPriceValue)
-
-    // 4. BİRLEŞTİRME:
-    // Tüm verileri temiz Product modelinde birleştir.
-    return Product(
-        id = safeId,
-        title = this.title ?: "Unnamed Product",
-        price = formattedPrice,
-        discountedPrice = formattedDiscountedPrice,
-        thumbnailUrl = this.thumbnail ?: "",
-        rating = (this.rating?.toFloat() ?: 0.0f),
-        stock = this.stock ?: 0
+        rating = this.rating.toFloat(),
+        stock = this.stock
     )
 }
