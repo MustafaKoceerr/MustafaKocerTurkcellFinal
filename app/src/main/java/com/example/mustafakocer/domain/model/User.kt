@@ -1,7 +1,7 @@
 package com.example.mustafakocer.domain.model
 
 /**
- * Uygulamanın UI ve Domain katmanlarında bir kullanıcıyı temsil eden temiz model.
+ * A clean model representing a user in the application's UI and domain layers.
  */
 data class User(
     val id: Int,
@@ -15,8 +15,8 @@ data class User(
     val imageUrl: String
 ) {
     /**
-     * Ad ve soyadın o anki değerlerinden birleştirilmiş tam adı döndüren
-     * bir hesaplanan özellik (computed property).
+     * A computed property that returns the full name, derived from the current
+     * state of firstName and lastName.
      */
     val fullName: String
         get() = "$firstName $lastName".trim()

@@ -7,21 +7,20 @@ import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 /**
- * Belirtilen bir ürünün sepetteki miktarını dinleyen iş kuralı.
+ * A business rule that listens to the cart and provides the quantity
+ * for a specific product.
  */
 class GetCartQuantityUseCase @Inject constructor(
     private val cartRepository: CartRepository,
 ) {
     operator fun invoke(productId: Int): Flow<Int> {
-        // Ham sepet verisini dinle
         return cartRepository.getRawCartItems().map { resource ->
             when (resource) {
                 is Resource.Success -> {
-                    // Başarılı durumda, listede bizim ürünümüzü bul ve miktarını döndür.
-                    // Bulamazsan 0 döndür.
-                    resource.data.find { (pId, _) -> pId == productId }?.second ?: 0
+                    // Find the specific item in the list and return its quantity, or 0 if not found.
+                    resource.data.find { it.productId == productId }?.quantity ?: 0
                 }
-                // Hata veya yüklenme durumunda miktar 0'dır.
+                // During loading or on error, the quantity is considered 0.
                 else -> 0
             }
         }

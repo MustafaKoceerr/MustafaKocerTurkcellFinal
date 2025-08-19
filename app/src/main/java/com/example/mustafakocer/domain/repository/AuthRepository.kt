@@ -4,6 +4,9 @@ import com.example.mustafakocer.domain.model.AuthSession
 import com.example.mustafakocer.domain.util.Resource
 import kotlinx.coroutines.flow.Flow
 
+/**
+ * A contract for the data layer to handle all authentication-related operations.
+ */
 interface AuthRepository {
 
     /**

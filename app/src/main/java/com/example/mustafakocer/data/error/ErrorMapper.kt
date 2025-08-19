@@ -9,12 +9,16 @@ import java.net.SocketTimeoutException
 import javax.inject.Inject
 import javax.inject.Singleton
 
+/**
+ * Maps raw [Throwable] instances to domain-specific [AppException] types.
+ * This is the central component for standardizing error handling across the application.
+ */
 @Singleton
 class ErrorMapperImpl @Inject constructor() : ErrorMapper {
 
     override fun map(throwable: Throwable): AppException {
         return when (throwable) {
-            is AppException -> throwable // If it's already our type, pass it through.
+            is AppException -> throwable
             is HttpException -> mapHttpException(throwable)
             is SocketTimeoutException -> AppException.Network.Timeout(throwable)
             is IOException -> AppException.Network.NoInternet(throwable)
@@ -33,3 +37,4 @@ class ErrorMapperImpl @Inject constructor() : ErrorMapper {
         }
     }
 }
+

@@ -3,18 +3,22 @@ package com.example.mustafakocer.data.model.dto
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
+/**
+ * Represents the top-level response for a user's orders (carts) from the API.
+ */
 @Serializable
 data class OrdersResponseDto(
-    // DÜZELTME: Varsayılan değerler ve @SerialName eklendi.
     @SerialName("carts") val carts: List<OrderDto> = emptyList(),
     @SerialName("total") val total: Int = 0,
     @SerialName("skip") val skip: Int = 0,
     @SerialName("limit") val limit: Int = 0
 )
 
+/**
+ * Represents a single order (cart) containing a list of products.
+ */
 @Serializable
 data class OrderDto(
-    // DÜZELTME: Varsayılan değerler ve @SerialName eklendi.
     @SerialName("id") val id: Int = 0,
     @SerialName("products") val products: List<OrderProductDto> = emptyList(),
     @SerialName("total") val total: Double = 0.0,
@@ -24,9 +28,11 @@ data class OrderDto(
     @SerialName("totalQuantity") val totalQuantity: Int = 0
 )
 
+/**
+ * Represents a single product within an order.
+ */
 @Serializable
 data class OrderProductDto(
-    // DÜZELTME: Varsayılan değerler ve @SerialName eklendi.
     @SerialName("id") val id: Int = 0,
     @SerialName("title") val title: String = "",
     @SerialName("price") val price: Double = 0.0,

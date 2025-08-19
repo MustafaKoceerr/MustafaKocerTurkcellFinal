@@ -3,8 +3,9 @@ package com.example.mustafakocer.data.model.dto
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
-// Bu, API'den gelen tek bir ürünün tüm verisini temsil eder.
-// data/model/dto/ProductDetailDto.kt
+/**
+ * Represents the detailed data for a single product as returned by the API.
+ */
 @Serializable
 data class ProductDetailDto(
     @SerialName("id") val id: Int?,
@@ -22,8 +23,9 @@ data class ProductDetailDto(
     @SerialName("reviews") val reviews: List<ReviewDto>? = null
 )
 
-// ... ReviewDto aynı kalıyor ...
-
+/**
+ * Represents a single review for a product.
+ */
 @Serializable
 data class ReviewDto(
     @SerialName("rating") val rating: Int? = null,

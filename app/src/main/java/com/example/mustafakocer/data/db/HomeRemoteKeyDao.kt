@@ -6,6 +6,10 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.example.mustafakocer.data.model.entity.HomeRemoteKeyEntity
 
+/**
+ * Data Access Object for home screen remote keys.
+ * Manages pagination state for the Paging 3 library for the main product list.
+ */
 @Dao
 interface HomeRemoteKeyDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)

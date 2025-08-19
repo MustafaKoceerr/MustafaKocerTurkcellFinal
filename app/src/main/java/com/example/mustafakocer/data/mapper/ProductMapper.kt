@@ -9,90 +9,84 @@ import java.text.DecimalFormatSymbols
 import java.util.Locale
 
 /**
- * A centralized, locale-independent price formatter.
- * It ensures that prices are always formatted as Strings with a dollar sign prefix ($)
- * and a dot (.) as the decimal separator, regardless of the device's locale.
- * This is crucial for reliable calculations later on.
- * Example: $1234.56
+ * A reusable, locale-independent price formatter.
+ * Ensures prices are formatted with a dollar sign and a dot for the decimal separator.
  */
-// DEĞİŞTİ: Format desenine '$' eklendi.
-private val priceFormat = DecimalFormat("'$'0.00", DecimalFormatSymbols(Locale.US))
-
-// --- DTO to Domain ---
+private val priceFormatter = DecimalFormat("'$'0.00", DecimalFormatSymbols(Locale.US))
+private fun Double.toFormattedPrice(): String = priceFormatter.format(this)
 
 /**
- * Maps a [ProductDto] (from a list) to a [Product] domain model.
+ * Private factory function to create a [Product] domain model.
+ * Encapsulates the common mapping logic from different DTOs to prevent code duplication.
  */
-fun ProductDto.toDomain(): Product {
-    val originalPrice = this.price ?: 0.0
-    val discount = this.discountPercentage ?: 0.0
+private fun createProductFromData(
+    id: Int?,
+    title: String?,
+    price: Double?,
+    discountPercentage: Double?,
+    thumbnail: String?,
+    rating: Double?,
+    stock: Int?
+): Product {
+    val originalPrice = price ?: 0.0
+    val discount = discountPercentage ?: 0.0
     val calculatedDiscountedPrice = originalPrice * (1 - (discount / 100.0))
 
     return Product(
-        id = this.id ?: 0,
-        title = this.title.orEmpty(),
-        price = priceFormat.format(originalPrice),
-        discountedPrice = priceFormat.format(calculatedDiscountedPrice),
-        thumbnailUrl = this.thumbnail.orEmpty(),
-        rating = (this.rating ?: 0.0).toFloat(),
-        stock = this.stock ?: 0
+        id = id ?: 0,
+        title = title.orEmpty(),
+        price = originalPrice.toFormattedPrice(),
+        discountedPrice = calculatedDiscountedPrice.toFormattedPrice(),
+        thumbnailUrl = thumbnail.orEmpty(),
+        rating = (rating ?: 0.0).toFloat(),
+        stock = stock ?: 0
     )
 }
 
 /**
- * Maps a [ProductDetailDto] (from a detail screen API call) to a [Product] domain model.
+ * Converts a [ProductDto] from the data layer to a [Product] in the domain layer.
  */
-fun ProductDetailDto.toDomainProduct(): Product {
-    val originalPrice = this.price ?: 0.0
-    val discount = this.discountPercentage ?: 0.0
-    val calculatedDiscountedPrice = originalPrice * (1 - (discount / 100.0))
-
-    return Product(
-        id = this.id ?: 0,
-        title = this.title.orEmpty(),
-        price = priceFormat.format(originalPrice),
-        discountedPrice = priceFormat.format(calculatedDiscountedPrice),
-        thumbnailUrl = this.thumbnail.orEmpty(),
-        rating = (this.rating ?: 0.0).toFloat(),
-        stock = this.stock ?: 0
-    )
-}
-
-// --- DTO to Entity ---
+fun ProductDto.toDomain(): Product = createProductFromData(
+    id, title, price, discountPercentage, thumbnail, rating, stock
+)
 
 /**
- * Maps a [ProductDto] to a [ProductEntity] for database storage.
+ * Converts a [ProductDetailDto] from the data layer to a [Product] in the domain layer.
+ * Reuses the common mapping logic.
  */
-fun ProductDto.toEntity(): ProductEntity {
-    return ProductEntity(
-        id = this.id ?: 0,
-        title = this.title.orEmpty(),
-        description = this.description.orEmpty(),
-        category = this.category.orEmpty(),
-        price = this.price ?: 0.0,
-        discountPercentage = this.discountPercentage ?: 0.0,
-        rating = this.rating ?: 0.0,
-        stock = this.stock ?: 0,
-        brand = this.brand.orEmpty(),
-        thumbnailUrl = this.thumbnail.orEmpty()
-    )
-}
-
-// --- Entity to Domain ---
+fun ProductDetailDto.toDomainProduct(): Product = createProductFromData(
+    id, title, price, discountPercentage, thumbnail, rating, stock
+)
 
 /**
- * Maps a [ProductEntity] from the database to a [Product] domain model.
+ * Converts a [ProductDto] from the data layer to a [ProductEntity] for database caching.
+ */
+fun ProductDto.toEntity(): ProductEntity = ProductEntity(
+    id = id ?: 0,
+    title = title.orEmpty(),
+    description = description.orEmpty(),
+    category = category.orEmpty(),
+    price = price ?: 0.0,
+    discountPercentage = discountPercentage ?: 0.0,
+    rating = rating ?: 0.0,
+    stock = stock ?: 0,
+    brand = brand.orEmpty(),
+    thumbnailUrl = thumbnail.orEmpty()
+)
+
+/**
+ * Converts a [ProductEntity] from the database to a [Product] in the domain layer.
  */
 fun ProductEntity.toDomain(): Product {
-    val calculatedDiscountedPrice = this.price * (1 - (this.discountPercentage / 100.0))
+    val calculatedDiscountedPrice = price * (1 - (discountPercentage / 100.0))
 
     return Product(
-        id = this.id,
-        title = this.title,
-        price = priceFormat.format(this.price),
-        discountedPrice = priceFormat.format(calculatedDiscountedPrice),
-        thumbnailUrl = this.thumbnailUrl,
-        rating = this.rating.toFloat(),
-        stock = this.stock
+        id = id,
+        title = title,
+        price = price.toFormattedPrice(),
+        discountedPrice = calculatedDiscountedPrice.toFormattedPrice(),
+        thumbnailUrl = thumbnailUrl,
+        rating = rating.toFloat(),
+        stock = stock
     )
 }

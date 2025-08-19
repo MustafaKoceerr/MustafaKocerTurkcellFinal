@@ -3,10 +3,10 @@ package com.example.mustafakocer.presentation.base
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.mustafakocer.domain.presentation.BaseUiEffect
-import com.example.mustafakocer.domain.presentation.BaseUiEvent
-import com.example.mustafakocer.domain.presentation.BaseUiState
-import com.example.mustafakocer.domain.presentation.UiContract
+import com.example.mustafakocer.presentation.mvi.BaseUiEffect
+import com.example.mustafakocer.presentation.mvi.BaseUiEvent
+import com.example.mustafakocer.presentation.mvi.BaseUiState
+import com.example.mustafakocer.presentation.mvi.UiContract
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch

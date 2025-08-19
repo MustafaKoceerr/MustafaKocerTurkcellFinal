@@ -3,16 +3,21 @@ package com.example.mustafakocer.data.paging
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.example.mustafakocer.data.mapper.toDomain
-import com.example.mustafakocer.data.network.IDummyApi
+import com.example.mustafakocer.data.network.DummyApi
 import com.example.mustafakocer.domain.model.Product
 import retrofit2.HttpException
 import java.io.IOException
 
 /**
- * Sadece pagination için gerekli, offline first yapılmayacak
+ * A [PagingSource] for fetching product search results directly from the network.
+ * It takes a search query and provides paginated [Product] domain models.
+ * This implementation does not use a local database cache.
+ *
+ * @param api The Retrofit API service.
+ * @param query The search term to filter products by.
  */
 class ProductPagingSource(
-    private val api: IDummyApi,
+    private val api: DummyApi,
     private val query: String
 ) : PagingSource<Int, Product>() {
 
@@ -22,8 +27,8 @@ class ProductPagingSource(
         return try {
             val response = api.searchProducts(
                 query = query,
-                limit = PAGING_PAGE_SIZE,
-                skip = page * PAGING_PAGE_SIZE
+                limit = params.loadSize, // Use flexible page size from PagingConfig
+                skip = page * params.loadSize
             )
 
             val productsDto = response.body()?.products ?: emptyList()
@@ -41,6 +46,9 @@ class ProductPagingSource(
         }
     }
 
+    /**
+     * Provides the key for the page to be loaded when the data is refreshed.
+     */
     override fun getRefreshKey(state: PagingState<Int, Product>): Int? {
         return state.anchorPosition?.let { anchorPosition ->
             state.closestPageToPosition(anchorPosition)?.prevKey?.plus(1)
@@ -50,14 +58,8 @@ class ProductPagingSource(
 
     companion object {
         /**
-         * Bu PagingSource için sayfa numaralandırmasının başlangıç indeksi.
+         * The starting page index for pagination.
          */
         private const val PAGING_STARTING_PAGE_INDEX = 0
-
-        /**
-         * Bu PagingSource'un her istekte API'den kaç ürün çekeceği.
-         * Bu değer, sadece ürün arama sayfasının bir iş kuralıdır.
-         */
-        private const val PAGING_PAGE_SIZE = 20
     }
 }

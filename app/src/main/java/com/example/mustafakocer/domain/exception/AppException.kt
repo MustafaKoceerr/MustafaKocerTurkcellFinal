@@ -15,7 +15,6 @@ sealed class AppException(
 ) : Exception(developerMessage, cause) {
 
     /**
-
      * Represents errors originating from network infrastructure issues (e.g., no connectivity, timeouts).
      */
     sealed class Network(message: String, cause: Throwable? = null) : AppException(message, cause) {
@@ -54,7 +53,6 @@ sealed class AppException(
         data class EmptyResponse(override val cause: Throwable? = null) :
             Data("The response from the server was empty.", cause)
 
-        // YENİ: Kullanıcı girdisiyle ilgili hataları temsil eder.
         data class InputError(val reason: String) : Data(reason, null)
     }
 

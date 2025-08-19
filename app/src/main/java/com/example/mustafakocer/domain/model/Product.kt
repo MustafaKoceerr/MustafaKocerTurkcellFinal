@@ -1,7 +1,8 @@
 package com.example.mustafakocer.domain.model
 
 /**
- * UI katmanında bir ürünü temsil eden temiz veri sınıfı.
+ * A clean data class representing a product summary in the UI layer,
+ * typically used in lists.
  */
 data class Product(
     val id: Int,

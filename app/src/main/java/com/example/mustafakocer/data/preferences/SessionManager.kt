@@ -6,7 +6,6 @@ import kotlinx.coroutines.flow.first
 import javax.inject.Inject
 import javax.inject.Singleton
 
-
 /**
  * Manages the user session data (token and user ID) in memory for fast access,
  * while persisting it to secure storage. This class acts as the single source

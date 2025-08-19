@@ -17,9 +17,12 @@ import retrofit2.http.PUT
 import retrofit2.http.Path
 import retrofit2.http.Query
 
-interface IDummyApi {
+/**
+ * Defines the contract for all network operations with the remote Dummy API.
+ * This interface is implemented by Retrofit to create a network client.
+ */
+interface DummyApi {
 
-    // Artık tüm fonksiyonlar Response<T> döndürüyor.
     @GET("products")
     suspend fun getProducts(
         @Query("limit") limit: Int,
@@ -32,8 +35,8 @@ interface IDummyApi {
     @GET("products/category/{category_name}")
     suspend fun getProductsByCategory(
         @Path("category_name") categoryName: String,
-        @Query("limit") limit: Int, // YENİ
-        @Query("skip") skip: Int,     // YENİ
+        @Query("limit") limit: Int,
+        @Query("skip") skip: Int,
     ): Response<ProductsResponseDto>
 
     @GET("products/search")

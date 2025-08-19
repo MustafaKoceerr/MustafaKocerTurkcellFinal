@@ -16,6 +16,12 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
+/**
+ * Hilt module for providing repository implementations.
+ * It uses the @Binds annotation to efficiently bind repository interfaces (defined in the
+ * domain layer) to their concrete implementations (in the data layer). This decouples
+ * the domain layer from the data layer, adhering to Clean Architecture principles.
+ */
 @Module
 @InstallIn(SingletonComponent::class)
 abstract class RepositoryModule {

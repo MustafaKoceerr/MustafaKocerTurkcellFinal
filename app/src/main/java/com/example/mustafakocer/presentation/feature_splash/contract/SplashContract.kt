@@ -1,9 +1,9 @@
 package com.example.mustafakocer.presentation.feature_splash.contract
 
 import com.example.mustafakocer.domain.exception.AppException
-import com.example.mustafakocer.domain.presentation.BaseUiEffect
-import com.example.mustafakocer.domain.presentation.BaseUiEvent
-import com.example.mustafakocer.domain.presentation.BaseUiState
+import com.example.mustafakocer.presentation.mvi.BaseUiEffect
+import com.example.mustafakocer.presentation.mvi.BaseUiEvent
+import com.example.mustafakocer.presentation.mvi.BaseUiState
 
 data class SplashUiState(
     override val isLoading: Boolean = true,

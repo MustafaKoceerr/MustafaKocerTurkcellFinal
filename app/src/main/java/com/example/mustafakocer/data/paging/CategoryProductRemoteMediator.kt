@@ -9,27 +9,42 @@ import com.example.mustafakocer.data.db.AppDatabase
 import com.example.mustafakocer.data.mapper.toEntity
 import com.example.mustafakocer.data.model.entity.CategoryRemoteKeyEntity
 import com.example.mustafakocer.data.model.entity.ProductEntity
-import com.example.mustafakocer.data.network.IDummyApi
+import com.example.mustafakocer.data.network.DummyApi
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import retrofit2.HttpException
 import java.io.IOException
 
+/**
+ * A [RemoteMediator] for category-specific product lists.
+ * It orchestrates loading data from the network ([DummyApi]) and saving it to the local
+ * database ([AppDatabase]), serving as the single source of truth for paginated category data.
+ *
+ * @param categoryName The specific category to fetch products for. This is provided at runtime.
+ * @param api The Retrofit API service, injected by Hilt.
+ * @param db The Room database instance, injected by Hilt.
+ */
 @OptIn(ExperimentalPagingApi::class)
 class CategoryProductRemoteMediator @AssistedInject constructor(
-    @Assisted private val categoryName: String, // Dinamik parametre
-    private val api: IDummyApi, // Hilt tarafından sağlanacak
-    private val db: AppDatabase // Hilt tarafından sağlanacak
+    @Assisted private val categoryName: String,
+    private val api: DummyApi,
+    private val db: AppDatabase
 ) : RemoteMediator<Int, ProductEntity>() {
 
     private val productDao = db.createProductDao()
     private val categoryRemoteKeyDao = db.createCategoryRemoteKeyDao()
-    // Factory arayüzü, Hilt'e bu sınıfı nasıl yaratacağını söyler.
+
+    /**
+     * A Hilt AssistedFactory for creating instances of [CategoryProductRemoteMediator].
+     * This allows Hilt to provide the static dependencies (`api`, `db`) while allowing
+     * the caller to provide the dynamic `categoryName` at creation time.
+     */
     @AssistedFactory
     interface Factory {
         fun create(categoryName: String): CategoryProductRemoteMediator
     }
+
     override suspend fun load(
         loadType: LoadType,
         state: PagingState<Int, ProductEntity>
@@ -44,14 +59,12 @@ class CategoryProductRemoteMediator @AssistedInject constructor(
                 }
             }
 
-            // **DÜZELTME:** API çağrısına artık 'limit' ve 'skip' parametrelerini ekliyoruz.
             val response = api.getProductsByCategory(
                 categoryName = categoryName,
                 limit = state.config.pageSize,
                 skip = page * state.config.pageSize
             )
             val productsDto = response.body()?.products ?: emptyList()
-            // **DÜZELTME:** Sayfa sonuna gelip gelmediğimizi API'den dönen listeye göre belirliyoruz.
             val endOfPaginationReached = productsDto.isEmpty()
 
             db.withTransaction {

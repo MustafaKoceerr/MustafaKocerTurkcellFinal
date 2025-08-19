@@ -1,11 +1,11 @@
 package com.example.mustafakocer.domain.model
 
 /**
- * Kullanıcının sepetindeki tek bir öğeyi temsil eder.
- * Bu model, hangi üründen (Product) kaç adet (quantity) olduğunu bir araya getirir.
- * Bu, "Kompozisyon" (Composition) prensibinin bir uygulamasıdır.
+ * Represents a single item within the user's shopping cart.
+ * It composes a [Product] with its corresponding quantity, demonstrating the
+ * "Composition" principle.
  */
 data class CartItem(
-    val product: Product, // Product modelini doğrudan içerir.
+    val product: Product,
     val quantity: Int
 )

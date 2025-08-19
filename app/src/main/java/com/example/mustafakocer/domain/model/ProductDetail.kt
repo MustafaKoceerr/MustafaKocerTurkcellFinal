@@ -1,8 +1,8 @@
 package com.example.mustafakocer.domain.model
 
 /**
- * Detay ekranında bir ürünü temsil eden temiz domain modeli.
- * Sadece UI'ın ihtiyaç duyduğu, formatlanmış ve basit verileri içerir.
+ * A clean domain model representing a product on its detail screen.
+ * It contains only the formatted and simplified data required by the UI.
  */
 data class ProductDetail(
     val id: Int,
@@ -10,17 +10,17 @@ data class ProductDetail(
     val description: String,
     val formattedPrice: String,
     val formattedDiscountedPrice: String,
-    val savingsInfo: String, // Örn: "%15 Tasarruf"
+    val savingsInfo: String, // e.g., "15% Savings"
     val rating: Float,
-    val ratingCount: Int, // Yorum sayısı
+    val ratingCount: Int,
     val stock: Int,
-    val tags: List<String>, // Marka, kategori ve diğer tüm etiketler burada toplanacak.
+    val tags: List<String>,
     val images: List<String>,
     val reviews: List<Review>
 )
 
 /**
- * Bir ürün yorumunu temsil eden temiz domain modeli.
+ * A clean domain model representing a single product review.
  */
 data class Review(
     val rating: Int,

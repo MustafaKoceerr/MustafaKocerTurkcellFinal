@@ -1,9 +1,9 @@
 package com.example.mustafakocer.presentation.feature_auth.contract
 
 import com.example.mustafakocer.domain.exception.AppException
-import com.example.mustafakocer.domain.presentation.BaseUiEffect
-import com.example.mustafakocer.domain.presentation.BaseUiEvent
-import com.example.mustafakocer.domain.presentation.BaseUiState
+import com.example.mustafakocer.presentation.mvi.BaseUiEffect
+import com.example.mustafakocer.presentation.mvi.BaseUiEvent
+import com.example.mustafakocer.presentation.mvi.BaseUiState
 
 /**
  * Login ekranının UI durumunu (State) temsil eden veri sınıfı.
