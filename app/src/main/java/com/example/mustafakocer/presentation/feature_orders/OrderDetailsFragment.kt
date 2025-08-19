@@ -11,19 +11,37 @@ import com.example.mustafakocer.R
 import com.example.mustafakocer.databinding.FragmentOrderDetailsBinding
 import com.example.mustafakocer.domain.model.Order
 import com.example.mustafakocer.presentation.base.BaseFragment
+import com.example.mustafakocer.presentation.common.UiErrorMapper
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class OrderDetailsFragment :
     BaseFragment<FragmentOrderDetailsBinding>(FragmentOrderDetailsBinding::inflate) {
 
     private val args: OrderDetailsFragmentArgs by navArgs()
     private lateinit var productListAdapter: OrderProductListAdapter
 
+    // --- BaseFragment Implementasyonu ---
+    // Bu fragment, BaseFragment'in hata yönetimi özelliklerini kullanmadığı için,
+    // bu property'leri sağlamamız gerekiyor ama içleri boş kalabilir veya
+    // bir NotImplementedError fırlatabilir.
+    // Ancak enjeksiyonun çalışması için bu gereklidir.
+    @Inject
+    lateinit var injectedUiErrorMapper: UiErrorMapper
+    override val uiErrorMapper: UiErrorMapper by lazy { injectedUiErrorMapper }
+
+    override fun onRetry() {
+        // Bu ekranda ağ isteği olmadığı için retry mantığına gerek yok.
+    }
+    // ------------------------------------
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         val order = args.order
 
-        setupRecyclerView()
+        setupRecyclerView(order)
         populateUi(order)
         setupToolbarTitle(order)
     }
@@ -33,34 +51,24 @@ class OrderDetailsFragment :
         (activity as? AppCompatActivity)?.supportActionBar?.title = dynamicTitle
     }
 
-    private fun setupRecyclerView() {
-        // DEĞİŞTİ: Adapter'ı, tıklama olayında navigasyonu tetikleyecek
-        // bir lambda ile oluşturuyoruz.
+    private fun setupRecyclerView(order: Order) {
         productListAdapter = OrderProductListAdapter { productId ->
-            // Tıklanan ürünün ID'si ile navigasyonu tetikle.
-            val action = OrderDetailsFragmentDirections.actionOrderDetailsFragmentToProductDetailFragment(
-                productId = productId
-            )
+            val action = OrderDetailsFragmentDirections.actionOrderDetailsFragmentToProductDetailFragment(productId)
             findNavController().navigate(action)
         }
 
         binding.productsRecyclerView.apply {
             adapter = productListAdapter
-            // Her ürün arasına bir ayırıcı çizgi ekleyelim.
             addItemDecoration(DividerItemDecoration(context, LinearLayoutManager.VERTICAL))
         }
+        productListAdapter.submitList(order.products)
     }
 
     private fun populateUi(order: Order) {
         binding.apply {
             txtOrderId.text = order.id.toString()
             txtTotalAmount.text = order.discountedTotal
-            // YENİ: Diğer UI elemanlarını da dolduralım.
-            txtItemCount.text = "${order.totalProducts} ürün"
-            // Tarih ve durum gibi diğer alanlar da burada doldurulabilir.
+            txtItemCount.text = getString(R.string.order_details_item_count_format, order.totalProducts)
         }
-
-        // Ürün listesini adaptöre gönder.
-        productListAdapter.submitList(order.products)
     }
 }

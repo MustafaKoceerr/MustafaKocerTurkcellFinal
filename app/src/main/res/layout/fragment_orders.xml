@@ -1,7 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- OrdersFragment (SwipeRefreshLayout kaldırıldı) -->
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<?xml version="1.0" encoding="utf-8"?><!-- OrdersFragment (SwipeRefreshLayout kaldırıldı) -->
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -11,20 +9,20 @@
 
     <!-- Sipariş listesi -->
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/orderRecyclerView"
+        android:id="@+id/contentView"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:clipToPadding="false"
         android:paddingStart="@dimen/orders_content_inset"
-        android:paddingEnd="@dimen/orders_content_inset"
         android:paddingTop="@dimen/orders_content_inset_top"
+        android:paddingEnd="@dimen/orders_content_inset"
         android:paddingBottom="@dimen/orders_content_inset_bottom"
-        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        tools:listitem="@layout/recycler_row_order"
-        tools:itemCount="6" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:itemCount="6"
+        tools:listitem="@layout/recycler_row_order" />
 
     <!-- Yüklenme göstergesi (ID korunur) -->
     <com.google.android.material.progressindicator.CircularProgressIndicator
@@ -32,69 +30,55 @@
         android:layout_width="48dp"
         android:layout_height="48dp"
         android:visibility="gone"
-        app:indicatorSize="32dp"
-        app:trackThickness="3dp"
         app:indicatorInset="8dp"
-        app:layout_constraintTop_toTopOf="parent"
+        app:indicatorSize="32dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:trackThickness="3dp"
         tools:visibility="visible" />
 
-    <!-- Boş durum metni (ID korunur) -->
-    <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/txtEmptyOrders"
+    <!-- 2. Yüklenme Durumu (Merkezde) -->
+    <!-- Eski ProgressBar kaldırıldı, yerine ortak ViewStub geldi -->
+    <ViewStub
+        android:id="@+id/viewLoadingStub"
+        android:layout="@layout/layout_state_loading"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:paddingStart="24dp"
-        android:paddingEnd="24dp"
-        android:drawablePadding="@dimen/empty_drawable_padding"
-        android:gravity="center"
-        android:text="@string/empty_orders_message"
-        android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
-        android:textColor="?attr/colorOnSurfaceVariant"
         android:visibility="gone"
-        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintVertical_bias="0.35"
-        tools:visibility="gone"
-        android:drawableTint="?attr/colorOnSurfaceVariant"
-        app:drawableTopCompat="@drawable/ic_receipt_long_24" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:visibility="visible" />
 
-    <!-- Hata durumu -->
-    <LinearLayout
-        android:id="@+id/stateErrorGroup"
-        android:layout_width="0dp"
+    <!-- 3. Hata Durumu (Merkezde) -->
+    <!-- Eski stateErrorGroup kaldırıldı, yerine ortak ViewStub geldi -->
+    <ViewStub
+        android:id="@+id/viewErrorStub"
+        android:layout="@layout/layout_state_error"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:gravity="center"
-        android:orientation="vertical"
-        android:padding="@dimen/state_padding"
         android:visibility="gone"
-        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        tools:visibility="gone">
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-        <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/txtErrorTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
-            android:textColor="?attr/colorOnSurface"
-            android:text="@string/orders_error_title" />
+    <!-- 4. Boş Durumu (Merkezde) -->
+    <!-- Eski txtEmptyOrders kaldırıldı, yerine ortak ViewStub geldi -->
+    <ViewStub
+        android:id="@+id/viewEmptyStub"
+        android:layout="@layout/layout_state_empty"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnRetry"
-            style="?attr/materialButtonOutlinedStyle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/state_action_top"
-            android:text="@string/action_retry"
-            android:contentDescription="@string/cd_retry" />
-    </LinearLayout>
 
     <!-- En üste dön FAB -->
     <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
@@ -102,15 +86,15 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/fab_margin"
-        android:text="@string/action_scroll_to_top"
         android:contentDescription="@string/cd_scroll_to_top"
-        app:icon="@drawable/ic_arrow_upward_24"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:backgroundTint="?attr/colorTertiaryContainer"
-        app:iconTint="?attr/colorOnTertiaryContainer"
+        android:text="@string/action_scroll_to_top"
         android:textColor="?attr/colorOnTertiaryContainer"
         android:visibility="gone"
+        app:backgroundTint="?attr/colorTertiaryContainer"
+        app:icon="@drawable/ic_arrow_upward_24"
+        app:iconTint="?attr/colorOnTertiaryContainer"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         tools:visibility="visible" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

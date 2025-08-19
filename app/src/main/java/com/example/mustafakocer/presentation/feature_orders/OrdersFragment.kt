@@ -2,7 +2,6 @@ package com.example.mustafakocer.presentation.feature_orders
 
 import android.os.Bundle
 import android.view.View
-import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -11,12 +10,17 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.paging.LoadState
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.mustafakocer.R
 import com.example.mustafakocer.databinding.FragmentOrdersBinding
+import com.example.mustafakocer.databinding.LayoutStateEmptyBinding
+import com.example.mustafakocer.domain.mapper.ErrorMapper
 import com.example.mustafakocer.presentation.base.BaseFragment
 import com.example.mustafakocer.presentation.common.PagingLoadStateAdapter
+import com.example.mustafakocer.presentation.common.UiErrorMapper
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class OrdersFragment : BaseFragment<FragmentOrdersBinding>(FragmentOrdersBinding::inflate) {
@@ -24,17 +28,29 @@ class OrdersFragment : BaseFragment<FragmentOrdersBinding>(FragmentOrdersBinding
     private val viewModel: OrderViewModel by viewModels()
     private lateinit var orderListAdapter: OrderListAdapter
 
+    @Inject
+    lateinit var errorMapper: ErrorMapper
+
+    @Inject
+    lateinit var injectedUiErrorMapper: UiErrorMapper
+
+    // --- BaseFragment Implementasyonu ---
+    override val uiErrorMapper: UiErrorMapper by lazy { injectedUiErrorMapper }
+
+    override fun onRetry() {
+        orderListAdapter.retry()
+    }
+    // ------------------------------------
+
+    // ViewStub'lar inflate edildikten sonra binding'lerini tutmak için.
+    private var emptyBinding: LayoutStateEmptyBinding? = null
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         setupRecyclerView()
         observeOrderFlow()
         observeLoadState()
-
-        // DEĞİŞTİ: Artık ViewModel'e userId göndermemize gerek yok.
-        // ViewModel, oluşturulduğu anda doğru kullanıcı için veri akışını
-        // kendi kendine başlatır. Fragment'ın bu detayı bilmesine gerek kalmadı.
-        // viewModel.onUserIdSet("6") satırı ve tüm ilgili yorumlar kaldırıldı.
     }
 
     private fun setupRecyclerView() {
@@ -43,16 +59,13 @@ class OrdersFragment : BaseFragment<FragmentOrdersBinding>(FragmentOrdersBinding
             findNavController().navigate(action)
         }
 
-        binding.orderRecyclerView.apply {
-            // Paging 3'ün LoadState'lerini göstermek için bir footer adaptörü eklemek
-            // kullanıcı deneyimini iyileştirir (örn: sayfa yükleniyor spinner'ı).
+        binding.contentView.apply {
             adapter = orderListAdapter.withLoadStateFooter(
                 footer = PagingLoadStateAdapter { orderListAdapter.retry() }
             )
             layoutManager = LinearLayoutManager(requireContext())
         }
     }
-
 
     private fun observeOrderFlow() {
         viewLifecycleOwner.lifecycleScope.launch {
@@ -68,31 +81,37 @@ class OrdersFragment : BaseFragment<FragmentOrdersBinding>(FragmentOrdersBinding
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 orderListAdapter.loadStateFlow.collectLatest { loadStates ->
-                    // Yüklenme durumunu sadece ilk yükleme (refresh) için yönetiyoruz.
-                    binding.progressbar.isVisible = loadStates.refresh is LoadState.Loading
+                    val refreshState = loadStates.refresh
+                    val isListEmpty = orderListAdapter.itemCount == 0
 
-                    // Hata durumunu yönet
-                    val errorState = loadStates.refresh as? LoadState.Error
-                        ?: loadStates.append as? LoadState.Error
-                        ?: loadStates.prepend as? LoadState.Error
+                    // Durumları belirle
+                    val isLoading = refreshState is LoadState.Loading && isListEmpty
+                    val isError = refreshState is LoadState.Error && isListEmpty
+                    val isTrulyEmpty = refreshState is LoadState.NotLoading && isListEmpty
 
-                    errorState?.let {
-                        Toast.makeText(
-                            requireContext(),
-                            "Hata: ${it.error.localizedMessage}",
-                            Toast.LENGTH_LONG
-                        ).show()
+                    // Görünürlükleri yönet
+                    binding.viewLoadingStub.isVisible = isLoading
+                    binding.contentView.isVisible = !isLoading && !isError
+
+                    // Hata durumunu işle
+                    if (isError) {
+                        val appException = errorMapper.map((refreshState as LoadState.Error).error)
+                        handleErrorState(binding.viewErrorStub, appException)
+                    } else {
+                        hideErrorState()
                     }
 
-                    // Boş durumunu yönet (Listenin ilk yüklemesi bittiğinde ve liste boşsa)
-                    val isListEmpty =
-                        loadStates.refresh is LoadState.NotLoading && orderListAdapter.itemCount == 0
-                    binding.txtEmptyOrders.isVisible = isListEmpty
-                    if (isListEmpty) {
-                        binding.txtEmptyOrders.text = "Henüz verilmiş bir siparişiniz bulunmuyor."
+                    // Boş durumunu işle
+                    if (isTrulyEmpty) {
+                        if (emptyBinding == null) {
+                            emptyBinding =
+                                LayoutStateEmptyBinding.bind(binding.viewEmptyStub.inflate())
+                        }
+                        emptyBinding?.root?.isVisible = true
+                        emptyBinding?.txtEmptyTitle?.setText(R.string.empty_orders_title)
+                        emptyBinding?.txtEmptySubtitle?.setText(R.string.empty_orders_subtitle)
                     } else {
-                        // Eğer liste doluysa, hata mesajı yerine boş metin göster.
-                        binding.txtEmptyOrders.isVisible = false
+                        emptyBinding?.root?.isVisible = false
                     }
                 }
             }
