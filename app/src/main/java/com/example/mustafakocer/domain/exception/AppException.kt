@@ -1,79 +1,73 @@
 package com.example.mustafakocer.domain.exception
 
 /**
- * Uygulama içindeki tüm özel istisnalar için tip-güvenli bir hiyerarşi tanımlar.
- * Bu sınıf, standart 'Exception' sınıfını genişletir ve 'message' özelliğini override eder.
+ * The single source of truth for all handled exceptions in the application.
  *
- * MİMARİ NOT: Bu sealed class, tüm katmanlarda hata yönetimi için tek ve iyi tanımlanmış
- * bir sözleşme oluşturur. Kullanıcıya hangi mesajın gösterileceğini değil, teknik olarak
- * *neyin* yanlış gittiğini temsil eder. Bu istisnaları kullanıcı dostu mesajlara
- * çevirmek UI katmanının sorumluluğundadır.
+ * This sealed class provides a type-safe hierarchy for all predictable errors,
+ * ensuring that different layers can communicate errors in a structured way without
+ * depending on specific implementation details of other layers.
+ *
+ * It represents WHAT went wrong, not HOW it should be displayed to the user.
  */
 sealed class AppException(
-    override val message: String?,
+    val developerMessage: String,
     override val cause: Throwable? = null,
-) : Exception(message, cause) {
+) : Exception(developerMessage, cause) {
 
     /**
-     * İnternet bağlantısı, zaman aşımı gibi altyapısal ağ sorunlarını temsil eder.
-     */
-    sealed class Network(message: String?, cause: Throwable? = null) :
-        AppException(message, cause) {
-        data class NoInternet(override val cause: Throwable? = null) :
-            Network("İnternet bağlantısı yok", cause)
 
-        data class Timeout(override val cause: Throwable? = null) :
-            Network("İstek zaman aşımına uğradı", cause)
+     * Represents errors originating from network infrastructure issues (e.g., no connectivity, timeouts).
+     */
+    sealed class Network(message: String, cause: Throwable? = null) : AppException(message, cause) {
+        data class NoInternet(override val cause: Throwable?) :
+            Network("No internet connection available.", cause)
+
+        data class Timeout(override val cause: Throwable?) :
+            Network("The request timed out.", cause)
     }
 
     /**
-     * Sunucunun HTTP yanıtlarından kaynaklanan hataları temsil eder.
+     * Represents errors originating from the server's HTTP responses (e.g., 4xx, 5xx codes).
      */
-    sealed class Api(val httpCode: Int, message: String?, cause: Throwable? = null) :
+    sealed class Server(val code: Int, message: String, cause: Throwable? = null) :
         AppException(message, cause) {
-        data class Unauthorized(override val cause: Throwable? = null) : Api(401, "Yetkisiz", cause)
-        data class NotFound(override val cause: Throwable? = null) : Api(404, "Bulunamadı", cause)
-        data class ServerError(val code: Int, override val cause: Throwable? = null) :
-            Api(code, "Sunucu Hatası", cause)
+        data class Unauthorized(override val cause: Throwable?) :
+            Server(401, "Unauthorized access. Token might be invalid or expired.", cause)
 
-        data class HttpError(
-            val code: Int,
-            override val message: String?,
-            override val cause: Throwable? = null,
-        ) : Api(code, message, cause)
+        data class NotFound(override val cause: Throwable?) :
+            Server(404, "The requested resource was not found.", cause)
+
+        data class ServiceUnavailable(override val cause: Throwable?) :
+            Server(503, "The service is temporarily unavailable.", cause)
+
+        data class Unexpected(val httpCode: Int, override val cause: Throwable?) :
+            Server(httpCode, "An unexpected HTTP error occurred: $httpCode", cause)
     }
 
     /**
-     * Veri işleme sırasında oluşan hataları temsil eder (örn: JSON parse hatası, boş yanıt).
+     * Represents errors that occur during data processing (e.g., parsing JSON, database issues).
      */
     sealed class Data(message: String, cause: Throwable? = null) : AppException(message, cause) {
-        data object EmptyResponse : Data("Sunucudan boş yanıt alındı", null)
-        data class Parse(override val cause: Throwable?) : Data("Veri ayrıştırma hatası", cause)
+        data class Parsing(override val cause: Throwable?) :
+            Data("Failed to parse data.", cause)
 
-        /**
-         * İş kurallarına uymayan girdiler (input) için kullanılır.
-         * Örn: Boş e-posta, geçersiz şifre formatı.
-         */
-        data class ValidationError(val validationMessage: String) : Data(validationMessage, null)
+        data class EmptyResponse(override val cause: Throwable? = null) :
+            Data("The response from the server was empty.", cause)
+
+        // YENİ: Kullanıcı girdisiyle ilgili hataları temsil eder.
+        data class InputError(val reason: String) : Data(reason, null)
     }
 
     /**
-     * Yukarıdaki kategorilere girmeyen, beklenmedik tüm hatalar için kullanılır.
+     * Represents errors related to the user's session state before a network call is made.
      */
-    data class Unknown(override val cause: Throwable? = null) :
-        AppException("Bilinmeyen bir hata oluştu", cause)
-
-    data class Firebase(
-        override val message: String?,
-        override val cause: Throwable? = null,
-    ) : AppException(message, cause)
-
-    sealed class Session(message: String, cause: Throwable? = null) :
-        AppException(message, cause) {
-
-        data class CorruptedSession(override val cause: Throwable? = null) :
-            Session("Oturum verisi bozuk veya okunamıyor.", cause)
-
+    sealed class Session(message: String, cause: Throwable? = null) : AppException(message, cause) {
         data class MissingSessionData(val reason: String) : Session(reason, null)
     }
+
+    /**
+     * A catch-all for any unexpected exceptions that are not explicitly handled.
+     */
+    data class Unknown(override val cause: Throwable?) :
+        AppException("An unknown error occurred.", cause)
 }
