@@ -16,6 +16,7 @@ class CartViewHolder(
     // O anki ViewHolder'ın bağlandığı CartItem'ı tutacak bir değişken.
     // Tıklama anında doğru ID'ye erişmek için kullanacağız.
     private var currentCartItem: CartItem? = null
+    private val displayFormat = DecimalFormat("#,##0.00")
 
     init {
         // Tıklama dinleyicileri ViewHolder oluşturulurken SADECE BİR KEZ ayarlanır.
@@ -34,21 +35,27 @@ class CartViewHolder(
     }
 
     fun bind(cartItem: CartItem) {
-        // 1. Tıklama olaylarının doğru ID'yi kullanabilmesi için o anki item'ı sakla.
         this.currentCartItem = cartItem
-
-        // 2. UI bileşenlerini veriye göre güncelle.
         val product = cartItem.product
-        val priceFormat = DecimalFormat("$#,##0.00")
 
         binding.apply {
             txtTitle.text = product.title
             txtQuantity.text = cartItem.quantity.toString()
-            txtPricePerUnit.text = "${product.discountedPrice} / adet"
 
-            val priceAsDouble = product.discountedPrice.replace("$", "").replace(",", "").toDoubleOrNull() ?: 0.0
+            // 1. Mapper'dan gelen güvenli String'i Double'a çevir.
+            // Bu, hesaplama için kullanılacak ham değerdir.
+            val priceAsDouble = product.discountedPrice
+                .replace("$", "")
+                .toDoubleOrNull() ?: 0.0
+
+            // 2. DÜZELTME: Birim fiyatı, kullanıcıya göstermek için formatla.
+            // Örnek: 8.94 -> "₺8,94"
+            val formattedPricePerUnit = "₺${displayFormat.format(priceAsDouble)}"
+            txtPricePerUnit.text = "$formattedPricePerUnit / adet"
+
+            // 3. Satır toplamını hesapla ve onu da gösterim için formatla.
             val lineTotal = priceAsDouble * cartItem.quantity
-            txtLineTotal.text = priceFormat.format(lineTotal)
+            txtLineTotal.text = "₺${displayFormat.format(lineTotal)}"
 
             Glide.with(root.context)
                 .load(product.thumbnailUrl)

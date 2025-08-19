@@ -46,14 +46,11 @@ class CartViewModel @Inject constructor(
     }
 
     private fun observeCart() {
-        // UseCase artık parametre almıyor.
         getCartItemsUseCase().onEach { resource ->
             _cartState.value = resource
             if (resource is Resource.Success) {
                 calculateTotalPrice(resource.data)
             } else if (resource is Resource.Error) {
-                // Eğer sepeti alırken bir hata oluşursa (örn: oturum kapalı),
-                // toplam fiyatı sıfırla.
                 _totalPrice.value = "$0.00"
             }
         }.launchIn(viewModelScope)
@@ -87,15 +84,18 @@ class CartViewModel @Inject constructor(
         }
     }
 
+
     private fun calculateTotalPrice(items: List<CartItem>) {
         val total = items.sumOf {
-            val priceAsString = it.product.discountedPrice
-                .replace("$", "")
-                .replace(",", "")
+            // DÜZELTME: Mapper'da formatladığımız String'i,
+            // yine aynı güvenli yöntemle Double'a geri çeviriyoruz.
+            val priceAsString = it.product.discountedPrice.replace("$", "")
             val priceAsDouble = priceAsString.toDoubleOrNull() ?: 0.0
             priceAsDouble * it.quantity
         }
-        val priceFormat = DecimalFormat("$#,##0.00")
-        _totalPrice.value = priceFormat.format(total)
+
+        // Gösterim formatı, cihazın diline uygun olabilir, bu sorun değil.
+        val displayFormat = DecimalFormat("₺#,##0.00")
+        _totalPrice.value = displayFormat.format(total)
     }
 }
