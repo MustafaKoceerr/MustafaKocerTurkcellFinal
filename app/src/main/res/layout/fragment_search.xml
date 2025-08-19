@@ -59,7 +59,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:visibility="gone" />
 
-    <!-- 4. Boş Durumu (Merkezde, içeriğin üstünde) -->
+    <!-- 4. Boş Durumu (Merkezde, içeriğin üstünde)
+     Arama yapıldı ancak sonuç bulunamadı. -->
     <ViewStub
         android:id="@+id/viewEmptyStub"
         android:layout="@layout/layout_state_empty"
@@ -71,7 +72,17 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:visibility="gone" />
 
-    <!-- Not: Idle (boşta) durumu için ayrı bir layout'a gerek yok.
-         Boş durumunu (viewEmpty) başlangıçta gösterebiliriz. -->
+    <!-- 5. Giriş Durumu
+     Arama yapılmadı query < 3 durumunda-->
+
+    <ViewStub
+        android:id="@+id/viewIdleStub"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout="@layout/layout_state_idle_search"
+        app:layout_constraintTop_toBottomOf="@id/searchView"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

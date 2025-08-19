@@ -2,6 +2,7 @@ package com.example.mustafakocer.presentation.feature_product_search
 
 import android.os.Bundle
 import android.view.View
+import android.widget.EditText
 import androidx.appcompat.widget.SearchView
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
@@ -9,13 +10,11 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
-import androidx.paging.LoadState
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.mustafakocer.R
 import com.example.mustafakocer.databinding.FragmentSearchBinding
 import com.example.mustafakocer.databinding.LayoutStateEmptyBinding
-import com.example.mustafakocer.domain.mapper.ErrorMapper
-import com.example.mustafakocer.domain.usecase.SearchProductsUseCase
+import com.example.mustafakocer.databinding.LayoutStateIdleSearchBinding
 import com.example.mustafakocer.presentation.base.BaseFragment
 import com.example.mustafakocer.presentation.common.PagingLoadStateAdapter
 import com.example.mustafakocer.presentation.common.ProductListAdapter
@@ -23,6 +22,8 @@ import com.example.mustafakocer.presentation.common.UiErrorMapper
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -34,35 +35,24 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>(FragmentSearchBinding
     private lateinit var productListAdapter: ProductListAdapter
 
     @Inject
-    lateinit var errorMapper: ErrorMapper
-
-    @Inject
     lateinit var injectedUiErrorMapper: UiErrorMapper
-
-    // --- BaseFragment Implementasyonu ---
     override val uiErrorMapper: UiErrorMapper by lazy { injectedUiErrorMapper }
-
-    override fun onRetry() {
-        productListAdapter.retry()
-    }
-    // ------------------------------------
+    override fun onRetry() { productListAdapter.retry() }
 
     // ViewStub'lar inflate edildikten sonra binding'lerini tutmak için.
     private var emptyBinding: LayoutStateEmptyBinding? = null
+    private var idleBinding: LayoutStateIdleSearchBinding? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         setupRecyclerView()
         setupSearchView()
-        observeProductPagingFlow()
-        observeLoadState()
+        observeViewModel()
     }
 
     private fun setupRecyclerView() {
         productListAdapter = ProductListAdapter { productId ->
-            val action =
-                SearchFragmentDirections.actionSearchFragmentToProductDetailFragment(productId)
+            val action = SearchFragmentDirections.actionSearchFragmentToProductDetailFragment(productId)
             findNavController().navigate(action)
         }
         binding.contentView.apply {
@@ -79,71 +69,80 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>(FragmentSearchBinding
                 binding.searchView.clearFocus()
                 return true
             }
-
             override fun onQueryTextChange(newText: String?): Boolean {
                 viewModel.onSearchQueryChanged(newText.orEmpty())
                 return true
             }
         })
+        val searchEditText = binding.searchView.findViewById<EditText>(androidx.appcompat.R.id.search_src_text)
+        searchEditText.background = null
     }
 
-    private fun observeProductPagingFlow() {
+    private fun observeViewModel() {
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.products.collectLatest { pagingData ->
-                    productListAdapter.submitData(pagingData)
+                // 1. Paging verisini her zaman adaptöre gönder.
+                // distinctUntilChanged, aynı PagingData'nın tekrar tekrar gönderilmesini engeller.
+                launch {
+                    viewModel.uiState
+                        .map { it.screenState }
+                        .distinctUntilChanged()
+                        .collectLatest { screenState ->
+                            if (screenState is ScreenState.Content) {
+                                productListAdapter.submitData(screenState.products)
+                            }
+                        }
+                }
+
+                // 2. Paging'in yükleme durumlarını ViewModel'e bildir.
+                launch {
+                    productListAdapter.loadStateFlow.collect { loadStates ->
+                        viewModel.onPagingLoadStateChanged(loadStates, productListAdapter.itemCount)
+                    }
+                }
+
+                // 3. ViewModel'den gelen TEK UiState'i dinle ve EKRANI ÇİZ.
+                launch {
+                    viewModel.uiState.collect { state ->
+                        render(state)
+                    }
                 }
             }
         }
     }
 
-    private fun observeLoadState() {
-        viewLifecycleOwner.lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                productListAdapter.loadStateFlow.collectLatest { loadStates ->
-                    val refreshState = loadStates.refresh
-                    val query = viewModel.searchQuery.value
-                    val isListEmpty = productListAdapter.itemCount == 0
+    private fun render(state: SearchUiState) {
+        // Tüm view'ları başlangıçta gizle
+        binding.contentView.isVisible = false
+        binding.viewLoadingStub.isVisible = false
+        hideErrorState()
+        idleBinding?.root?.isVisible = false
+        emptyBinding?.root?.isVisible = false
 
-                    // Durumları belirle
-                    val isIdle = query.length < SearchProductsUseCase.MIN_QUERY_LENGTH
-                    val isLoading = refreshState is LoadState.Loading && isListEmpty
-                    val isError = refreshState is LoadState.Error && isListEmpty
-                    val isTrulyEmpty =
-                        refreshState is LoadState.NotLoading && isListEmpty && !isIdle
-
-                    // Görünürlükleri yönet
-                    binding.viewLoadingStub.isVisible = isLoading
-                    binding.contentView.isVisible = !isLoading && !isError
-
-                    // Hata durumunu işle
-                    if (isError) {
-                        val appException = errorMapper.map((refreshState as LoadState.Error).error)
-                        handleErrorState(binding.viewErrorStub, appException)
-                    } else {
-                        hideErrorState()
-                    }
-
-                    // Boş veya Boşta durumunu işle
-                    val showEmptyOrIdle = isIdle || isTrulyEmpty
-                    if (showEmptyOrIdle) {
-                        if (emptyBinding == null) {
-                            emptyBinding =
-                                LayoutStateEmptyBinding.bind(binding.viewEmptyStub.inflate())
-                        }
-                        emptyBinding?.root?.isVisible = true
-                        if (isIdle) {
-                            emptyBinding?.txtEmptyTitle?.setText(R.string.search_idle_title)
-                            emptyBinding?.txtEmptySubtitle?.setText(R.string.search_idle_subtitle)
-                        } else { // isTrulyEmpty
-                            emptyBinding?.txtEmptyTitle?.setText(R.string.search_empty_title)
-                            emptyBinding?.txtEmptySubtitle?.text =
-                                getString(R.string.search_empty_subtitle, query)
-                        }
-                    } else {
-                        emptyBinding?.root?.isVisible = false
-                    }
+        // Doğru durumu göster
+        when (val screenState = state.screenState) {
+            is ScreenState.Idle -> {
+                if (idleBinding == null) {
+                    idleBinding = LayoutStateIdleSearchBinding.bind(binding.viewIdleStub.inflate())
                 }
+                idleBinding?.root?.isVisible = true
+            }
+            is ScreenState.Loading -> {
+                binding.viewLoadingStub.isVisible = true
+            }
+            is ScreenState.Error -> {
+                handleErrorState(binding.viewErrorStub, screenState.exception)
+            }
+            is ScreenState.Empty -> {
+                if (emptyBinding == null) {
+                    emptyBinding = LayoutStateEmptyBinding.bind(binding.viewEmptyStub.inflate())
+                }
+                emptyBinding?.root?.isVisible = true
+                emptyBinding?.txtEmptyTitle?.setText(R.string.search_empty_title)
+                emptyBinding?.txtEmptySubtitle?.text = getString(R.string.search_empty_subtitle, state.searchQuery)
+            }
+            is ScreenState.Content -> {
+                binding.contentView.isVisible = true
             }
         }
     }
