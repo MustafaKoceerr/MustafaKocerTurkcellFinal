@@ -7,178 +7,71 @@
     android:background="?attr/colorSurface"
     tools:context=".presentation.feature_product_search.SearchFragment">
 
-    <!-- Arama alanı ve filtreler, durumdan bağımsız olarak her zaman görünür kalır -->
+    <!-- Arama alanı her zaman görünür -->
     <androidx.appcompat.widget.SearchView
         android:id="@+id/searchView"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/search_content_margin"
-        android:layout_marginTop="@dimen/search_content_margin_top"
-        android:layout_marginEnd="@dimen/search_content_margin"
+        android:layout_margin="16dp"
         android:background="@drawable/bg_search_view"
-        android:focusable="true"
-        android:iconifiedByDefault="false"
-        android:imeOptions="actionSearch"
-        android:inputType="text"
-        android:paddingStart="@dimen/search_field_inner_padding_h"
-        android:paddingEnd="@dimen/search_field_inner_padding_h"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        app:queryHint="@string/search_hint"
+        app:iconifiedByDefault="false"
         app:layout_constraintTop_toTopOf="parent"
-        app:queryHint="@string/search_hint" />
-
-    <HorizontalScrollView
-        android:id="@+id/filtersScroll"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/search_content_margin"
-        android:layout_marginTop="@dimen/search_filters_margin_top"
-        android:layout_marginEnd="@dimen/search_content_margin"
-        android:overScrollMode="never"
-        android:scrollbars="none"
-        android:visibility="gone"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/searchView"
-        tools:visibility="visible">
-        <!-- Filtre ChipGroup'u buraya gelecek -->
-    </HorizontalScrollView>
+        app:layout_constraintEnd_toEndOf="parent" />
 
-
-    <!-- =================================================================== -->
-    <!-- ======================= STATE SWITCHER ============================ -->
-    <!-- Tüm UI durumları bu ViewAnimator içinde yönetilir.                -->
-    <!-- Bu, manuel visibility yönetimini ve kırpışmayı ortadan kaldırır. -->
-    <!-- =================================================================== -->
-    <ViewAnimator
-        android:id="@+id/stateSwitcher"
+    <!-- 1. Ana İçerik: RecyclerView -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/contentView"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginTop="@dimen/search_results_padding_top"
-        app:layout_constraintTop_toBottomOf="@id/filtersScroll"
+        android:layout_marginTop="16dp"
+        android:clipToPadding="false"
+        android:paddingHorizontal="8dp"
+        app:layout_constraintTop_toBottomOf="@id/searchView"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        app:layout_constraintEnd_toEndOf="parent"
+        tools:listitem="@layout/recyler_row_product_grid" />
 
-        <!-- CHILD 0: IDLE (Boşta Durumu) -->
-        <LinearLayout
-            android:id="@+id/stateIdleGroup"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:gravity="center"
-            android:orientation="vertical"
-            android:padding="@dimen/state_padding">
-            <!-- Eski stateIdleGroup içeriğini buraya taşıdık -->
-            <ImageView
-                android:layout_width="72dp"
-                android:layout_height="72dp"
-                android:alpha="0.12"
-                android:contentDescription="@null"
-                android:src="@drawable/ic_search_24"
-                app:tint="?attr/colorOnSurface" />
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/state_subtitle_top"
-                android:text="@string/search_idle_message"
-                android:textAppearance="?attr/textAppearanceBodyMedium"
-                android:textColor="?attr/colorOnSurfaceVariant" />
-        </LinearLayout>
-
-        <!-- CHILD 1: CONTENT (İçerik) -->
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/searchRecyclerView"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:clipToPadding="false"
-            android:paddingStart="@dimen/home_content_margin"
-            android:paddingEnd="@dimen/home_content_margin"
-            android:paddingBottom="@dimen/search_results_padding_bottom"
-            tools:listitem="@layout/recyler_row_product_grid" />
-
-        <!-- CHILD 2: EMPTY (Boş Sonuç) -->
-        <LinearLayout
-            android:id="@+id/stateEmptyGroup"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:gravity="center"
-            android:orientation="vertical"
-            android:padding="@dimen/state_padding">
-            <!-- Eski stateEmptyGroup içeriğini buraya taşıdık -->
-            <ImageView
-                android:layout_width="72dp"
-                android:layout_height="72dp"
-                android:alpha="0.12"
-                android:contentDescription="@null"
-                android:src="@drawable/ic_search_off_24"
-                app:tint="?attr/colorOnSurface" />
-            <TextView
-                android:id="@+id/txtEmptyTitle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/search_empty_title"
-                android:textAppearance="?attr/textAppearanceTitleMedium" />
-            <TextView
-                android:id="@+id/txtEmptySubtitle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/state_subtitle_top"
-                android:textAppearance="?attr/textAppearanceBodyMedium"
-                android:textColor="?attr/colorOnSurfaceVariant"
-                tools:text="Aranan: 'imkansız bir ürün'" />
-        </LinearLayout>
-
-        <!-- CHILD 3: ERROR (Hata) -->
-        <LinearLayout
-            android:id="@+id/stateErrorGroup"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:gravity="center"
-            android:orientation="vertical"
-            android:padding="@dimen/state_padding">
-            <!-- Eski stateErrorGroup içeriğini buraya taşıdık -->
-            <TextView
-                android:id="@+id/txtErrorTitle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/search_error_title"
-                android:textAppearance="?attr/textAppearanceTitleMedium" />
-            <Button
-                android:id="@+id/btnRetry"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/state_action_top"
-                android:text="@string/action_retry" />
-        </LinearLayout>
-
-        <!-- CHILD 4: LOADING (Yükleniyor) -->
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-            <!-- ProgressBar'ı ortalamak için FrameLayout kullandık -->
-            <com.google.android.material.progressindicator.CircularProgressIndicator
-                android:id="@+id/progressbar"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:indeterminate="true" />
-        </FrameLayout>
-
-    </ViewAnimator>
-
-
-    <!-- FAB, ViewAnimator'ın dışında kalmalı ki her zaman diğerlerinin üstünde olsun -->
-    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
-        android:id="@+id/fabScrollTop"
+    <!-- 2. Yüklenme Durumu (Merkezde, içeriğin üstünde) -->
+    <ViewStub
+        android:id="@+id/viewLoadingStub"
+        android:layout="@layout/layout_state_loading"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/fab_margin"
-        android:contentDescription="@string/cd_scroll_to_top"
-        android:text="@string/action_scroll_to_top"
-        android:visibility="gone"
-        app:icon="@drawable/ic_arrow_upward_24"
+        app:layout_constraintTop_toBottomOf="@id/searchView"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        tools:visibility="visible" />
+        android:visibility="gone"
+        tools:visibility="visible"/>
+
+    <!-- 3. Hata Durumu (Merkezde, içeriğin üstünde) -->
+    <ViewStub
+        android:id="@+id/viewErrorStub"
+        android:layout="@layout/layout_state_error"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/searchView"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:visibility="gone" />
+
+    <!-- 4. Boş Durumu (Merkezde, içeriğin üstünde) -->
+    <ViewStub
+        android:id="@+id/viewEmptyStub"
+        android:layout="@layout/layout_state_empty"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/searchView"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:visibility="gone" />
+
+    <!-- Not: Idle (boşta) durumu için ayrı bir layout'a gerek yok.
+         Boş durumunu (viewEmpty) başlangıçta gösterebiliriz. -->
 
 </androidx.constraintlayout.widget.ConstraintLayout>

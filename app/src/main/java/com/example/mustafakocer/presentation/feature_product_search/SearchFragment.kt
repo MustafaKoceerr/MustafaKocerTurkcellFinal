@@ -2,7 +2,6 @@ package com.example.mustafakocer.presentation.feature_product_search
 
 import android.os.Bundle
 import android.view.View
-import android.view.animation.AnimationUtils
 import androidx.appcompat.widget.SearchView
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
@@ -12,65 +11,69 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.paging.LoadState
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.SimpleItemAnimator
 import com.example.mustafakocer.R
 import com.example.mustafakocer.databinding.FragmentSearchBinding
+import com.example.mustafakocer.databinding.LayoutStateEmptyBinding
+import com.example.mustafakocer.domain.mapper.ErrorMapper
 import com.example.mustafakocer.domain.usecase.SearchProductsUseCase
 import com.example.mustafakocer.presentation.base.BaseFragment
+import com.example.mustafakocer.presentation.common.PagingLoadStateAdapter
 import com.example.mustafakocer.presentation.common.ProductListAdapter
+import com.example.mustafakocer.presentation.common.UiErrorMapper
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @AndroidEntryPoint
 class SearchFragment : BaseFragment<FragmentSearchBinding>(FragmentSearchBinding::inflate) {
+
     private val viewModel: SearchViewModel by viewModels()
     private lateinit var productListAdapter: ProductListAdapter
 
-    // ViewAnimator'daki çocukların pozisyonlarını sabit olarak tanımlamak kodu çok okunaklı yapar.
-    private companion object {
-        private const val CHILD_IDLE = 0
-        private const val CHILD_CONTENT = 1
-        private const val CHILD_EMPTY = 2
-        private const val CHILD_ERROR = 3
-        private const val CHILD_LOADING = 4
+    @Inject
+    lateinit var errorMapper: ErrorMapper
+
+    @Inject
+    lateinit var injectedUiErrorMapper: UiErrorMapper
+
+    // --- BaseFragment Implementasyonu ---
+    override val uiErrorMapper: UiErrorMapper by lazy { injectedUiErrorMapper }
+
+    override fun onRetry() {
+        productListAdapter.retry()
     }
+    // ------------------------------------
+
+    // ViewStub'lar inflate edildikten sonra binding'lerini tutmak için.
+    private var emptyBinding: LayoutStateEmptyBinding? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         setupRecyclerView()
         setupSearchView()
-        setupStateSwitcherAnimation() // Bonus: Geçiş animasyonu
-        observeSearchResults()
-        observeUiState() // Tek ve birleşik UI state yöneticisi
+        observeProductPagingFlow()
+        observeLoadState()
     }
 
     private fun setupRecyclerView() {
         productListAdapter = ProductListAdapter { productId ->
-            val action = SearchFragmentDirections
-                .actionSearchFragmentToProductDetailFragment(productId)
+            val action =
+                SearchFragmentDirections.actionSearchFragmentToProductDetailFragment(productId)
             findNavController().navigate(action)
         }
-
-        binding.searchRecyclerView.apply {
-            adapter = productListAdapter
+        binding.contentView.apply {
+            adapter = productListAdapter.withLoadStateFooter(
+                footer = PagingLoadStateAdapter { productListAdapter.retry() }
+            )
             layoutManager = GridLayoutManager(requireContext(), 2)
-            // Optimizasyonlar:
-            setHasFixedSize(true)
-            (itemAnimator as? SimpleItemAnimator)?.supportsChangeAnimations = false
         }
-        // Konfigürasyon değişikliklerinde scroll pozisyonunu korumaya yardımcı olur.
-        productListAdapter.stateRestorationPolicy =
-            RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
     }
 
     private fun setupSearchView() {
-        binding.searchView.setOnClickListener { binding.searchView.isIconified = false }
-
         binding.searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
                 binding.searchView.clearFocus()
@@ -82,20 +85,9 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>(FragmentSearchBinding
                 return true
             }
         })
-
-        // Retry butonu artık stateErrorGroup içinde, ID'si aynı olduğu için binding çalışır.
-        binding.btnRetry.setOnClickListener { productListAdapter.retry() }
     }
 
-    private fun setupStateSwitcherAnimation() {
-        // Bonus: ViewAnimator'a yumuşak bir geçiş animasyonu ekleyelim.
-        val fadeIn = AnimationUtils.loadAnimation(requireContext(), android.R.anim.fade_in)
-        val fadeOut = AnimationUtils.loadAnimation(requireContext(), android.R.anim.fade_out)
-        binding.stateSwitcher.inAnimation = fadeIn
-        binding.stateSwitcher.outAnimation = fadeOut
-    }
-
-    private fun observeSearchResults() {
+    private fun observeProductPagingFlow() {
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.products.collectLatest { pagingData ->
@@ -105,48 +97,51 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>(FragmentSearchBinding
         }
     }
 
-    // ESKİ observeLoadState VE observeSearchQuery METOTLARI GİTTİ.
-    // YERİNE BU TEMİZ VE TEK METOT GELDİ:
-    private fun observeUiState() {
+    private fun observeLoadState() {
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                productListAdapter.loadStateFlow.collectLatest { states ->
+                productListAdapter.loadStateFlow.collectLatest { loadStates ->
+                    val refreshState = loadStates.refresh
                     val query = viewModel.searchQuery.value
-                    val isQueryShort = query.length < SearchProductsUseCase.MIN_QUERY_LENGTH
-                    val hasItems = productListAdapter.itemCount > 0
+                    val isListEmpty = productListAdapter.itemCount == 0
 
-                    val refreshState = states.refresh
+                    // Durumları belirle
+                    val isIdle = query.length < SearchProductsUseCase.MIN_QUERY_LENGTH
+                    val isLoading = refreshState is LoadState.Loading && isListEmpty
+                    val isError = refreshState is LoadState.Error && isListEmpty
+                    val isTrulyEmpty =
+                        refreshState is LoadState.NotLoading && isListEmpty && !isIdle
 
-                    // Sadece ilk yükleme anında (liste boşken) LOADING durumunu göster.
-                    val isFirstLoad = refreshState is LoadState.Loading && !hasItems
+                    // Görünürlükleri yönet
+                    binding.viewLoadingStub.isVisible = isLoading
+                    binding.contentView.isVisible = !isLoading && !isError
 
-                    // Sadece liste boşken hata durumunu göster.
-                    val isError = refreshState is LoadState.Error && !hasItems
-
-                    // Arama bittiğinde ve hiç sonuç yoksa EMPTY durumunu göster.
-                    val isEmpty = !isQueryShort &&
-                            (refreshState is LoadState.NotLoading) &&
-                            states.append.endOfPaginationReached &&
-                            !hasItems
-
-                    // Tek bir `when` bloğu ile doğru çocuğu seç.
-                    val childToDisplay = when {
-                        isQueryShort -> CHILD_IDLE
-                        isFirstLoad -> CHILD_LOADING
-                        isError -> CHILD_ERROR
-                        isEmpty -> CHILD_EMPTY
-                        else -> CHILD_CONTENT // Geriye kalan tüm durumlar içeriği gösterir.
+                    // Hata durumunu işle
+                    if (isError) {
+                        val appException = errorMapper.map((refreshState as LoadState.Error).error)
+                        handleErrorState(binding.viewErrorStub, appException)
+                    } else {
+                        hideErrorState()
                     }
 
-                    // Sadece gerekliyse `displayedChild`'ı güncelle. Bu küçük bir optimizasyondur.
-                    if (binding.stateSwitcher.displayedChild != childToDisplay) {
-                        binding.stateSwitcher.displayedChild = childToDisplay
-                    }
-
-                    // Eğer boş ekran gösteriliyorsa, aranan kelimeyi de yazdır.
-                    if (childToDisplay == CHILD_EMPTY) {
-                        binding.txtEmptySubtitle.text =
-                            getString(R.string.search_empty_subtitle, query)
+                    // Boş veya Boşta durumunu işle
+                    val showEmptyOrIdle = isIdle || isTrulyEmpty
+                    if (showEmptyOrIdle) {
+                        if (emptyBinding == null) {
+                            emptyBinding =
+                                LayoutStateEmptyBinding.bind(binding.viewEmptyStub.inflate())
+                        }
+                        emptyBinding?.root?.isVisible = true
+                        if (isIdle) {
+                            emptyBinding?.txtEmptyTitle?.setText(R.string.search_idle_title)
+                            emptyBinding?.txtEmptySubtitle?.setText(R.string.search_idle_subtitle)
+                        } else { // isTrulyEmpty
+                            emptyBinding?.txtEmptyTitle?.setText(R.string.search_empty_title)
+                            emptyBinding?.txtEmptySubtitle?.text =
+                                getString(R.string.search_empty_subtitle, query)
+                        }
+                    } else {
+                        emptyBinding?.root?.isVisible = false
                     }
                 }
             }
