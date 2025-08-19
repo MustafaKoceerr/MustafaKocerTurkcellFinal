@@ -24,4 +24,7 @@ interface ProductRepository {
     fun getSingleProduct(productId: Int): Flow<Resource<Product>>
 
     fun getProductDetail(productId: Int): Flow<Resource<ProductDetail>>
+
+    suspend fun getProduct(productId: Int): Product
+
 }
