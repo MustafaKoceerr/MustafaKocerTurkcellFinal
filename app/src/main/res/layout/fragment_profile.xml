@@ -1,7 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- ProfileFragment -->
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<?xml version="1.0" encoding="utf-8"?><!-- ProfileFragment -->
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -10,6 +8,7 @@
     tools:context=".presentation.feature_profile.ProfileFragment">
 
     <androidx.core.widget.NestedScrollView
+        android:id="@+id/contentView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:fillViewport="true">
@@ -19,8 +18,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:paddingStart="@dimen/profile_content_padding"
-            android:paddingEnd="@dimen/profile_content_padding"
             android:paddingTop="@dimen/profile_content_padding_top"
+            android:paddingEnd="@dimen/profile_content_padding"
             android:paddingBottom="@dimen/profile_content_padding_bottom">
 
             <!-- Profil resmi -->
@@ -31,8 +30,8 @@
                 android:layout_marginTop="@dimen/spacing_medium"
                 android:contentDescription="@string/cd_profile_image"
                 android:padding="@dimen/spacing_xsmall"
-                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.Full"
                 app:strokeColor="?attr/colorPrimary"
@@ -47,9 +46,9 @@
                 android:layout_marginTop="@dimen/spacing_medium"
                 android:textAppearance="@style/TextAppearance.Material3.HeadlineSmall"
                 android:textColor="?attr/colorOnSurface"
-                app:layout_constraintTop_toBottomOf="@id/imgProfile"
-                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/imgProfile"
                 tools:text="Mustafa Koçer" />
 
             <!-- Kullanıcı adı -->
@@ -60,9 +59,9 @@
                 android:layout_marginTop="@dimen/spacing_xsmall"
                 android:textAppearance="@style/TextAppearance.Material3.BodyLarge"
                 android:textColor="?attr/colorOnSurfaceVariant"
-                app:layout_constraintTop_toBottomOf="@id/txtFullName"
-                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/txtFullName"
                 tools:text="\@mustafakocer" />
 
             <!-- Fotoğrafı değiştir (YENİ: btnChangePhoto) -->
@@ -72,14 +71,14 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/spacing_small"
-                android:text="@string/profile_change_photo"
                 android:contentDescription="@string/cd_change_photo"
+                android:text="@string/profile_change_photo"
                 app:icon="@drawable/ic_camera_24"
-                app:iconPadding="@dimen/spacing_xsmall"
                 app:iconGravity="textStart"
-                app:layout_constraintTop_toBottomOf="@id/txtCurrentUsername"
+                app:iconPadding="@dimen/spacing_xsmall"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent" />
+                app:layout_constraintTop_toBottomOf="@id/txtCurrentUsername" />
 
             <!-- Ad -->
             <com.google.android.material.textfield.TextInputLayout
@@ -88,20 +87,20 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/spacing_large"
-                app:layout_constraintTop_toBottomOf="@id/btnChangePhoto"
-                app:layout_constraintStart_toStartOf="parent"
+                app:hintEnabled="true"
                 app:layout_constraintEnd_toStartOf="@id/inputLayoutLastName"
                 app:layout_constraintHorizontal_weight="1"
-                app:hintEnabled="true">
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/btnChangePhoto">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/editFirstName"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:autofillHints="givenName"
                     android:hint="@string/profile_first_name_hint"
-                    android:inputType="textPersonName"
                     android:imeOptions="actionNext"
-                    android:autofillHints="givenName" />
+                    android:inputType="textPersonName" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <!-- Soyad -->
@@ -111,20 +110,20 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/spacing_small"
-                app:layout_constraintTop_toTopOf="@id/inputLayoutFirstName"
-                app:layout_constraintStart_toEndOf="@id/inputLayoutFirstName"
+                app:hintEnabled="true"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_weight="1"
-                app:hintEnabled="true">
+                app:layout_constraintStart_toEndOf="@id/inputLayoutFirstName"
+                app:layout_constraintTop_toTopOf="@id/inputLayoutFirstName">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/editLastName"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:autofillHints="familyName"
                     android:hint="@string/profile_last_name_hint"
-                    android:inputType="textPersonName"
                     android:imeOptions="actionNext"
-                    android:autofillHints="familyName" />
+                    android:inputType="textPersonName" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <!-- E-posta -->
@@ -134,20 +133,20 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/spacing_small"
-                app:startIconDrawable="@drawable/ic_email_24"
-                app:layout_constraintTop_toBottomOf="@id/inputLayoutFirstName"
-                app:layout_constraintStart_toStartOf="parent"
+                app:hintEnabled="true"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:hintEnabled="true">
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/inputLayoutFirstName"
+                app:startIconDrawable="@drawable/ic_email_24">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/editEmail"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:autofillHints="emailAddress"
                     android:hint="@string/profile_username_hint"
-                    android:inputType="textEmailAddress"
                     android:imeOptions="actionNext"
-                    android:autofillHints="emailAddress" />
+                    android:inputType="textEmailAddress" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <!-- Telefon -->
@@ -157,20 +156,20 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/spacing_small"
-                app:startIconDrawable="@drawable/ic_phone_24"
-                app:layout_constraintTop_toBottomOf="@id/inputLayoutEmail"
-                app:layout_constraintStart_toStartOf="parent"
+                app:hintEnabled="true"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:hintEnabled="true">
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/inputLayoutEmail"
+                app:startIconDrawable="@drawable/ic_phone_24">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/editPhone"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:autofillHints="phoneNumber"
                     android:hint="@string/profile_phone_hint"
-                    android:inputType="phone"
                     android:imeOptions="actionNext"
-                    android:autofillHints="phoneNumber" />
+                    android:inputType="phone" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <!-- Yaş -->
@@ -180,20 +179,20 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/spacing_small"
-                app:startIconDrawable="@drawable/ic_age_24"
-                app:layout_constraintTop_toBottomOf="@id/inputLayoutPhone"
-                app:layout_constraintStart_toStartOf="parent"
+                app:hintEnabled="true"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:hintEnabled="true">
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/inputLayoutPhone"
+                app:startIconDrawable="@drawable/ic_age_24">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/editAge"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:autofillHints="age"
                     android:hint="@string/profile_age_hint"
-                    android:inputType="number"
                     android:imeOptions="actionDone"
-                    android:autofillHints="age" />
+                    android:inputType="number" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <!-- Güncelle (ID korunur) -->
@@ -203,35 +202,46 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/spacing_xlarge"
+                android:contentDescription="@string/cd_update_profile"
                 android:insetLeft="0dp"
                 android:insetRight="0dp"
                 android:paddingTop="@dimen/button_padding_vertical"
                 android:paddingBottom="@dimen/button_padding_vertical"
                 android:text="@string/profile_update_button"
-                android:contentDescription="@string/cd_update_profile"
                 app:icon="@drawable/ic_save_24"
-                app:iconPadding="@dimen/spacing_xsmall"
                 app:iconGravity="textStart"
-                app:layout_constraintTop_toBottomOf="@id/inputLayoutAge"
+                app:iconPadding="@dimen/spacing_xsmall"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent" />
+                app:layout_constraintTop_toBottomOf="@id/inputLayoutAge" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.core.widget.NestedScrollView>
 
-    <!-- Yüklenme göstergesi (ID korunur) -->
-    <com.google.android.material.progressindicator.CircularProgressIndicator
-        android:id="@+id/progressbar"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
+    <!-- 2. Yüklenme Durumu (Merkezde, içeriğin üstünde) -->
+    <!-- Eski ProgressBar kaldırıldı, yerine ortak ViewStub geldi -->
+    <ViewStub
+        android:id="@+id/viewLoadingStub"
+        android:layout="@layout/layout_state_loading"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:visibility="gone"
-        app:indicatorSize="32dp"
-        app:trackThickness="3dp"
-        app:indicatorInset="8dp"
-        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
         tools:visibility="visible" />
+
+    <!-- 3. Hata Durumu (Merkezde, içeriğin üstünde) -->
+    <ViewStub
+        android:id="@+id/viewErrorStub"
+        android:layout="@layout/layout_state_error"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

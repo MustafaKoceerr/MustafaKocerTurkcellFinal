@@ -13,70 +13,95 @@ import com.example.mustafakocer.R
 import com.example.mustafakocer.databinding.FragmentProfileBinding
 import com.example.mustafakocer.domain.model.User
 import com.example.mustafakocer.presentation.base.BaseFragment
+import com.example.mustafakocer.presentation.common.UiErrorMapper
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class ProfileFragment : BaseFragment<FragmentProfileBinding>(FragmentProfileBinding::inflate) {
 
     private val viewModel: ProfileViewModel by viewModels()
 
+    @Inject
+    lateinit var injectedUiErrorMapper: UiErrorMapper
+
+    // --- BaseFragment Implementasyonu ---
+    override val uiErrorMapper: UiErrorMapper by lazy { injectedUiErrorMapper }
+
+    override fun onRetry() {
+        viewModel.fetchUserProfile()
+    }
+    // ------------------------------------
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         setupClickListeners()
-        observeViewModel()
+        observeViewModelStates()
     }
 
     private fun setupClickListeners() {
         binding.btnUpdateProfile.setOnClickListener {
-            // EditText'lerden güncel verileri al
-            val firstName = binding.inputLayoutFirstName.editText?.text.toString()
-            val lastName = binding.inputLayoutLastName.editText?.text.toString()
-            val email = binding.inputLayoutEmail.editText?.text.toString()
-            val phone = binding.inputLayoutPhone.editText?.text.toString()
-            val age = binding.inputLayoutAge.editText?.text.toString()
-
-            // ViewModel'deki public fonksiyonu çağır
-            viewModel.updateProfile(firstName, lastName, email, phone, age)
+            viewModel.updateProfile(
+                firstName = binding.editFirstName.text.toString(),
+                lastName = binding.editLastName.text.toString(),
+                email = binding.editEmail.text.toString(),
+                phone = binding.editPhone.text.toString(),
+                age = binding.editAge.text.toString()
+            )
         }
     }
 
-    private fun observeViewModel() {
+    private fun observeViewModelStates() {
         viewLifecycleOwner.lifecycleScope.launch {
-            // repeatOnLifecycle, Fragment'ın view'ı STARTED durumundayken çalışır,
-            // STOPPED olduğunda coroutine'i durdurur. Bu, memory leak'leri önler.
             repeatOnLifecycle(Lifecycle.State.STARTED) {
 
-                // 1. Kullanıcı verisini dinle
+                // 1. Ana UI durumunu (isLoading, error, user) tek bir yerden dinle
                 launch {
-                    viewModel.user.collect { user ->
-                        user?.let { populateUi(it) }
-                    }
-                }
-
-                // 2. İlk yüklenme durumunu dinle
-                launch {
-                    viewModel.isLoading.collect { isLoading ->
-                        // Sadece ilk yüklenme durumunda ana progressbar'ı göster/gizle
+                    viewModel.isLoading.collectLatest { isLoading ->
+                        // Sadece ilk yükleme durumunda tam ekran yükleme göstergesini yönet.
                         if (!viewModel.isUpdating.value) {
-                            binding.progressbar.isVisible = isLoading
+                            binding.viewLoadingStub.isVisible = isLoading
+                            binding.contentView.isVisible = !isLoading
                         }
                     }
                 }
 
-                // 3. güncelleme durumunu dinle.
                 launch {
-                    viewModel.isUpdating.collect { isUpdating ->
-                        // Güncelleme sırasında butonu devre dışı bırak ve progressbar'ı göster
-                        binding.btnUpdateProfile.isEnabled = !isUpdating
-                        binding.progressbar.isVisible = isUpdating
-                        binding.btnUpdateProfile.text =
-                            if (isUpdating) "Güncelleniyor..." else "Bilgileri Güncelle"
+                    viewModel.error.collectLatest { exception ->
+                        val hasError = exception != null
+                        binding.contentView.isVisible = !hasError
+                        if (hasError) {
+                            handleErrorState(binding.viewErrorStub, exception!!)
+                            viewModel.errorHandled()
+                        } else {
+                            hideErrorState()
+                        }
                     }
                 }
 
-                // 4. Toast mesajlarını dinle
+                launch {
+                    viewModel.user.collect { user ->
+                        user?.let {
+                            if (!viewModel.isLoading.value && viewModel.error.value == null) {
+                                binding.contentView.isVisible = true
+                                populateUi(it)
+                            }
+                        }
+                    }
+                }
+
+                // 2. Ayrı durumları (isUpdating, toastMessage) dinlemeye devam et
+                launch {
+                    viewModel.isUpdating.collect { isUpdating ->
+                        binding.btnUpdateProfile.isEnabled = !isUpdating
+                        binding.btnUpdateProfile.text =
+                            if (isUpdating) getString(R.string.profile_updating_button) else getString(R.string.profile_update_button)
+                    }
+                }
+
                 launch {
                     viewModel.toastMessage.collect { message ->
                         Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show()
@@ -86,21 +111,15 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding>(FragmentProfileBind
         }
     }
 
-
-    /**
-     * Gelen User nesnesi ile UI bileşenlerini doldurur.
-     */
     private fun populateUi(user: User) {
         binding.apply {
-            // Başlık kısmını doldur
             txtFullName.text = user.fullName
-            txtCurrentUsername.text = "@${user.username}"
+            txtCurrentUsername.text = getString(R.string.profile_username_format, user.username)
             Glide.with(requireContext())
                 .load(user.imageUrl)
-                .placeholder(R.drawable.ic_person_24) // Yüklenirken gösterilecek varsayılan ikon
+                .placeholder(R.drawable.ic_person_24)
                 .into(imgProfile)
 
-            // EditText alanlarını doldur
             editFirstName.setText(user.firstName)
             editLastName.setText(user.lastName)
             editEmail.setText(user.email)
