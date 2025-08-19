@@ -1,6 +1,5 @@
 <resources>
     <string name="app_name">MustafaKocerTurkcellFinal</string>
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
@@ -164,4 +163,41 @@
     <string name="action_retry">Tekrar dene</string>
     <string name="cd_retry">Tekrar dene</string>
 
+    <!-- ProfileFragment -->
+    <string name="profile_updating_button">Güncelleniyor…</string>
+
+    <!-- Kullanıcı adını formatlamak için. Örnek: @kullaniciadi -->
+    <string name="profile_username_format">\@%s</string>
+
+    <!-- Hata Yönetimi (UiErrorMapper tarafından kullanılır) -->
+    <string name="action_login">Giriş Yap</string>
+
+    <string name="error_title_no_internet">Bağlantı Sorunu</string>
+    <string name="error_subtitle_no_internet">Lütfen internet bağlantınızı kontrol edin.</string>
+
+    <string name="error_title_unauthorized">Oturum Gerekli</string>
+    <string name="error_subtitle_unauthorized">Bu içeriği görmek için lütfen giriş yapın.</string>
+
+    <string name="error_title_server">Sunucu Hatası</string>
+    <string name="error_subtitle_server">Bir şeyler ters gitti, lütfen daha sonra tekrar deneyin.</string>
+
+    <string name="error_title_unknown">Bir Hata Oluştu</string>
+    <string name="error_subtitle_unknown">Beklenmedik bir sorun oluştu.</string>
+
+    <string name="empty_orders_title">Henüz Siparişiniz Yok</string>
+    <string name="empty_orders_subtitle">Alışverişe başlayarak ilk siparişinizi verin.</string>
+
+    <string name="empty_products_title">Ürün Bulunamadı</string>
+    <string name="empty_products_subtitle">Görünüşe göre şu an gösterilecek bir ürün yok.</string>
+
+    <!-- CartFragment -->
+    <string name="cart_empty_title">Sepetiniz Boş</string>
+    <string name="cart_empty_subtitle">Hemen alışverişe başlayarak sepetinizi doldurun.</string>
+
+    <string name="order_details_item_count_format">%d ürün</string>
+    <string name="empty_categories_title">Kategori Bulunamadı</string>
+    <string name="empty_categories_subtitle">Görünüşe göre şu an gösterilecek bir kategori yok.</string>
+
+    <string name="search_idle_title">Aramaya Başla</string>
+    <string name="search_idle_subtitle">Ürünleri, markaları ve daha fazlasını keşfet.</string>
 </resources>
