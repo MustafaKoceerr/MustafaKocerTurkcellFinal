@@ -1,5 +1,6 @@
 package com.example.mustafakocer.presentation.common
 
+import android.graphics.Paint
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.view.isVisible
@@ -40,7 +41,27 @@ class ProductListAdapter(
                 txtRatingValue.text = product.rating.toString()
                 txtDiscountedPrice.text = product.discountedPrice
                 txtPrice.text = product.price
-                // TODO: Fiyatın üzerini çizme ve rozet mantıkları eklenecek.
+
+                val originalPriceValue = product.price
+                    .replace("$", "").replace("₺", "").replace(",", "")
+                    .toDoubleOrNull() ?: 0.0
+
+                val discountedPriceValue = product.discountedPrice
+                    .replace("$", "").replace("₺", "").replace(",", "")
+                    .toDoubleOrNull() ?: 0.0
+
+                // 2. Fiyatları karşılaştır.
+                if (discountedPriceValue < originalPriceValue) {
+                    // İndirim varsa, orijinal fiyatı göster ve üzerini çiz.
+                    txtPrice.isVisible = true
+                    txtPrice.paintFlags = txtPrice.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
+                } else {
+                    // İndirim yoksa, orijinal fiyatı gizle ve (varsa) üzerindeki çizgiyi kaldır.
+                    // Bu 'else' bloğu, RecyclerView'ın view'ları yeniden kullanmasından
+                    // kaynaklanabilecek hataları (eski bir view'ın çizgili kalması gibi) önler.
+                    txtPrice.isVisible = false
+                    txtPrice.paintFlags = txtPrice.paintFlags and Paint.STRIKE_THRU_TEXT_FLAG.inv()
+                }
 
                 // Görsel: animasyonu kapat, oran sabitse zıplama olmaz (XML’de ratio önerilir)
                 Glide.with(root.context)

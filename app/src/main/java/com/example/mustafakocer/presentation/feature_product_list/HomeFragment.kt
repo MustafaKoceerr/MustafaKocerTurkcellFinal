@@ -86,35 +86,41 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 productListAdapter.loadStateFlow.collectLatest { loadStates ->
+                    // Sadece refresh (ilk yükleme veya pull-to-refresh) durumuna odaklan.
                     val refreshState = loadStates.refresh
-                    val isListEmpty = productListAdapter.itemCount == 0
 
-                    // Durumları belirle
-                    val isLoading = refreshState is LoadState.Loading && isListEmpty
-                    val isError = refreshState is LoadState.Error && isListEmpty
-                    val isTrulyEmpty = refreshState is LoadState.NotLoading && isListEmpty
+                    // İçeriği her zaman görünür olarak başlat.
+                    binding.contentView.isVisible = true
 
-                    // Görünürlükleri yönet
-                    binding.viewLoadingStub.isVisible = isLoading
-                    binding.contentView.isVisible = !isLoading && !isError
+                    // Tam ekran durumlarını (loading, error, empty) sadece liste boşsa yönet.
+                    if (productListAdapter.itemCount == 0) {
+                        binding.viewLoadingStub.isVisible = refreshState is LoadState.Loading
 
-                    // Hata durumunu işle
-                    if (isError) {
-                        val appException = errorMapper.map((refreshState as LoadState.Error).error)
-                        handleErrorState(binding.viewErrorStub, appException)
-                    } else {
-                        hideErrorState()
-                    }
-
-                    // Boş durumunu işle
-                    if (isTrulyEmpty) {
-                        if (emptyBinding == null) {
-                            emptyBinding = LayoutStateEmptyBinding.bind(binding.viewEmptyStub.inflate())
+                        val isError = refreshState is LoadState.Error
+                        if (isError) {
+                            // Hata varsa, içeriği gizle ve hata ekranını göster.
+                            binding.contentView.isVisible = false
+                            val appException = errorMapper.map((refreshState as LoadState.Error).error)
+                            handleErrorState(binding.viewErrorStub, appException)
+                        } else {
+                            hideErrorState()
                         }
-                        emptyBinding?.root?.isVisible = true
-                        emptyBinding?.txtEmptyTitle?.setText(R.string.empty_products_title)
-                        emptyBinding?.txtEmptySubtitle?.setText(R.string.empty_products_subtitle)
+
+                        val isEmpty = refreshState is LoadState.NotLoading && loadStates.append.endOfPaginationReached
+                        if (isEmpty) {
+                            binding.contentView.isVisible = false
+                            if (emptyBinding == null) {
+                                emptyBinding = LayoutStateEmptyBinding.bind(binding.viewEmptyStub.inflate())
+                            }
+                            emptyBinding?.root?.isVisible = true
+                            // ... (emptyBinding'i doldur)
+                        } else {
+                            emptyBinding?.root?.isVisible = false
+                        }
                     } else {
+                        // Liste doluysa, tam ekran durumlarını her zaman gizle.
+                        binding.viewLoadingStub.isVisible = false
+                        hideErrorState()
                         emptyBinding?.root?.isVisible = false
                     }
                 }
