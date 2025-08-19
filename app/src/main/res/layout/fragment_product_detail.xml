@@ -8,7 +8,7 @@
 
     <!-- İçerik: Scroll -->
     <androidx.core.widget.NestedScrollView
-        android:id="@+id/scrollView"
+        android:id="@+id/contentView"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:clipToPadding="false"
@@ -378,53 +378,33 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.core.widget.NestedScrollView>
 
-    <!-- Loading -->
-    <com.google.android.material.progressindicator.CircularProgressIndicator
-        android:id="@+id/progressbar"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:visibility="gone"
-        app:indicatorInset="8dp"
-        app:indicatorSize="32dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:trackThickness="3dp"
-        tools:visibility="gone" />
-
-    <!-- Error state -->
-    <LinearLayout
-        android:id="@+id/stateErrorGroup"
-        android:layout_width="0dp"
+    <!-- 2. Yüklenme Durumu (Merkezde) -->
+    <!-- Eski ProgressBar kaldırıldı, yerine ortak ViewStub geldi -->
+    <ViewStub
+        android:id="@+id/viewLoadingStub"
+        android:layout="@layout/layout_state_loading"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:gravity="center"
-        android:orientation="vertical"
-        android:padding="@dimen/state_padding"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:visibility="gone">
+        tools:visibility="visible" />
 
-        <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/txtErrorTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/pd_error_title"
-            android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
-            android:textColor="?attr/colorOnSurface" />
+    <!-- 3. Hata Durumu (Merkezde) -->
+    <!-- Eski stateErrorGroup kaldırıldı, yerine ortak ViewStub geldi -->
+    <ViewStub
+        android:id="@+id/viewErrorStub"
+        android:layout="@layout/layout_state_error"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnRetry"
-            style="?attr/materialButtonOutlinedStyle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/state_action_top"
-            android:contentDescription="@string/cd_retry"
-            android:text="@string/action_retry" />
-    </LinearLayout>
 
     <!-- Alt sabit aksiyon barı: fiyat + (Sepete Ekle | − qty +) -->
     <com.google.android.material.card.MaterialCardView
@@ -490,8 +470,8 @@
                     android:layout_height="@dimen/cart_btn_size"
                     android:background="@drawable/ripple_minus"
                     android:contentDescription="@string/cd_decrease"
-                    app:srcCompat="@drawable/ic_remove_24"
                     android:scaleType="center"
+                    app:srcCompat="@drawable/ic_remove_24"
                     app:tint="?attr/colorOnSurface" />
 
                 <TextView
@@ -501,8 +481,8 @@
                     android:layout_marginStart="@dimen/cart_qty_gap"
                     android:layout_marginEnd="@dimen/cart_qty_gap"
                     android:textAppearance="@style/TextAppearance.Material3.TitleSmall"
-                    android:textStyle="bold"
                     android:textColor="?attr/colorOnSurface"
+                    android:textStyle="bold"
                     tools:text="1" />
 
                 <!-- + -->
@@ -512,8 +492,8 @@
                     android:layout_height="@dimen/cart_btn_size"
                     android:background="@drawable/ripple_plus"
                     android:contentDescription="@string/cd_increase"
-                    app:srcCompat="@drawable/ic_add_24"
                     android:scaleType="center"
+                    app:srcCompat="@drawable/ic_add_24"
                     app:tint="?attr/colorOnSurface" />
             </LinearLayout>
 

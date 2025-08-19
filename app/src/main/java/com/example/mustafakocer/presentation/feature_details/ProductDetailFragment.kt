@@ -30,16 +30,9 @@ import com.google.android.material.chip.ChipGroup
 import com.google.android.material.tabs.TabLayoutMediator
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-// Gerekli importları ekle
-// imports (üst kısma ekle)
-import android.view.MotionEvent
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.isActive
-import kotlin.math.max
-import androidx.compose.runtime.*
+import com.example.mustafakocer.presentation.common.UiErrorMapper
 import com.example.mustafakocer.presentation.feature_details.util.enableAutoRepeat
-
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class ProductDetailFragment :
@@ -48,8 +41,16 @@ class ProductDetailFragment :
     private val viewModel: ProductDetailViewModel by viewModels()
     private var pagerMediator: TabLayoutMediator? = null
 
-    // YENİ: Tekrarlayan işlemi yönetmek için bir Coroutine Job'ı
-    private var autoRepeatJob: Job? = null
+    @Inject
+    lateinit var injectedUiErrorMapper: UiErrorMapper
+
+    // --- BaseFragment Implementasyonu ---
+    override val uiErrorMapper: UiErrorMapper by lazy { injectedUiErrorMapper }
+
+    override fun onRetry() {
+        viewModel.getProductDetail()
+    }
+    // ------------------------------------
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -64,16 +65,26 @@ class ProductDetailFragment :
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.productDetailState.collect { resource ->
-                    binding.progressbar.isVisible = resource is Resource.Loading
-                    binding.stateErrorGroup.isVisible = resource is Resource.Error
-                    binding.scrollView.isVisible = resource is Resource.Success
-                    binding.cardActionBar.isVisible = resource is Resource.Success
+                    val isLoading = resource is Resource.Loading
+                    val isError = resource is Resource.Error
+                    val isSuccess = resource is Resource.Success
 
-                    when (resource) {
-                        is Resource.Success -> populateUi(resource.data)
-                        is Resource.Error -> binding.txtErrorTitle.text = resource.exception.message
-                        else -> { /* No-op */
-                        }
+                    // Görünürlükleri yönet
+                    binding.viewLoadingStub.isVisible = isLoading
+                    binding.contentView.isVisible = isSuccess
+                    binding.cardActionBar.isVisible = isSuccess
+
+                    if (isError) {
+                        handleErrorState(
+                            binding.viewErrorStub,
+                            (resource as Resource.Error).exception
+                        )
+                    } else {
+                        hideErrorState()
+                    }
+
+                    if (isSuccess) {
+                        populateUi((resource as Resource.Success).data)
                     }
                 }
             }
@@ -97,10 +108,8 @@ class ProductDetailFragment :
         binding.btnAddToCart.setOnClickListener { viewModel.onIncreaseClicked() }
         binding.btnPlus.enableAutoRepeat { viewModel.onIncreaseClicked() }
         binding.btnMinus.enableAutoRepeat { viewModel.onDecreaseClicked() }
-        binding.btnRetry.setOnClickListener { viewModel.getProductDetail() }
         binding.btnToggleDescription.setOnClickListener { viewModel.onToggleDescription() }
     }
-
 
     private companion object {
         private const val COLLAPSED_MAX_LINES = 3
@@ -248,15 +257,6 @@ class ProductDetailFragment :
     }
 
 
-    // YENİDEN EKLENDİ: onDestroyView'ı geri getiriyoruz.
-    override fun onDestroyView() {
-        // Mediator'ı view yok edildiğinde ayırmak (detach) memory leak'leri önler.
-        pagerMediator?.detach()
-        pagerMediator = null
-        super.onDestroyView()
-    }
-
-
     private fun setupReviews(reviews: List<Review>) {
         // Senaryo Yönetimi: Yorum listesi boş mu?
         val hasReviews = reviews.isNotEmpty()
@@ -285,6 +285,12 @@ class ProductDetailFragment :
                 isNestedScrollingEnabled = false
             }
         }
+    }
+
+    override fun onDestroyView() {
+        pagerMediator?.detach()
+        pagerMediator = null
+        super.onDestroyView()
     }
 
 }
