@@ -231,5 +231,12 @@
 
     <string name="error_title_generic">Bir Sorun Oluştu</string>
     <string name="error_message_order_not_found">Sipariş detayları bulunamadı. Lütfen tekrar deneyin veya destek ile iletişime geçin.</string>
+    <string name="press_back_again_to_exit">Press back again to exit</string>
+
+    <!-- Genel Dolar formatı (ör: $12.34) -->
+    <string name="price_format_dollar">$%1$.2f</string>
+
+    <!-- Birim başına fiyat formatı (ör: $12.34 / unit) -->
+    <string name="price_per_unit_format_dollar">$%1$.2f / unit</string>
 
 </resources>

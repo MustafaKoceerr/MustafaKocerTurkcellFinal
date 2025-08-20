@@ -18,80 +18,90 @@ import com.example.mustafakocer.presentation.feature_splash.components.SplashLog
 /**
  * A "dumb" composable that is responsible for drawing the UI of the login screen.
  * It is driven entirely by the [state] and delegates all user interactions via [onEvent].
+ * It also provides a host for displaying Snackbars.
  */
 @Composable
 fun LoginScreen(
     state: LoginUiState,
     onEvent: (LoginEvent) -> Unit,
+    // 1. SnackbarHostState, Route'dan parametre olarak alınır.
+    snackbarHostState: SnackbarHostState
 ) {
-    SplashBackground {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .systemBarsPadding()
-                .imePadding()
-                .padding(horizontal = 20.dp),
-            contentAlignment = Alignment.Center
-        ) {
-            Column(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(20.dp)
+    // 2. Ekran, Snackbar'ı yerleştirebilmek için Scaffold ile sarmalanır.
+    Scaffold(
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
+    ) { innerPadding ->
+        SplashBackground {
+            Box(
+                // 3. Scaffold'un sağladığı padding, içeriğin üst/alt barların altına girmesini önler.
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding)
+                    .systemBarsPadding()
+                    .imePadding()
+                    .padding(horizontal = 20.dp),
+                contentAlignment = Alignment.Center
             ) {
-                SplashLogo()
-
-                Surface(
-                    tonalElevation = 3.dp,
-                    shape = MaterialTheme.shapes.extraLarge,
-                    color = MaterialTheme.colorScheme.surface
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(20.dp)
                 ) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(20.dp),
-                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                    SplashLogo()
+
+                    Surface(
+                        tonalElevation = 3.dp,
+                        shape = MaterialTheme.shapes.extraLarge,
+                        color = MaterialTheme.colorScheme.surface
                     ) {
-                        Text(
-                            text = stringResource(id = R.string.login_title),
-                            style = MaterialTheme.typography.headlineSmall
-                        )
-
-                        LoginFields(
-                            state = state,
-                            onEvent = onEvent,
-                            onSubmit = { onEvent(LoginEvent.LoginClicked) })
-
-                        Button(
-                            onClick = { onEvent(LoginEvent.LoginClicked) },
-                            modifier = Modifier.fillMaxWidth(),
-                            enabled = !state.isLoading
-                        ) { Text(text = stringResource(id = R.string.login_cta)) }
-
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(20.dp),
+                            verticalArrangement = Arrangement.spacedBy(16.dp)
                         ) {
-                            TextButton(onClick = { /*TODO*/ }, enabled = !state.isLoading) {
-                                Text(stringResource(id = R.string.login_forgot_password))
-                            }
-                            TextButton(onClick = { /*TODO*/ }, enabled = !state.isLoading) {
-                                Text(stringResource(id = R.string.login_create_account))
+                            Text(
+                                text = stringResource(id = R.string.login_title),
+                                style = MaterialTheme.typography.headlineSmall
+                            )
+
+                            LoginFields(
+                                state = state,
+                                onEvent = onEvent,
+                                onSubmit = { onEvent(LoginEvent.LoginClicked) })
+
+                            Button(
+                                onClick = { onEvent(LoginEvent.LoginClicked) },
+                                modifier = Modifier.fillMaxWidth(),
+                                enabled = !state.isLoading
+                            ) { Text(text = stringResource(id = R.string.login_cta)) }
+
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                TextButton(onClick = { /*TODO*/ }, enabled = !state.isLoading) {
+                                    Text(stringResource(id = R.string.login_forgot_password))
+                                }
+                                TextButton(onClick = { /*TODO*/ }, enabled = !state.isLoading) {
+                                    Text(stringResource(id = R.string.login_create_account))
+                                }
                             }
                         }
                     }
+
+                    Text(
+                        text = stringResource(id = R.string.login_terms_hint),
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.padding(horizontal = 8.dp)
+                    )
                 }
 
-                Text(
-                    text = stringResource(id = R.string.login_terms_hint),
-                    style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.padding(horizontal = 8.dp)
-                )
-            }
-
-            if (state.isLoading) {
-                CircularProgressIndicator()
+                if (state.isLoading) {
+                    CircularProgressIndicator()
+                }
             }
         }
     }

@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-@OptIn(ExperimentalCoroutinesApi::class) // flatMapLatest için gerekli
+@OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class ProductDetailViewModel @Inject constructor(
     private val getProductDetailUseCase: GetProductDetailUseCase,
@@ -25,13 +25,17 @@ class ProductDetailViewModel @Inject constructor(
     private val productId: Int = savedStateHandle.get<Int>("productId")
         ?: throw IllegalStateException("productId must be passed to ProductDetailViewModel")
 
-    // 1. TETİKLEYİCİ: Artık bir Int sayacı. Her onRetry çağrısında artacak.
+    /**
+     * A trigger that causes the product detail flow to be re-executed when its value changes.
+     */
     private val retryTrigger = MutableStateFlow(0)
 
+    /**
+     * A reactive flow for product details. It uses `flatMapLatest` to re-subscribe to the
+     * `getProductDetailUseCase` whenever the `retryTrigger` emits a new value.
+     */
     val productDetailState: StateFlow<Resource<ProductDetail>> =
         retryTrigger.flatMapLatest {
-            // retryTrigger her yeni bir değer aldığında (0, 1, 2...),
-            // bu blok yeniden çalışacak ve use case'i yeniden tetikleyecek.
             getProductDetailUseCase(productId)
         }.stateIn(
             scope = viewModelScope,
@@ -39,12 +43,11 @@ class ProductDetailViewModel @Inject constructor(
             initialValue = Resource.Loading
         )
 
-    // ... quantityInCart ve isDescriptionExpanded flow'ları aynı kalıyor ...
     val quantityInCart: StateFlow<Int> = getCartQuantityUseCase(productId)
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0)
+
     private val _isDescriptionExpanded = MutableStateFlow(false)
     val isDescriptionExpanded: StateFlow<Boolean> = _isDescriptionExpanded.asStateFlow()
-
 
     fun onToggleDescription() {
         _isDescriptionExpanded.update { !it }
@@ -59,12 +62,10 @@ class ProductDetailViewModel @Inject constructor(
     }
 
     /**
-     * Retries fetching the product detail.
-     * It increments the retryTrigger, which causes the flatMapLatest to re-execute the use case.
+     * Retries fetching the product detail by incrementing the retryTrigger,
+     * which causes the `flatMapLatest` operator to re-execute the use case.
      */
     fun onRetry() {
-        // 2. İŞLEVSELLİK: Sayacı bir artır. Değer değiştiği için (örn: 0 -> 1),
-        // StateFlow kesinlikle yeni bir değer yayınlayacak ve akışı tetikleyecek.
         retryTrigger.value++
     }
 }

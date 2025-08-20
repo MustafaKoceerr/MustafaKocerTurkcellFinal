@@ -11,14 +11,8 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.example.mustafakocer.databinding.RecylerRowProductGridBinding
 import com.example.mustafakocer.domain.model.Product
+import com.example.mustafakocer.presentation.common.util.parsePriceToDouble
 
-/**
- * A private extension function to safely parse a formatted price string (e.g., "$1,234.56")
- * into a Double, handling various currency symbols and separators.
- */
-private fun String.parsePriceToDouble(): Double {
-    return this.replace(Regex("[$,₺]"), "").replace(",", "").toDoubleOrNull() ?: 0.0
-}
 
 /**
  * A [PagingDataAdapter] for displaying a grid of [Product] items.

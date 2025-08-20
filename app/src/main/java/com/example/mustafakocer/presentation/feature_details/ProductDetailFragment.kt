@@ -1,4 +1,3 @@
-// com/example/mustafakocer/presentation/feature_details/ProductDetailFragment.kt (Refactor Edilmiş Hali)
 package com.example.mustafakocer.presentation.feature_details
 
 import android.graphics.Paint
@@ -34,6 +33,11 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
+/**
+ * Displays the detailed information for a single product.
+ * This fragment observes multiple state flows from [ProductDetailViewModel] to build a complex,
+ * dynamic UI with animations and interactive elements.
+ */
 @AndroidEntryPoint
 class ProductDetailFragment :
     BaseFragment<FragmentProductDetailBinding>(FragmentProductDetailBinding::inflate) {
@@ -41,69 +45,58 @@ class ProductDetailFragment :
     private val viewModel: ProductDetailViewModel by viewModels()
     private var pagerMediator: TabLayoutMediator? = null
 
-    // --- KALDIRILANLAR ---
-    // @Inject lateinit var injectedUiErrorMapper: UiErrorMapper
-    // override val uiErrorMapper: UiErrorMapper by lazy { injectedUiErrorMapper }
-    // override fun onRetry() = viewModel.onRetry()
-    // ---------------------
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupClickListeners()
         observeViewModel()
     }
 
+    /**
+     * Subscribes to all relevant StateFlows from the ViewModel to update the UI
+     * in a lifecycle-aware manner.
+     */
     private fun observeViewModel() {
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                // 1) Ana ürün detayı durumu (Loading / Error / Success)
                 launch { viewModel.productDetailState.collect(::handleProductDetailState) }
-                // 2) Sepet miktarı
                 launch { viewModel.quantityInCart.collect(::handleCartQuantityState) }
-                // 3) Açıklama genişletme durumu
                 launch { viewModel.isDescriptionExpanded.collect(::handleDescriptionExpandedState) }
             }
         }
     }
 
+    /**
+     * Sets up all click and touch listeners for the fragment's views.
+     */
     private fun setupClickListeners() {
-        // Retry butonu artık StateLayout tarafından yönetiliyor.
         binding.stateLayout.onRetry = { viewModel.onRetry() }
-
         binding.btnAddToCart.setOnClickListener { viewModel.onIncreaseClicked() }
         binding.btnPlus.enableAutoRepeat { viewModel.onIncreaseClicked() }
         binding.btnMinus.enableAutoRepeat { viewModel.onDecreaseClicked() }
-
-        // İçerik StateLayout içinde olduğundan, gerekirse contentView üzerinden erişiyoruz.
         binding.contentView.findViewById<View>(R.id.btnToggleDescription).setOnClickListener {
             viewModel.onToggleDescription()
         }
     }
 
+    /**
+     * Handles updates to the main product detail resource, showing loading, error, or content states.
+     */
     private fun handleProductDetailState(resource: Resource<ProductDetail>) {
-        // Aksiyon barı sadece içerik başarıyla yüklendiğinde görünür.
         binding.cardActionBar.isVisible = resource is Resource.Success
-
         when (resource) {
-            is Resource.Loading -> {
-                binding.stateLayout.showLoading()
-            }
-
-            is Resource.Error -> {
-                binding.stateLayout.showError(subtitle = resource.exception.message)
-            }
-
+            is Resource.Loading -> binding.stateLayout.showLoading()
+            is Resource.Error -> binding.stateLayout.showError(subtitle = resource.exception.message)
             is Resource.Success -> {
                 populateUi(resource.data)
                 binding.stateLayout.showContent()
             }
-
-            is Resource.Idle -> {
-                // No-op
-            }
+            is Resource.Idle -> { /* No-op */ }
         }
     }
 
+    /**
+     * Handles updates to the quantity of the product in the cart, toggling UI elements accordingly.
+     */
     private fun handleCartQuantityState(quantity: Int) {
         val isInCart = quantity > 0
         binding.btnAddToCart.isVisible = !isInCart
@@ -111,6 +104,9 @@ class ProductDetailFragment :
         binding.txtQuantity.text = quantity.toString()
     }
 
+    /**
+     * Handles the expanded/collapsed state of the description text, applying animations.
+     */
     private fun handleDescriptionExpandedState(isExpanded: Boolean) {
         val transition = TransitionSet().apply {
             ordering = TransitionSet.ORDERING_TOGETHER
@@ -137,6 +133,9 @@ class ProductDetailFragment :
         )
     }
 
+    /**
+     * Populates the main content area with data from the [ProductDetail] object.
+     */
     private fun populateUi(product: ProductDetail) {
         binding.apply {
             setupPager(product.images)

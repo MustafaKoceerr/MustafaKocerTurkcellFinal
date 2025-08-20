@@ -23,6 +23,11 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
+/**
+ * Displays the user's shopping cart.
+ * This fragment is responsible for setting up the UI, observing state changes from the
+ * [CartViewModel], and delegating user interactions back to the ViewModel.
+ */
 @AndroidEntryPoint
 class CartFragment : BaseFragment<FragmentCartBinding>(FragmentCartBinding::inflate) {
 
@@ -36,6 +41,9 @@ class CartFragment : BaseFragment<FragmentCartBinding>(FragmentCartBinding::infl
         observeViewModel()
     }
 
+    /**
+     * Initializes the RecyclerView, its adapter, and handles item click events.
+     */
     private fun setupRecyclerView() {
         cartListAdapter = CartListAdapter { event ->
             when (event) {
@@ -50,7 +58,6 @@ class CartFragment : BaseFragment<FragmentCartBinding>(FragmentCartBinding::infl
             }
         }
 
-        // Retry butonu StateLayout tarafından yönetiliyor (reaktif akışta opsiyonel).
         binding.stateLayout.onRetry = { /* no-op */ }
 
         binding.stateLayout.findViewById<RecyclerView>(R.id.contentView).apply {
@@ -59,17 +66,19 @@ class CartFragment : BaseFragment<FragmentCartBinding>(FragmentCartBinding::infl
         }
     }
 
+    /**
+     * Subscribes to the StateFlows exposed by the [CartViewModel] to update the UI
+     * in a lifecycle-aware manner.
+     */
     private fun observeViewModel() {
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                // 1) Ana sepet durumu
+                // Observe the main cart state (loading, error, success, empty)
                 launch {
                     viewModel.cartState.collect { resource ->
-                        // Alt özet kartı sadece dolu sepet olduğunda görünür.
                         binding.cardSummary.isVisible =
                             resource is Resource.Success && resource.data.isNotEmpty()
 
-                        // Menü görünürlüğünü güncelle
                         requireActivity().invalidateOptionsMenu()
 
                         when (resource) {
@@ -92,16 +101,23 @@ class CartFragment : BaseFragment<FragmentCartBinding>(FragmentCartBinding::infl
                         }
                     }
                 }
-                // 2) Toplam fiyat
+                // Observe the total price separately
                 launch {
-                    viewModel.totalPrice.collectLatest { totalPrice ->
-                        binding.txtTotalPrice.text = totalPrice
+                    // ViewModel'den gelen Double değeri dinle
+                    viewModel.totalPrice.collectLatest { price ->
+                        // Context kullanarak string kaynağı ile formatla ve TextView'e ata
+                        val formattedPrice =
+                            requireContext().getString(R.string.price_format_dollar, price)
+                        binding.txtTotalPrice.text = formattedPrice
                     }
                 }
             }
         }
     }
 
+    /**
+     * Sets up the toolbar menu for this fragment.
+     */
     private fun setupMenu() {
         requireActivity().addMenuProvider(object : MenuProvider {
             override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
@@ -124,6 +140,9 @@ class CartFragment : BaseFragment<FragmentCartBinding>(FragmentCartBinding::infl
         }, viewLifecycleOwner, Lifecycle.State.RESUMED)
     }
 
+    /**
+     * Displays a confirmation dialog before clearing the entire cart.
+     */
     private fun showClearCartConfirmationDialog() {
         MaterialAlertDialogBuilder(requireContext())
             .setTitle(R.string.dialog_title_clear_cart)
@@ -136,6 +155,9 @@ class CartFragment : BaseFragment<FragmentCartBinding>(FragmentCartBinding::infl
             .show()
     }
 
+    /**
+     * Displays a confirmation dialog before removing a single item from the cart.
+     */
     private fun showRemoveItemConfirmationDialog(productId: Int) {
         MaterialAlertDialogBuilder(requireContext())
             .setTitle(R.string.dialog_title_remove_item)

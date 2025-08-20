@@ -1,4 +1,3 @@
-// com/example/mustafakocer/presentation/feature_orders/OrderDetailsFragment.kt (Refactor Edilmiş Hali)
 package com.example.mustafakocer.presentation.feature_orders
 
 import android.os.Bundle
@@ -18,7 +17,7 @@ import dagger.hilt.android.AndroidEntryPoint
 
 /**
  * Displays the details of a single [Order] object received via navigation arguments.
- * This fragment does not perform any network requests and relies on the passed data.
+ * This fragment does not have its own ViewModel and relies entirely on the passed data.
  */
 @AndroidEntryPoint
 class OrderDetailsFragment :
@@ -37,6 +36,7 @@ class OrderDetailsFragment :
             setupRecyclerView(order)
             populateUi(order)
         } else {
+            // Handle the edge case where the order data is missing.
             binding.stateLayout.showError(
                 title = getString(R.string.error_title_generic),
                 subtitle = getString(R.string.error_message_order_not_found)
@@ -47,11 +47,17 @@ class OrderDetailsFragment :
         }
     }
 
+    /**
+     * Sets the toolbar title dynamically with the order ID.
+     */
     private fun setupToolbarTitle(order: Order) {
         val dynamicTitle = getString(R.string.title_order_details, order.id)
         (activity as? AppCompatActivity)?.supportActionBar?.title = dynamicTitle
     }
 
+    /**
+     * Initializes the RecyclerView to display the products within the order.
+     */
     private fun setupRecyclerView(order: Order) {
         productListAdapter = OrderProductListAdapter { productId ->
             val action =
@@ -61,7 +67,6 @@ class OrderDetailsFragment :
             findNavController().navigate(action)
         }
 
-        // RecyclerView, StateLayout'ın (ve dolayısıyla NestedScrollView'un) içindedir.
         binding.stateLayout.findViewById<RecyclerView>(R.id.productsRecyclerView).apply {
             adapter = productListAdapter
             addItemDecoration(DividerItemDecoration(context, LinearLayoutManager.VERTICAL))
@@ -69,8 +74,10 @@ class OrderDetailsFragment :
         productListAdapter.submitList(order.products)
     }
 
+    /**
+     * Populates the order summary card with the order's details.
+     */
     private fun populateUi(order: Order) {
-        // Summary kartı içindeki alanlar
         val summaryCard =
             binding.stateLayout.findViewById<com.google.android.material.card.MaterialCardView>(
                 R.id.cardOrderSummary
@@ -80,6 +87,5 @@ class OrderDetailsFragment :
         summaryCard.findViewById<TextView>(R.id.txtTotalAmount).text = order.discountedTotal
         summaryCard.findViewById<TextView>(R.id.txtItemCount).text =
             getString(R.string.order_details_item_count_format, order.totalProducts)
-
     }
 }

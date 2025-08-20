@@ -5,19 +5,12 @@ import androidx.lifecycle.viewModelScope
 import com.example.mustafakocer.domain.model.CartItem
 import com.example.mustafakocer.domain.usecase.*
 import com.example.mustafakocer.domain.util.Resource
+import com.example.mustafakocer.presentation.common.util.parsePriceToDouble
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import java.text.DecimalFormat
 import javax.inject.Inject
 
-/**
- * A private extension function to safely parse a formatted price string into a Double.
- * This centralizes the parsing logic to avoid repetition.
- */
-private fun String.parsePriceToDouble(): Double {
-    return this.replace(Regex("[$,₺]"), "").replace(",", "").toDoubleOrNull() ?: 0.0
-}
 
 /**
  * Manages the UI state and business logic for the Cart screen.
@@ -29,19 +22,14 @@ class CartViewModel @Inject constructor(
     private val addOrIncreaseCartItemUseCase: AddOrIncreaseCartItemUseCase,
     private val decreaseOrRemoveCartItemUseCase: DecreaseOrRemoveCartItemUseCase,
     private val clearCartUseCase: ClearCartUseCase,
-    private val removeCartItemUseCase: RemoveCartItemUseCase
+    private val removeCartItemUseCase: RemoveCartItemUseCase,
 ) : ViewModel() {
 
     private val _cartState = MutableStateFlow<Resource<List<CartItem>>>(Resource.Loading)
     val cartState: StateFlow<Resource<List<CartItem>>> = _cartState.asStateFlow()
 
-    private val _totalPrice = MutableStateFlow("₺0.00")
-    val totalPrice: StateFlow<String> = _totalPrice.asStateFlow()
-
-    /**
-     * A single, reusable formatter instance to improve performance.
-     */
-    private val priceFormatter = DecimalFormat("₺#,##0.00")
+    private val _totalPrice = MutableStateFlow(0.0)
+    val totalPrice: StateFlow<Double> = _totalPrice.asStateFlow()
 
     init {
         observeCart()
@@ -52,8 +40,10 @@ class CartViewModel @Inject constructor(
             _cartState.value = resource
             when (resource) {
                 is Resource.Success -> calculateTotalPrice(resource.data)
-                is Resource.Error -> _totalPrice.value = "₺0.00"
-                else -> { /* No-op for Loading/Idle */ }
+                // 3. Hata durumunda toplam fiyat 0.0 olarak ayarlandı.
+                is Resource.Error -> _totalPrice.value = 0.0
+                else -> { /* No-op for Loading/Idle */
+                }
             }
         }.launchIn(viewModelScope)
     }
@@ -78,6 +68,6 @@ class CartViewModel @Inject constructor(
         val total = items.sumOf {
             it.product.discountedPrice.parsePriceToDouble() * it.quantity
         }
-        _totalPrice.value = priceFormatter.format(total)
+        _totalPrice.value = total
     }
 }

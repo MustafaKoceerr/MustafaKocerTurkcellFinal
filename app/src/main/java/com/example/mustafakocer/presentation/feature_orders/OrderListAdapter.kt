@@ -10,13 +10,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.mustafakocer.R
 import com.example.mustafakocer.databinding.RecyclerRowOrderBinding
 import com.example.mustafakocer.domain.model.Order
+import com.example.mustafakocer.presentation.common.util.parsePriceToDouble
 
-/**
- * A private extension function to safely parse a formatted price string into a Double.
- */
-private fun String.parsePriceToDouble(): Double {
-    return this.replace(Regex("[$,₺]"), "").replace(",", "").toDoubleOrNull() ?: 0.0
-}
 
 /**
  * A [PagingDataAdapter] for displaying a list of [Order] items in a RecyclerView.
@@ -43,13 +38,22 @@ class OrderListAdapter(
 
         fun bind(order: Order) {
             binding.apply {
-                txtOrderId.text = order.id.toString()
-                txtDiscountedTotal.text = order.discountedTotal
-                txtOriginalTotal.text = order.total
+                val context = root.context // Context'i bir kere alalım
 
+                // Fiyat string'lerini Double değerlere çevir
                 val originalTotal = order.total.parsePriceToDouble()
                 val discountedTotal = order.discountedTotal.parsePriceToDouble()
 
+                // Değerleri strings.xml'deki kaynak ile Dolar ($) formatında yeniden oluştur
+                val formattedOriginalTotal = context.getString(R.string.price_format_dollar, originalTotal)
+                val formattedDiscountedTotal = context.getString(R.string.price_format_dollar, discountedTotal)
+
+                // UI elemanlarına formatlanmış yeni değerleri ata
+                txtOrderId.text = order.id.toString()
+                txtDiscountedTotal.text = formattedDiscountedTotal
+                txtOriginalTotal.text = formattedOriginalTotal
+
+                // İndirim olup olmadığını kontrol et ve üstü çizili metni ayarla
                 val hasDiscount = discountedTotal < originalTotal
                 txtOriginalTotal.isVisible = hasDiscount
                 if (hasDiscount) {
@@ -58,7 +62,8 @@ class OrderListAdapter(
                     txtOriginalTotal.paintFlags = txtOriginalTotal.paintFlags and Paint.STRIKE_THRU_TEXT_FLAG.inv()
                 }
 
-                txtTotalProducts.text = root.context.getString(
+                // Ürün sayısı metnini ayarla
+                txtTotalProducts.text = context.getString(
                     R.string.order_product_count_format,
                     order.totalProducts,
                     order.totalQuantity

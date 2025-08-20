@@ -12,6 +12,12 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+
+/**
+ * Manages the UI state and business logic for the Profile screen.
+ * It exposes multiple StateFlows to represent different parts of the screen's state,
+ * such as initial loading, user data, and update progress.
+ */
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
     private val getUserProfileUseCase: GetUserProfileUseCase,
@@ -30,8 +36,8 @@ class ProfileViewModel @Inject constructor(
     private val _error = MutableStateFlow<com.example.mustafakocer.domain.exception.AppException?>(null)
     val error = _error.asStateFlow()
 
-    private val _toastMessage = MutableSharedFlow<UiText>()
-    val toastMessage = _toastMessage.asSharedFlow()
+    private val _snackbarMessage = MutableSharedFlow<UiText>()
+    val snackbarMessage = _snackbarMessage.asSharedFlow()
 
     init {
         fetchUserProfile()
@@ -71,9 +77,8 @@ class ProfileViewModel @Inject constructor(
             age = age.toIntOrNull() ?: currentUser.age
         )
 
-        // Only proceed if there are actual changes.
         if (updatedUser == currentUser) {
-            viewModelScope.launch { _toastMessage.emit(UiText.StringResource(R.string.toast_no_changes_made)) }
+            viewModelScope.launch { _snackbarMessage.emit(UiText.StringResource(R.string.toast_no_changes_made)) }
             return
         }
 
@@ -85,11 +90,11 @@ class ProfileViewModel @Inject constructor(
                         _isUpdating.value = false
                         val errorMessage = resource.exception.message?.let { UiText.DynamicString(it) }
                             ?: UiText.StringResource(R.string.toast_update_failed)
-                        _toastMessage.emit(errorMessage)
+                        _snackbarMessage.emit(errorMessage)
                     }
                     is Resource.Success -> {
                         _isUpdating.value = false
-                        _toastMessage.emit(UiText.StringResource(R.string.toast_profile_updated))
+                        _snackbarMessage.emit(UiText.StringResource(R.string.toast_profile_updated))
                     }
                     is Resource.Idle -> { /* No-op */ }
                 }

@@ -2,7 +2,6 @@ package com.example.mustafakocer.presentation.feature_profile
 
 import android.os.Bundle
 import android.view.View
-import android.widget.Toast
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -13,12 +12,19 @@ import com.example.mustafakocer.databinding.FragmentProfileBinding
 import com.example.mustafakocer.domain.model.User
 import com.example.mustafakocer.presentation.base.BaseFragment
 import com.google.android.material.button.MaterialButton
+import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputEditText
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 
+/**
+ * Displays the user's profile and allows for editing and updating the information.
+ * This fragment observes multiple StateFlows from the [ProfileViewModel] to manage
+ * its complex UI, which includes a full-screen state layout and partial state updates
+ * for the content.
+ */
 @AndroidEntryPoint
 class ProfileFragment : BaseFragment<FragmentProfileBinding>(FragmentProfileBinding::inflate) {
 
@@ -30,15 +36,15 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding>(FragmentProfileBind
         observeViewModel()
     }
 
+    /**
+     * Sets up click listeners for the interactive elements on the screen.
+     */
     private fun setupClickListeners() {
-        // Retry butonu artık StateLayout tarafından yönetiliyor.
         binding.stateLayout.onRetry = { viewModel.fetchUserProfile() }
 
-        // Güncelle butonu
         val updateButton = binding.contentView.findViewById<MaterialButton>(R.id.btnUpdateProfile)
         updateButton.setOnClickListener {
-            val firstNameEt =
-                binding.contentView.findViewById<TextInputEditText>(R.id.editFirstName)
+            val firstNameEt = binding.contentView.findViewById<TextInputEditText>(R.id.editFirstName)
             val lastNameEt = binding.contentView.findViewById<TextInputEditText>(R.id.editLastName)
             val emailEt = binding.contentView.findViewById<TextInputEditText>(R.id.editEmail)
             val phoneEt = binding.contentView.findViewById<TextInputEditText>(R.id.editPhone)
@@ -54,11 +60,15 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding>(FragmentProfileBind
         }
     }
 
+    /**
+     * Subscribes to all StateFlows and SharedFlows from the [ProfileViewModel]
+     * to update the UI in a lifecycle-aware manner.
+     */
     private fun observeViewModel() {
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
 
-                // 1) Tam ekran durum: Loading / Error / Content
+                // Observe the main screen state (loading/error)
                 launch {
                     combine(viewModel.isLoading, viewModel.error) { isLoading, error ->
                         isLoading to error
@@ -69,24 +79,22 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding>(FragmentProfileBind
                                 binding.stateLayout.showError(subtitle = error.message)
                                 viewModel.errorHandled()
                             }
-
                             else -> binding.stateLayout.showContent()
                         }
                     }
                 }
 
-                // 2) Kullanıcı verisi
+                // Observe the user data to populate the fields
                 launch {
                     viewModel.user.collect { user ->
                         user?.let { populateUi(it) }
                     }
                 }
 
-                // 3) Güncelle butonu (tam ekran state değil)
+                // Observe the update button's loading state
                 launch {
                     viewModel.isUpdating.collect { isUpdating ->
-                        val updateBtn =
-                            binding.contentView.findViewById<MaterialButton>(R.id.btnUpdateProfile)
+                        val updateBtn = binding.contentView.findViewById<MaterialButton>(R.id.btnUpdateProfile)
                         updateBtn.isEnabled = !isUpdating
                         updateBtn.text = if (isUpdating) {
                             getString(R.string.profile_updating_button)
@@ -96,21 +104,21 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding>(FragmentProfileBind
                     }
                 }
 
-                // 4) Tek seferlik toast mesajları
+                // Observe one-time snackbar messages
                 launch {
-                    viewModel.toastMessage.collect { uiText ->
-                        Toast.makeText(
-                            requireContext(),
-                            uiText.asString(requireContext()),
-                            Toast.LENGTH_LONG
-                        ).show()
+                    viewModel.snackbarMessage.collect { uiText ->
+                        Snackbar.make(binding.root, uiText.asString(requireContext()), Snackbar.LENGTH_LONG).show()
                     }
                 }
             }
         }
     }
 
-    // Eski populateUi korunur
+    /**
+     * Populates the UI fields with the user's data.
+     * It includes checks to prevent resetting the cursor position in EditTexts
+     * if the text has not changed.
+     */
     private fun populateUi(user: User) {
         binding.apply {
             if (txtFullName.text.toString() != user.fullName) {

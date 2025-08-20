@@ -1,4 +1,3 @@
-// com/example/mustafakocer/presentation/feature_product_list/HomeFragment.kt (Refactor Edilmiş Hali)
 package com.example.mustafakocer.presentation.feature_product_list
 
 import android.os.Bundle
@@ -21,6 +20,10 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
+/**
+ * Displays the main screen of the application, showing a paginated grid of products.
+ * It also handles the "press back again to exit" functionality.
+ */
 @AndroidEntryPoint
 class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::inflate) {
 
@@ -31,20 +34,21 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         setupRecyclerView()
         observeProductPagingFlow()
         observeLoadState()
         setupBackButtonHandler()
     }
 
+    /**
+     * Initializes the RecyclerView, its adapter, and the load state footer.
+     */
     private fun setupRecyclerView() {
         productListAdapter = ProductListAdapter { productId ->
             val action = HomeFragmentDirections.actionHomeFragmentToProductDetailFragment(productId)
             findNavController().navigate(action)
         }
 
-        // ÖNEMLİ: RecyclerView'a artık binding.stateLayout.contentView üzerinden erişiyoruz.
         binding.stateLayout.findViewById<androidx.recyclerview.widget.RecyclerView>(R.id.contentView)
             .apply {
                 adapter = productListAdapter.withLoadStateFooter(
@@ -54,6 +58,9 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
             }
     }
 
+    /**
+     * Subscribes to the PagingData flow from the ViewModel and submits it to the adapter.
+     */
     private fun observeProductPagingFlow() {
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -64,8 +71,10 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
         }
     }
 
+    /**
+     * Subscribes to the adapter's load state to manage the UI (loading, error, empty states).
+     */
     private fun observeLoadState() {
-        // Retry butonuna basıldığında adaptörü tetikle.
         binding.stateLayout.onRetry = {
             productListAdapter.retry()
         }
@@ -73,30 +82,20 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 productListAdapter.loadStateFlow.collectLatest { loadStates ->
-                    // Ana yükleme durumunu (refresh) al.
                     when (val refreshState = loadStates.refresh) {
                         is LoadState.Loading -> {
-                            // Sadece liste boşken tam ekran loading göster.
                             if (productListAdapter.itemCount == 0) {
                                 binding.stateLayout.showLoading()
                             }
                         }
-
                         is LoadState.NotLoading -> {
-                            // Yükleme bittiğinde, liste boş mu diye kontrol et.
                             if (productListAdapter.itemCount < 1) {
-                                // XML'de tanımladığımız varsayılan boş ekranı göster.
                                 binding.stateLayout.showEmpty()
                             } else {
-                                // Liste doluysa içeriği göster.
                                 binding.stateLayout.showContent()
                             }
                         }
-
                         is LoadState.Error -> {
-                            // Hata durumunda, XML'de tanımlı hata ekranını göster.
-                            // İstersen hatayı parse edip özel bir mesaj da gönderebilirsin.
-                            // val errorMessage = (refreshState.error as? Exception)?.message
                             binding.stateLayout.showError()
                         }
                     }
@@ -105,11 +104,14 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
         }
     }
 
+    /**
+     * Sets up a custom back press handler to implement the "press back again to exit" feature.
+     */
     private fun setupBackButtonHandler() {
         val callback = object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
                 if (System.currentTimeMillis() - lastBackPressedTime > 2000) {
-                    Snackbar.make(binding.root, "Çıkmak için tekrar basın", Snackbar.LENGTH_SHORT)
+                    Snackbar.make(binding.root, R.string.press_back_again_to_exit, Snackbar.LENGTH_SHORT)
                         .show()
                     lastBackPressedTime = System.currentTimeMillis()
                 } else {

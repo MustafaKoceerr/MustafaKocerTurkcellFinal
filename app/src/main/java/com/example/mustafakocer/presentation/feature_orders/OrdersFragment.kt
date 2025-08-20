@@ -18,6 +18,11 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
+/**
+ * Displays a paginated list of the user's past orders.
+ * This fragment observes a PagingData flow from the [OrderViewModel] and also
+ * listens to the adapter's load states to manage the UI (loading, error, empty states).
+ */
 @AndroidEntryPoint
 class OrdersFragment : BaseFragment<FragmentOrdersBinding>(FragmentOrdersBinding::inflate) {
 
@@ -30,13 +35,16 @@ class OrdersFragment : BaseFragment<FragmentOrdersBinding>(FragmentOrdersBinding
         observeState()
     }
 
+    /**
+     * Initializes the RecyclerView, its adapter, and the load state footer.
+     * Also handles item click events for navigation.
+     */
     private fun setupRecyclerView() {
         orderListAdapter = OrderListAdapter { order ->
             val action = OrdersFragmentDirections.actionOrdersFragmentToOrderDetailsFragment(order)
             findNavController().navigate(action)
         }
 
-        // Retry butonu artık StateLayout tarafından yönetiliyor.
         binding.stateLayout.onRetry = {
             orderListAdapter.retry()
         }
@@ -49,16 +57,20 @@ class OrdersFragment : BaseFragment<FragmentOrdersBinding>(FragmentOrdersBinding
         }
     }
 
+    /**
+     * Subscribes to the PagingData flow and the adapter's LoadState flow
+     * to update the UI accordingly.
+     */
     private fun observeState() {
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                // 1. ViewModel'den gelen PagingData'yı dinle ve adaptöre gönder.
+                // Observe the PagingData from the ViewModel and submit it to the adapter.
                 launch {
                     viewModel.ordersFlow.collectLatest { pagingData ->
                         orderListAdapter.submitData(pagingData)
                     }
                 }
-                // 2. PagingDataAdapter'ın durumunu dinleyerek UI'ı güncelle.
+                // Observe the adapter's load state to show/hide loading, error, and empty states.
                 launch {
                     orderListAdapter.loadStateFlow.collectLatest { loadStates ->
                         when (val refreshState = loadStates.refresh) {

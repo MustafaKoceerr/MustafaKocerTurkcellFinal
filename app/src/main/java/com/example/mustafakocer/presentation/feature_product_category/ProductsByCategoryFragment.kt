@@ -1,4 +1,3 @@
-// com/example/mustafakocer/presentation/feature_product_category/ProductsByCategoryFragment.kt (Refactor Edilmiş Hali)
 package com.example.mustafakocer.presentation.feature_product_category
 
 import android.os.Bundle
@@ -21,6 +20,11 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
+/**
+ * Displays a paginated grid of products for a specific category.
+ * It reuses the [CategoryViewModel] to get a reactive flow of products based on the
+ * category name passed through navigation arguments.
+ */
 @AndroidEntryPoint
 class ProductsByCategoryFragment : BaseFragment<FragmentProductsByCategoryBinding>(
     FragmentProductsByCategoryBinding::inflate
@@ -31,15 +35,17 @@ class ProductsByCategoryFragment : BaseFragment<FragmentProductsByCategoryBindin
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         setupRecyclerView()
         observeProductPagingFlow()
         observeLoadState()
 
-        // Kategori seçildiğinde ViewModel'i bilgilendir.
+        // Inform the ViewModel about the selected category.
         viewModel.onCategorySelected(args.categoryName)
     }
 
+    /**
+     * Initializes the RecyclerView, its adapter, and the load state footer.
+     */
     private fun setupRecyclerView() {
         productListAdapter = ProductListAdapter { productId ->
             val action =
@@ -49,7 +55,6 @@ class ProductsByCategoryFragment : BaseFragment<FragmentProductsByCategoryBindin
             findNavController().navigate(action)
         }
 
-        // Retry butonu artık StateLayout tarafından yönetiliyor.
         binding.stateLayout.onRetry = {
             productListAdapter.retry()
         }
@@ -62,6 +67,9 @@ class ProductsByCategoryFragment : BaseFragment<FragmentProductsByCategoryBindin
         }
     }
 
+    /**
+     * Subscribes to the paginated product flow from the ViewModel.
+     */
     private fun observeProductPagingFlow() {
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -72,31 +80,27 @@ class ProductsByCategoryFragment : BaseFragment<FragmentProductsByCategoryBindin
         }
     }
 
+    /**
+     * Subscribes to the adapter's load state to manage the UI (loading, error, empty states).
+     */
     private fun observeLoadState() {
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 productListAdapter.loadStateFlow.collectLatest { loadStates ->
-                    // Ana yükleme durumunu (refresh) al.
                     when (val refreshState = loadStates.refresh) {
                         is LoadState.Loading -> {
                             if (productListAdapter.itemCount == 0) {
                                 binding.stateLayout.showLoading()
                             }
                         }
-
                         is LoadState.NotLoading -> {
-                            // --- DEĞİŞİKLİK BURADA ---
-                            // Bir listenin gerçekten boş olduğunu anlamanın en güvenilir yolu:
-                            // Yükleme bitmiş OLMALI ve sayfalama sonuna gelinmiş OLMALI.
                             val isListEmpty = loadStates.append.endOfPaginationReached && productListAdapter.itemCount < 1
-
                             if (isListEmpty) {
                                 binding.stateLayout.showEmpty()
                             } else {
                                 binding.stateLayout.showContent()
                             }
                         }
-
                         is LoadState.Error -> {
                             val errorMessage = (refreshState.error as? Exception)?.message
                             binding.stateLayout.showError(subtitle = errorMessage)

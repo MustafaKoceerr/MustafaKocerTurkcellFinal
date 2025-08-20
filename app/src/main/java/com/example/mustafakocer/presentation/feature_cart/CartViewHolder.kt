@@ -4,21 +4,10 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.example.mustafakocer.R
 import com.example.mustafakocer.databinding.RecylerRowProductCartBinding
 import com.example.mustafakocer.domain.model.CartItem
-import java.text.DecimalFormat
-
-/**
- * A reusable, file-level formatter to avoid creating new instances for each ViewHolder.
- */
-private val priceFormatter = DecimalFormat("₺#,##0.00")
-
-/**
- * A private extension function to safely parse a formatted price string into a Double.
- */
-private fun String.parsePriceToDouble(): Double {
-    return this.replace(Regex("[$,₺]"), "").replace(",", "").toDoubleOrNull() ?: 0.0
-}
+import com.example.mustafakocer.presentation.common.util.parsePriceToDouble
 
 /**
  * A [RecyclerView.ViewHolder] for displaying a single [CartItem].
@@ -28,7 +17,7 @@ private fun String.parsePriceToDouble(): Double {
  */
 class CartViewHolder(
     private val binding: RecylerRowProductCartBinding,
-    private val onEvent: (CartEvent) -> Unit
+    private val onEvent: (CartEvent) -> Unit,
 ) : RecyclerView.ViewHolder(binding.root) {
 
     private var currentCartItem: CartItem? = null
@@ -55,19 +44,24 @@ class CartViewHolder(
     fun bind(cartItem: CartItem) {
         this.currentCartItem = cartItem
         val product = cartItem.product
+        val context = binding.root.context // Context'i al
 
         binding.apply {
             txtTitle.text = product.title
             txtQuantity.text = cartItem.quantity.toString()
 
             val priceAsDouble = product.discountedPrice.parsePriceToDouble()
-            val formattedPricePerUnit = priceFormatter.format(priceAsDouble)
-            txtPricePerUnit.text = "$formattedPricePerUnit / unit"
+
+            // strings.xml'deki kaynakları kullanarak metinleri formatla
+            val formattedPricePerUnit =
+                context.getString(R.string.price_per_unit_format_dollar, priceAsDouble)
+            txtPricePerUnit.text = formattedPricePerUnit
 
             val lineTotal = priceAsDouble * cartItem.quantity
-            txtLineTotal.text = priceFormatter.format(lineTotal)
+            val formattedLineTotal = context.getString(R.string.price_format_dollar, lineTotal)
+            txtLineTotal.text = formattedLineTotal
 
-            Glide.with(root.context)
+            Glide.with(context)
                 .load(product.thumbnailUrl)
                 .into(imgProduct)
         }

@@ -1,10 +1,11 @@
 package com.example.mustafakocer.presentation.feature_auth
 
-import android.widget.Toast
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.runtime.remember
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.mustafakocer.presentation.feature_auth.contract.LoginEffect
@@ -25,7 +26,8 @@ fun LoginRoute(
     viewModel: LoginViewModel = hiltViewModel(),
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
-    val context = LocalContext.current
+    // 1. Snackbar'ın durumunu yönetmek ve göstermek için bir state oluşturulur.
+    val snackbarHostState = remember { SnackbarHostState() }
 
     // Listen for one-time effects from the ViewModel.
     LaunchedEffect(true) {
@@ -36,7 +38,11 @@ fun LoginRoute(
                 }
 
                 is LoginEffect.ShowSnackbar -> {
-                    Toast.makeText(context, effect.message, Toast.LENGTH_LONG).show()
+                    // 2. Toast yerine snackbarHostState üzerinden Snackbar gösterilir.
+                    snackbarHostState.showSnackbar(
+                        message = effect.message,
+                        duration = SnackbarDuration.Long
+                    )
                 }
             }
         }
@@ -45,6 +51,8 @@ fun LoginRoute(
     // Pass the state and event handler down to the "dumb" UI screen.
     LoginScreen(
         state = state,
-        onEvent = viewModel::onEvent
+        onEvent = viewModel::onEvent,
+        // 3. Oluşturulan state, UI katmanına (LoginScreen) gönderilir.
+        snackbarHostState = snackbarHostState
     )
 }

@@ -8,17 +8,17 @@ import androidx.fragment.app.Fragment
 import androidx.viewbinding.ViewBinding
 
 /**
- * ViewBinding örneği oluşturmak için kullanılan inflater fonksiyonu için bir typealias.
+ * A typealias for the inflater function used to create a [ViewBinding] instance.
  */
 typealias Inflater<T> = (LayoutInflater, ViewGroup?, Boolean) -> T
 
 /**
- * Fragment'lar için ViewBinding kurulumunu kolaylaştıran soyut bir base class.
- * Bu sınıf, binding nesnesinin oluşturulmasını ve yaşam döngüsünü yöneterek
- * alt sınıflardaki boilerplate kodu azaltır.
+ * An abstract base class for Fragments that simplifies ViewBinding setup.
+ * This class manages the creation and lifecycle of the binding object, reducing
+ * boilerplate code in subclasses.
  *
- * @param VB ViewBinding sınıfının tipi.
- * @param inflate Belirli bir ViewBinding için inflater fonksiyonu.
+ * @param VB The type of the ViewBinding class.
+ * @param inflate The inflater function for the specific [ViewBinding].
  */
 abstract class BaseFragment<VB : ViewBinding>(
     private val inflate: Inflater<VB>,
@@ -40,5 +40,4 @@ abstract class BaseFragment<VB : ViewBinding>(
         super.onDestroyView()
         _binding = null
     }
-
 }
