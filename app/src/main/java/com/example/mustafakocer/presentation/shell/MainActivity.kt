@@ -3,8 +3,6 @@ package com.example.mustafakocer.presentation.shell
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
-import android.widget.ImageView
-import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -14,13 +12,14 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
-import androidx.navigation.ui.onNavDestinationSelected // Bu import doğru
 import androidx.navigation.ui.navigateUp
+import androidx.navigation.ui.onNavDestinationSelected
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.bumptech.glide.Glide
 import com.example.mustafakocer.R
 import com.example.mustafakocer.databinding.ActivityMainBinding
+import com.example.mustafakocer.databinding.HeaderBinding // XML dosyan 'header.xml' olduğu için bu import doğru.
 import com.example.mustafakocer.domain.model.User
 import com.example.mustafakocer.domain.util.Resource
 import com.example.mustafakocer.presentation.feature_auth.AuthActivity
@@ -42,8 +41,7 @@ class MainActivity : AppCompatActivity() {
         setSupportActionBar(binding.toolbar)
 
         setupNavigation()
-        observeUserState()
-        observeLogoutEvent()
+        observeViewModel()
     }
 
     private fun setupNavigation() {
@@ -68,7 +66,6 @@ class MainActivity : AppCompatActivity() {
                 return@setNavigationItemSelectedListener true
             }
 
-            // DEĞİŞTİ: Fonksiyonu doğru şekilde, menuItem üzerinden çağırıyoruz.
             val handled = menuItem.onNavDestinationSelected(navController)
             if (handled) {
                 binding.drawerLayout.closeDrawers()
@@ -77,47 +74,46 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun observeUserState() {
+    private fun observeViewModel() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.userState.collect { resource ->
-                    when (resource) {
-                        is Resource.Loading -> { /* No-op */ }
-                        is Resource.Success -> { updateNavHeader(resource.data) }
-                        is Resource.Error -> {
-                            Toast.makeText(this@MainActivity, "Kullanıcı bilgileri alınamadı.", Toast.LENGTH_SHORT).show()
+                launch {
+                    viewModel.userState.collect { resource ->
+                        when (resource) {
+                            is Resource.Success -> updateNavHeader(resource.data)
+                            is Resource.Error -> {
+                                Toast.makeText(this@MainActivity, R.string.toast_user_info_error, Toast.LENGTH_SHORT).show()
+                            }
+                            else -> { /* No-op for Loading/Idle */ }
                         }
-                        is Resource.Idle -> { /* No-op */ }
+                    }
+                }
+
+                launch {
+                    viewModel.logoutEvent.collect {
+                        goToAuthActivity()
                     }
                 }
             }
         }
     }
 
-    private fun observeLogoutEvent() {
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.logoutEvent.collect {
-                    goToAuthActivity()
-                }
-            }
+    private fun updateNavHeader(user: User) {
+        // Use ViewBinding for the header for type-safety and efficiency.
+        val headerView: View = binding.navView.getHeaderView(0)
+        val headerBinding = HeaderBinding.bind(headerView) // DEĞİŞTİ: Doğru Binding sınıfı kullanılıyor.
+
+        headerBinding.apply {
+            txtNameHeader.text = user.fullName
+            txtMailHeader.text = user.email
+            Glide.with(this@MainActivity).load(user.imageUrl).into(imgViewHeader)
         }
     }
 
-    private fun updateNavHeader(user: User) {
-        val headerView: View = binding.navView.getHeaderView(0)
-        val headerName = headerView.findViewById<TextView>(R.id.txtNameHeader)
-        val headerMail = headerView.findViewById<TextView>(R.id.txtMailHeader)
-        val headerImage = headerView.findViewById<ImageView>(R.id.imgViewHeader)
-
-        headerName.text = user.fullName
-        headerMail.text = user.email
-        Glide.with(this).load(user.imageUrl).into(headerImage)
-    }
-
     private fun goToAuthActivity() {
-        val intent = Intent(this, AuthActivity::class.java)
-        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        val intent = Intent(this, AuthActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        }
         startActivity(intent)
     }
 
