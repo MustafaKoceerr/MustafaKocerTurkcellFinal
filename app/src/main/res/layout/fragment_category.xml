@@ -7,7 +7,6 @@
     android:background="?attr/colorSurface"
     tools:context=".presentation.feature_product_category.CategoryFragment">
 
-    <!-- 1. StateLayout'ı ana view olarak ekliyoruz. -->
     <com.example.mustafakocer.presentation.common.StateLayout
         android:id="@+id/state_layout"
         android:layout_width="0dp"
@@ -16,25 +15,21 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+        app:errorIcon="@drawable/ic_cloud_off_24"
+        app:emptyIcon="@drawable/ic_category_24"
+        app:emptyTitle="@string/empty_categories_title"
+        app:emptySubtitle="@string/empty_categories_subtitle">
 
-    app:errorIcon="@drawable/ic_cloud_off_24"
-    app:emptyIcon="@drawable/ic_category_24"
-    app:emptyTitle="@string/empty_categories_title"
-    app:emptySubtitle="@string/empty_categories_subtitle">
-        <!-- 2. Bu ekrana özel varsayılan durumları belirliyoruz. -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/contentView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:paddingStart="@dimen/category_content_inset"
+            android:paddingTop="@dimen/category_content_inset_top"
+            android:paddingEnd="@dimen/category_content_inset"
+            android:paddingBottom="@dimen/category_content_inset_bottom"
+            tools:listitem="@layout/recycler_row_category" />
+    </com.example.mustafakocer.presentation.common.StateLayout>
 
-    <!-- 3. RecyclerView (contentView) artık StateLayout'ın bir çocuğu. -->
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/contentView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:clipToPadding="false"
-        android:paddingStart="@dimen/category_content_inset"
-        android:paddingTop="@dimen/category_content_inset_top"
-        android:paddingEnd="@dimen/category_content_inset"
-        android:paddingBottom="@dimen/category_content_inset_bottom"
-        tools:listitem="@layout/recycler_row_category" />
-
-</com.example.mustafakocer.presentation.common.StateLayout>
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

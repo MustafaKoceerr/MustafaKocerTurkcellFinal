@@ -86,6 +86,6 @@ class OrderDetailsFragment :
         summaryCard.findViewById<TextView>(R.id.txtOrderId).text = order.id.toString()
         summaryCard.findViewById<TextView>(R.id.txtTotalAmount).text = order.discountedTotal
         summaryCard.findViewById<TextView>(R.id.txtItemCount).text =
-            getString(R.string.order_details_item_count_format, order.totalProducts)
+            resources.getQuantityString(R.plurals.order_details_item_count, order.totalProducts, order.totalProducts)
     }
 }

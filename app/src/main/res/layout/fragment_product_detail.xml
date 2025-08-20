@@ -6,7 +6,6 @@
     android:layout_height="match_parent"
     android:background="?attr/colorSurface">
 
-    <!-- StateLayout ana kapsayıcı (içerik burada yönetilir) -->
     <com.example.mustafakocer.presentation.common.StateLayout
         android:id="@+id/state_layout"
         android:layout_width="0dp"
@@ -17,7 +16,6 @@
         app:layout_constraintTop_toTopOf="parent"
         app:errorIcon="@drawable/ic_cloud_off_24">
 
-        <!-- İçerik: Scroll -->
         <androidx.core.widget.NestedScrollView
             android:id="@+id/contentView"
             android:layout_width="match_parent"
@@ -44,7 +42,6 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent" />
 
-                    <!-- Alt scrim: dots’un arkasını yumuşat -->
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="56dp"
@@ -74,7 +71,7 @@
                     android:paddingTop="@dimen/badge_v"
                     android:paddingEnd="@dimen/badge_h"
                     android:paddingBottom="@dimen/badge_v"
-                    android:textAppearance="@style/TextAppearance.Material3.LabelSmall"
+                    android:textAppearance="@style/TextAppearance.App.LabelSmall"
                     android:textColor="?attr/colorOnPrimaryContainer"
                     android:textStyle="bold"
                     android:visibility="gone"
@@ -96,7 +93,7 @@
                     android:paddingTop="@dimen/badge_v"
                     android:paddingEnd="@dimen/badge_h"
                     android:paddingBottom="@dimen/badge_v"
-                    android:textAppearance="@style/TextAppearance.Material3.LabelSmall"
+                    android:textAppearance="@style/TextAppearance.App.LabelSmall"
                     android:textColor="?attr/colorOnTertiaryContainer"
                     android:textStyle="bold"
                     android:visibility="gone"
@@ -105,7 +102,7 @@
                     tools:text="Son 3"
                     tools:visibility="gone" />
 
-                <!-- Başlık + Marka/Kategori + Rating -->
+                <!-- Başlık + Meta + Rating -->
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/cardHeader"
                     android:layout_width="0dp"
@@ -135,7 +132,7 @@
                             android:layout_height="wrap_content"
                             android:ellipsize="end"
                             android:maxLines="3"
-                            android:textAppearance="@style/TextAppearance.Material3.TitleLarge"
+                            android:textAppearance="@style/TextAppearance.App.TitleLarge"
                             android:textColor="?attr/colorOnSurface"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintStart_toStartOf="parent"
@@ -143,7 +140,6 @@
                             tools:text="Apple iPhone 13 Pro Max 256GB Sierra Blue" />
 
                         <androidx.constraintlayout.helper.widget.Flow
-                            android:id="@+id/flowMeta"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="@dimen/pd_meta_chips_top"
@@ -154,7 +150,6 @@
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toBottomOf="@id/txtTitle" />
 
-                        <!-- ChipGroup Flow tarafından yönetiliyor -->
                         <com.google.android.material.chip.ChipGroup
                             android:id="@+id/chipGroupMeta"
                             android:layout_width="wrap_content"
@@ -163,7 +158,6 @@
                             tools:ignore="MissingConstraints" />
 
                         <LinearLayout
-                            android:id="@+id/ratingContainer"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="12dp"
@@ -183,7 +177,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginStart="6dp"
-                                android:textAppearance="@style/TextAppearance.Material3.LabelLarge"
+                                android:textAppearance="@style/TextAppearance.App.LabelSmall"
                                 android:textColor="?attr/colorOnSurface"
                                 tools:text="4.8 (126)" />
                         </LinearLayout>
@@ -225,7 +219,7 @@
                                 android:id="@+id/txtDiscountedPrice"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:textAppearance="@style/TextAppearance.Material3.DisplaySmall"
+                                android:textAppearance="@style/TextAppearance.App.Price"
                                 android:textColor="?attr/colorPrimary"
                                 android:textStyle="bold"
                                 tools:text="₺10.999" />
@@ -235,7 +229,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginStart="@dimen/product_original_price_gap_start"
-                                android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
+                                android:textAppearance="@style/TextAppearance.App.BodyMedium"
                                 android:textColor="?attr/colorOnSurfaceVariant"
                                 tools:text="₺12.999" />
                         </LinearLayout>
@@ -245,7 +239,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="@dimen/pd_savings_top"
-                            android:textAppearance="@style/TextAppearance.Material3.LabelMedium"
+                            android:textAppearance="@style/TextAppearance.App.LabelSmall"
                             android:textColor="?attr/colorOnSurfaceVariant"
                             tools:text="Tasarruf: %15" />
                     </LinearLayout>
@@ -277,11 +271,10 @@
                         android:paddingBottom="@dimen/pd_card_padding_v">
 
                         <TextView
-                            android:id="@+id/txtDescTitle"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:text="@string/pd_description_title"
-                            android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
+                            android:textAppearance="@style/TextAppearance.App.TitleMedium"
                             android:textColor="?attr/colorOnSurface" />
 
                         <TextView
@@ -291,7 +284,7 @@
                             android:layout_marginTop="@dimen/pd_desc_top"
                             android:ellipsize="end"
                             android:maxLines="3"
-                            android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
+                            android:textAppearance="@style/TextAppearance.App.BodyMedium"
                             android:textColor="?attr/colorOnSurface" />
 
                         <com.google.android.material.button.MaterialButton
@@ -323,16 +316,14 @@
                     app:layout_constraintTop_toBottomOf="@id/cardDescription">
 
                     <TextView
-                        android:id="@+id/txtReviewsTitle"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="@string/pd_reviews_title"
-                        android:textAppearance="@style/TextAppearance.Material3.TitleLarge"
+                        android:textAppearance="@style/TextAppearance.App.TitleLarge"
                         android:textColor="?attr/colorOnSurface" />
 
                     <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnSeeAllReviews"
                         style="?attr/materialButtonOutlinedStyle"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -340,7 +331,6 @@
                         android:text="@string/pd_reviews_see_all" />
                 </LinearLayout>
 
-                <!-- RecyclerView: Önizleme -->
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/recyclerReviews"
                     android:layout_width="0dp"
@@ -356,7 +346,6 @@
                     tools:itemCount="3"
                     tools:listitem="@layout/recycler_row_review" />
 
-                <!-- Yorumlar listesi (kısa) -->
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/reviewsRecyclerView"
                     android:layout_width="0dp"
@@ -372,7 +361,6 @@
                     tools:itemCount="2"
                     tools:listitem="@layout/recycler_row_review" />
 
-                <!-- Alt boşluk -->
                 <Space
                     android:layout_width="0dp"
                     android:layout_height="@dimen/pd_bottom_space"
@@ -385,7 +373,7 @@
 
     </com.example.mustafakocer.presentation.common.StateLayout>
 
-    <!-- Alt sabit aksiyon barı: StateLayout DIŞINDA -->
+    <!-- Alt sabit aksiyon barı -->
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/cardActionBar"
         android:layout_width="0dp"
@@ -410,12 +398,11 @@
             android:paddingEnd="@dimen/pd_actionbar_padding_h"
             android:paddingBottom="@dimen/pd_actionbar_padding_v">
 
-            <!-- Özet fiyat -->
             <TextView
                 android:id="@+id/txtActionPrice"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:textAppearance="@style/TextAppearance.Material3.TitleLarge"
+                android:textAppearance="@style/TextAppearance.App.Price"
                 android:textColor="?attr/colorOnSurface"
                 android:textStyle="bold"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -425,7 +412,6 @@
                 app:layout_goneMarginEnd="8dp"
                 tools:text="₺10.999" />
 
-            <!-- qty>0 iken -->
             <LinearLayout
                 android:id="@+id/layoutCartOperations"
                 android:layout_width="wrap_content"
@@ -459,12 +445,11 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/cart_qty_gap"
                     android:layout_marginEnd="@dimen/cart_qty_gap"
-                    android:textAppearance="@style/TextAppearance.Material3.TitleSmall"
+                    android:textAppearance="@style/TextAppearance.App.TitleSmall"
                     android:textColor="?attr/colorOnSurface"
                     android:textStyle="bold"
                     tools:text="1" />
 
-                <!-- + -->
                 <ImageButton
                     android:id="@+id/btnPlus"
                     android:layout_width="@dimen/cart_btn_size"
@@ -476,7 +461,6 @@
                     app:tint="?attr/colorOnSurface" />
             </LinearLayout>
 
-            <!-- qty==0 iken -->
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnAddToCart"
                 style="?attr/materialButtonStyle"

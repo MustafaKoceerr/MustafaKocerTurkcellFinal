@@ -7,7 +7,6 @@
     android:background="?attr/colorSurface"
     tools:context=".presentation.feature_profile.ProfileFragment">
 
-    <!-- StateLayout ana kapsayıcı -->
     <com.example.mustafakocer.presentation.common.StateLayout
         android:id="@+id/state_layout"
         android:layout_width="0dp"
@@ -18,7 +17,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:errorIcon="@drawable/ic_cloud_off_24">
 
-        <!-- İçerik: NestedScrollView -->
         <androidx.core.widget.NestedScrollView
             android:id="@+id/contentView"
             android:layout_width="match_parent"
@@ -26,7 +24,6 @@
             android:fillViewport="true">
 
             <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/profileFragmentRoot"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:paddingStart="@dimen/profile_content_padding"
@@ -34,7 +31,6 @@
                 android:paddingEnd="@dimen/profile_content_padding"
                 android:paddingBottom="@dimen/profile_content_padding_bottom">
 
-                <!-- Profil resmi -->
                 <com.google.android.material.imageview.ShapeableImageView
                     android:id="@+id/imgProfile"
                     android:layout_width="@dimen/profile_image_size"
@@ -56,7 +52,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/spacing_medium"
-                    android:textAppearance="@style/TextAppearance.Material3.HeadlineSmall"
+                    android:textAppearance="@style/TextAppearance.App.TitleLarge"
                     android:textColor="?attr/colorOnSurface"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
@@ -69,14 +65,13 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/spacing_xsmall"
-                    android:textAppearance="@style/TextAppearance.Material3.BodyLarge"
+                    android:textAppearance="@style/TextAppearance.App.BodyLarge"
                     android:textColor="?attr/colorOnSurfaceVariant"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/txtFullName"
                     tools:text="\@mustafakocer" />
 
-                <!-- Fotoğrafı değiştir -->
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnChangePhoto"
                     style="?attr/materialButtonOutlinedStyle"
@@ -92,7 +87,7 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/txtCurrentUsername" />
 
-                <!-- Ad -->
+                <!-- Form alanları (TextInputEditText'ler Inter'i temadan alıyor) -->
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/inputLayoutFirstName"
                     style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
@@ -115,7 +110,6 @@
                         android:inputType="textPersonName" />
                 </com.google.android.material.textfield.TextInputLayout>
 
-                <!-- Soyad -->
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/inputLayoutLastName"
                     style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
@@ -138,7 +132,6 @@
                         android:inputType="textPersonName" />
                 </com.google.android.material.textfield.TextInputLayout>
 
-                <!-- E-posta -->
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/inputLayoutEmail"
                     style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
@@ -161,7 +154,6 @@
                         android:inputType="textEmailAddress" />
                 </com.google.android.material.textfield.TextInputLayout>
 
-                <!-- Telefon -->
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/inputLayoutPhone"
                     style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
@@ -184,7 +176,6 @@
                         android:inputType="phone" />
                 </com.google.android.material.textfield.TextInputLayout>
 
-                <!-- Yaş -->
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/inputLayoutAge"
                     style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
@@ -207,7 +198,6 @@
                         android:inputType="number" />
                 </com.google.android.material.textfield.TextInputLayout>
 
-                <!-- Güncelle -->
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnUpdateProfile"
                     style="?attr/materialButtonStyle"

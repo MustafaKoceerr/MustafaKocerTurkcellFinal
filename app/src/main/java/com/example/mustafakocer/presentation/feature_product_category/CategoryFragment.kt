@@ -14,6 +14,7 @@ import com.example.mustafakocer.databinding.FragmentCategoryBinding
 import com.example.mustafakocer.domain.model.Category
 import com.example.mustafakocer.domain.util.Resource
 import com.example.mustafakocer.presentation.base.BaseFragment
+import com.example.mustafakocer.presentation.common.defaultSlideOptions
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -32,6 +33,14 @@ class CategoryFragment : BaseFragment<FragmentCategoryBinding>(FragmentCategoryB
         super.onViewCreated(view, savedInstanceState)
         setupRecyclerView()
         observeCategories()
+    }
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        // Transition varsa temizle (action animleri çalışsın)
+        enterTransition = null
+        exitTransition = null
+        reenterTransition = null
+        returnTransition = null
     }
 
     /**
@@ -84,10 +93,10 @@ class CategoryFragment : BaseFragment<FragmentCategoryBinding>(FragmentCategoryB
      * Navigates to the screen that displays products for the selected category.
      */
     private fun navigateToProductsByCategory(category: Category) {
-        val action = CategoryFragmentDirections.actionCategoryFragmentToProductsByCategoryFragment(
-            categoryName = category.slug,
-            categoryDisplayName = category.name
-        )
-        findNavController().navigate(action)
+        val action = CategoryFragmentDirections
+            .actionCategoryFragmentToProductsByCategoryFragment(category.slug, category.name)
+
+        findNavController().navigate(action, defaultSlideOptions())
     }
+
 }

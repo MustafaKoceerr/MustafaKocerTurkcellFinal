@@ -1,5 +1,6 @@
 package com.example.mustafakocer.presentation.feature_cart
 
+import android.content.DialogInterface
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuInflater
@@ -14,7 +15,6 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.mustafakocer.R
 import com.example.mustafakocer.databinding.FragmentCartBinding
 import com.example.mustafakocer.domain.util.Resource
 import com.example.mustafakocer.presentation.base.BaseFragment
@@ -22,6 +22,8 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import com.example.mustafakocer.R
+import java.text.NumberFormat
 
 /**
  * Displays the user's shopping cart.
@@ -103,12 +105,16 @@ class CartFragment : BaseFragment<FragmentCartBinding>(FragmentCartBinding::infl
                 }
                 // Observe the total price separately
                 launch {
-                    // ViewModel'den gelen Double değeri dinle
                     viewModel.totalPrice.collectLatest { price ->
-                        // Context kullanarak string kaynağı ile formatla ve TextView'e ata
-                        val formattedPrice =
-                            requireContext().getString(R.string.price_format_dollar, price)
-                        binding.txtTotalPrice.text = formattedPrice
+                        val locale = requireContext().resources.configuration.locales[0]
+                        val currency = NumberFormat.getCurrencyInstance(locale).apply {
+                            isGroupingUsed = true
+                            minimumFractionDigits = 2
+                            maximumFractionDigits = 2
+                        }
+                        val priceText = currency.format(price)
+                        binding.txtTotalPrice.text =
+                            getString(R.string.price_format_dollar, priceText) // %1$s
                     }
                 }
             }
@@ -140,30 +146,28 @@ class CartFragment : BaseFragment<FragmentCartBinding>(FragmentCartBinding::infl
         }, viewLifecycleOwner, Lifecycle.State.RESUMED)
     }
 
-    /**
-     * Displays a confirmation dialog before clearing the entire cart.
-     */
     private fun showClearCartConfirmationDialog() {
         MaterialAlertDialogBuilder(requireContext())
             .setTitle(R.string.dialog_title_clear_cart)
             .setMessage(R.string.dialog_message_clear_cart)
-            .setNegativeButton(R.string.action_cancel) { dialog, _ -> dialog.dismiss() }
-            .setPositiveButton(R.string.action_confirm) { dialog, _ ->
+            .setNegativeButton(R.string.action_cancel) { dialog: DialogInterface, _ ->
+                dialog.dismiss()
+            }
+            .setPositiveButton(R.string.action_confirm) { dialog: DialogInterface, _ ->
                 viewModel.onClearCartConfirmed()
                 dialog.dismiss()
             }
             .show()
     }
 
-    /**
-     * Displays a confirmation dialog before removing a single item from the cart.
-     */
     private fun showRemoveItemConfirmationDialog(productId: Int) {
         MaterialAlertDialogBuilder(requireContext())
             .setTitle(R.string.dialog_title_remove_item)
             .setMessage(R.string.dialog_message_remove_item)
-            .setNegativeButton(R.string.action_cancel) { dialog, _ -> dialog.dismiss() }
-            .setPositiveButton(R.string.action_confirm) { dialog, _ ->
+            .setNegativeButton(R.string.action_cancel) { dialog: DialogInterface, _ ->
+                dialog.dismiss()
+            }
+            .setPositiveButton(R.string.action_confirm) { dialog: DialogInterface, _ ->
                 viewModel.onRemoveItemConfirmed(productId)
                 dialog.dismiss()
             }

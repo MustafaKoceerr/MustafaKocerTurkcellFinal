@@ -14,6 +14,7 @@ import com.example.mustafakocer.R
 import com.example.mustafakocer.databinding.FragmentOrdersBinding
 import com.example.mustafakocer.presentation.base.BaseFragment
 import com.example.mustafakocer.presentation.common.PagingLoadStateAdapter
+import com.example.mustafakocer.presentation.common.defaultSlideOptions
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -35,14 +36,24 @@ class OrdersFragment : BaseFragment<FragmentOrdersBinding>(FragmentOrdersBinding
         observeState()
     }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        // Transition varsa temizle (action animleri çalışsın)
+        enterTransition = null
+        exitTransition = null
+        reenterTransition = null
+        returnTransition = null
+    }
+
     /**
      * Initializes the RecyclerView, its adapter, and the load state footer.
      * Also handles item click events for navigation.
      */
     private fun setupRecyclerView() {
         orderListAdapter = OrderListAdapter { order ->
-            val action = OrdersFragmentDirections.actionOrdersFragmentToOrderDetailsFragment(order)
-            findNavController().navigate(action)
+            val action = OrdersFragmentDirections
+                .actionOrdersFragmentToOrderDetailsFragment(order)
+            findNavController().navigate(action, defaultSlideOptions())
         }
 
         binding.stateLayout.onRetry = {

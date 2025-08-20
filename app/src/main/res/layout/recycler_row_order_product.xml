@@ -22,7 +22,6 @@
         android:paddingTop="@dimen/od_item_padding_v"
         android:paddingBottom="@dimen/od_item_padding_v">
 
-        <!-- Ürün görseli -->
         <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/imgProduct"
             android:layout_width="@dimen/od_item_image_size"
@@ -43,7 +42,7 @@
             android:layout_marginStart="@dimen/od_item_text_start_margin"
             android:ellipsize="end"
             android:maxLines="2"
-            android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
+            android:textAppearance="@style/TextAppearance.App.TitleMedium"
             android:textColor="?attr/colorOnSurface"
             app:layout_constraintStart_toEndOf="@id/imgProduct"
             app:layout_constraintEnd_toEndOf="parent"
@@ -56,7 +55,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/od_item_quantity_top"
-            android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
+            android:textAppearance="@style/TextAppearance.App.BodyMedium"
             android:textColor="?attr/colorOnSurfaceVariant"
             app:layout_constraintStart_toStartOf="@id/txtProductTitle"
             app:layout_constraintTop_toBottomOf="@id/txtProductTitle"
@@ -67,21 +66,20 @@
             android:id="@+id/txtPricePerUnit"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textAppearance="@style/TextAppearance.Material3.BodyLarge"
+            android:textAppearance="@style/TextAppearance.App.BodyLarge"
             android:textStyle="bold"
             android:textColor="?attr/colorOnSurface"
             app:layout_constraintBaseline_toBaselineOf="@id/txtQuantity"
             app:layout_constraintEnd_toEndOf="parent"
             tools:text="₺25,59" />
 
-        <!-- Satır toplamı (YENİ) -->
+        <!-- Satır toplamı -->
         <TextView
             android:id="@+id/txtLineTotal"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/od_item_total_top"
-            android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
-            android:textStyle="bold"
+            android:textAppearance="@style/TextAppearance.App.Price"
             android:textColor="?attr/colorPrimary"
             app:layout_constraintTop_toBottomOf="@id/txtPricePerUnit"
             app:layout_constraintEnd_toEndOf="parent"

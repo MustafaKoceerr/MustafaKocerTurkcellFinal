@@ -2,16 +2,11 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/root_view"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="?attr/colorSurface"
     tools:context=".presentation.feature_product_list.HomeFragment">
 
-    <!--
-        1. StateLayout'ı ana view olarak ekliyoruz.
-           Tüm ekranı kaplayacak şekilde constrain ediyoruz.
-    -->
     <com.example.mustafakocer.presentation.common.StateLayout
         android:id="@+id/state_layout"
         android:layout_width="0dp"
@@ -20,19 +15,11 @@
         app:emptySubtitle="Listenizde gösterilecek ürün yok."
         app:emptyTitle="Ürün Bulunamadı"
         app:errorIcon="@drawable/ic_cloud_off_24"
-
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
-        <!--
-            // 2. XML üzerinden varsayılan ikon ve metinleri belirliyoruz.
-        -->
-        <!--
-            3. RecyclerView (contentView) artık StateLayout'ın bir çocuğu (child).
-               StateLayout, bunu otomatik olarak 'content' olarak algılayacak.
-               Constrain'leri artık StateLayout'a göre değil, match_parent olarak ayarlanır.
-        -->
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/contentView"
             android:layout_width="match_parent"
@@ -43,13 +30,9 @@
             android:paddingEnd="@dimen/home_content_margin"
             android:paddingBottom="@dimen/home_content_margin_bottom"
             tools:listitem="@layout/recyler_row_product_grid" />
-        <!-- tools:listitem eklemek önizlemeyi güzelleştirir -->
-
     </com.example.mustafakocer.presentation.common.StateLayout>
 
-    <!-- FAB gibi diğer view'lar StateLayout'ın DIŞINDA kalabilir. -->
     <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
-        android:id="@+id/fabScrollTop"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/fab_margin"

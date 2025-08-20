@@ -7,7 +7,7 @@
     android:background="?attr/colorSurface"
     tools:context=".presentation.feature_product_search.SearchFragment">
 
-    <!-- Arama alanı her zaman görünür ve StateLayout'ın DIŞINDADIR. -->
+    <!-- SearchAutoComplete, temadaki android:editTextStyle (Widget.App.EditText) ile INTER kullanır -->
     <androidx.appcompat.widget.SearchView
         android:id="@+id/searchView"
         android:layout_width="0dp"
@@ -15,14 +15,11 @@
         android:layout_margin="16dp"
         android:background="@drawable/bg_search_view"
         app:iconifiedByDefault="false"
+        app:queryHint="@string/search_hint"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:queryHint="@string/search_hint" />
+        app:layout_constraintTop_toTopOf="parent" />
 
-    <!--
-        1. StateLayout, SearchView'ın altında kalan tüm alanı kaplar.
-    -->
     <com.example.mustafakocer.presentation.common.StateLayout
         android:id="@+id/state_layout"
         android:layout_width="0dp"
@@ -31,20 +28,14 @@
         app:emptyIcon="@drawable/ic_search_off_24"
         app:emptyTitle="@string/search_empty_title"
         app:errorIcon="@drawable/ic_cloud_off_24"
-        app:layout_constraintBottom_toBottomOf="parent"
-
-
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/searchView"
         app:promptIcon="@drawable/ic_search_24"
         app:promptSubtitle="@string/search_idle_subtitle"
-        app:promptTitle="@string/search_idle_title">
-        <!--
-            2. Bu ekrana özel varsayılan durumları XML'den belirliyoruz.
-               Bu, component'imizin ne kadar esnek olduğunu gösterir.
-        -->
-        <!-- 3. RecyclerView (contentView) artık StateLayout'ın bir çocuğu. -->
+        app:promptTitle="@string/search_idle_title"
+        app:layout_constraintTop_toBottomOf="@id/searchView"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/contentView"
             android:layout_width="match_parent"
@@ -52,7 +43,6 @@
             android:clipToPadding="false"
             android:paddingHorizontal="8dp"
             tools:listitem="@layout/recyler_row_product_grid" />
-
     </com.example.mustafakocer.presentation.common.StateLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

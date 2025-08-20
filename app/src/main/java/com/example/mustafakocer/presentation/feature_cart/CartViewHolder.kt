@@ -8,13 +8,9 @@ import com.example.mustafakocer.R
 import com.example.mustafakocer.databinding.RecylerRowProductCartBinding
 import com.example.mustafakocer.domain.model.CartItem
 import com.example.mustafakocer.presentation.common.util.parsePriceToDouble
+import java.text.NumberFormat
+import java.util.Locale
 
-/**
- * A [RecyclerView.ViewHolder] for displaying a single [CartItem].
- *
- * @param binding The ViewBinding instance for the item layout.
- * @param onEvent The callback to send [CartEvent]s for user interactions.
- */
 class CartViewHolder(
     private val binding: RecylerRowProductCartBinding,
     private val onEvent: (CartEvent) -> Unit,
@@ -23,7 +19,6 @@ class CartViewHolder(
     private var currentCartItem: CartItem? = null
 
     init {
-        // Listeners are set only once for performance, referencing `currentCartItem`.
         binding.btnPlus.setOnClickListener {
             currentCartItem?.let { onEvent(CartEvent.OnIncrease(it.product.id)) }
         }
@@ -38,39 +33,41 @@ class CartViewHolder(
         }
     }
 
-    /**
-     * Binds a [CartItem] to the views in the ViewHolder.
-     */
     fun bind(cartItem: CartItem) {
-        this.currentCartItem = cartItem
+        currentCartItem = cartItem
         val product = cartItem.product
-        val context = binding.root.context // Context'i al
+        val context = binding.root.context
+
+        // Geçerli locale ile para formatı (binlik ayırıcı aktif)
+        val locale = context.resources.configuration.locales[0]
+        val currency = NumberFormat.getCurrencyInstance(locale).apply {
+            isGroupingUsed = true
+            minimumFractionDigits = 2
+            maximumFractionDigits = 2
+        }
 
         binding.apply {
             txtTitle.text = product.title
             txtQuantity.text = cartItem.quantity.toString()
 
-            val priceAsDouble = product.discountedPrice.parsePriceToDouble()
+            val unitPrice = product.discountedPrice.parsePriceToDouble()
+            val unitPriceText = currency.format(unitPrice)
 
-            // strings.xml'deki kaynakları kullanarak metinleri formatla
-            val formattedPricePerUnit =
-                context.getString(R.string.price_per_unit_format_dollar, priceAsDouble)
-            txtPricePerUnit.text = formattedPricePerUnit
+            val lineTotal = unitPrice * cartItem.quantity
+            val lineTotalText = currency.format(lineTotal)
 
-            val lineTotal = priceAsDouble * cartItem.quantity
-            val formattedLineTotal = context.getString(R.string.price_format_dollar, lineTotal)
-            txtLineTotal.text = formattedLineTotal
+            // İsimler değişmedi: artık %1$s bekliyorlar
+            txtPricePerUnit.text =
+                context.getString(R.string.price_per_unit_format_dollar, unitPriceText)
+            txtLineTotal.text =
+                context.getString(R.string.price_format_dollar, lineTotalText)
 
-            Glide.with(context)
-                .load(product.thumbnailUrl)
-                .into(imgProduct)
+            Glide.with(context).load(product.thumbnailUrl).into(imgProduct)
         }
     }
 
+
     companion object {
-        /**
-         * A factory method to create a new [CartViewHolder] instance.
-         */
         fun create(parent: ViewGroup, onEvent: (CartEvent) -> Unit): CartViewHolder {
             val binding = RecylerRowProductCartBinding.inflate(
                 LayoutInflater.from(parent.context), parent, false

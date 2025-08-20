@@ -5,18 +5,17 @@
     android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="true"
+    android:background="@android:color/transparent"
+    android:fitsSystemWindows="false"
+    app:statusBarBackground="@android:color/transparent"
     tools:context=".presentation.shell.MainActivity"
     tools:openDrawer="start">
 
-    <!-- Ana içerik -->
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:fitsSystemWindows="false">
 
-
-        <!-- App bar (MD3 Top App Bar) -->
         <com.google.android.material.appbar.AppBarLayout
             android:id="@+id/app_bar"
             android:layout_width="match_parent"
@@ -34,12 +33,12 @@
                 android:paddingStart="@dimen/toolbar_horizontal_padding"
                 android:paddingEnd="@dimen/toolbar_horizontal_padding"
                 android:title="@string/app_name"
-                app:popupTheme="@style/ThemeOverlay.Material3.ActionBar"
+                app:popupTheme="@style/ThemeOverlay.MustiShop.ToolbarMenu"
                 app:titleCentered="false"
+                app:titleTextAppearance="@style/TextAppearance.App.TitleLarge"
                 app:titleTextColor="?attr/colorOnSurface" />
         </com.google.android.material.appbar.AppBarLayout>
 
-        <!-- NavHost -->
         <androidx.fragment.app.FragmentContainerView
             android:id="@+id/fragmentContainerView"
             android:name="androidx.navigation.fragment.NavHostFragment"
@@ -49,10 +48,8 @@
             app:defaultNavHost="true"
             app:layout_behavior="@string/appbar_scrolling_view_behavior"
             app:navGraph="@navigation/navigation_graph_home" />
-
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
-    <!-- Drawer -->
     <com.google.android.material.navigation.NavigationView
         android:id="@+id/nav_view"
         android:layout_width="wrap_content"
@@ -61,6 +58,8 @@
         android:fitsSystemWindows="false"
         app:elevation="@dimen/elevation_drawer"
         app:headerLayout="@layout/header"
+        app:itemIconTint="?attr/colorOnSurfaceVariant"
+        app:itemTextAppearance="@style/TextAppearance.App.BodyLarge"
+        app:itemTextColor="?attr/colorOnSurface"
         app:menu="@menu/main_menu" />
-
 </androidx.drawerlayout.widget.DrawerLayout>

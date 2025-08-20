@@ -7,7 +7,6 @@
     android:background="?attr/colorSurface"
     tools:context=".presentation.feature_product_category.ProductsByCategoryFragment">
 
-    <!-- 1. StateLayout'ı ana view olarak ekliyoruz. -->
     <com.example.mustafakocer.presentation.common.StateLayout
         android:id="@+id/state_layout"
         android:layout_width="0dp"
@@ -16,14 +15,11 @@
         app:emptySubtitle="@string/pbc_empty_subtitle"
         app:emptyTitle="@string/pbc_empty_title"
         app:errorIcon="@drawable/ic_cloud_off_24"
-
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
-        <!-- 2. Bu ekrana özel varsayılan durumları belirliyoruz. -->
 
-        <!-- 3. RecyclerView (contentView) artık StateLayout'ın bir çocuğu. -->
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/contentView"
             android:layout_width="match_parent"
@@ -34,10 +30,8 @@
             android:paddingEnd="@dimen/home_content_margin"
             android:paddingBottom="@dimen/home_content_margin_bottom"
             tools:listitem="@layout/recyler_row_product_grid" />
-
     </com.example.mustafakocer.presentation.common.StateLayout>
 
-    <!-- FAB gibi diğer view'lar StateLayout'ın DIŞINDA kalabilir. -->
     <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
         android:id="@+id/fabScrollTop"
         android:layout_width="wrap_content"
@@ -49,5 +43,4 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         tools:visibility="visible" />
-
 </androidx.constraintlayout.widget.ConstraintLayout>

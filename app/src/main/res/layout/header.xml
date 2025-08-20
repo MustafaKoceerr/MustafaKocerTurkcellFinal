@@ -9,7 +9,6 @@
     android:background="?attr/colorPrimaryContainer"
     android:padding="@dimen/header_padding">
 
-    <!-- Avatar -->
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/cardViewHeader"
         android:layout_width="@dimen/header_avatar_size"
@@ -31,34 +30,34 @@
             tools:src="@tools:sample/avatars" />
     </com.google.android.material.card.MaterialCardView>
 
-    <!-- Ad Soyad (avatarın altında, tam genişlik) -->
+    <!-- Ad Soyad (Manrope / TitleLarge) -->
     <TextView
         android:id="@+id/txtNameHeader"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/header_spacing_small"
-        app:layout_constraintTop_toBottomOf="@id/cardViewHeader"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:textAppearance="@style/TextAppearance.Material3.TitleLarge"
+        android:textAppearance="@style/TextAppearance.App.TitleLarge"
         android:textColor="?attr/colorOnPrimaryContainer"
         android:maxLines="1"
         android:ellipsize="end"
+        app:layout_constraintTop_toBottomOf="@id/cardViewHeader"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         tools:text="Mustafa Koçer" />
 
-    <!-- E-posta (adın altında, tam genişlik) -->
+    <!-- E-posta (Inter / BodyMedium) -->
     <TextView
         android:id="@+id/txtMailHeader"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/header_spacing_xsmall"
-        app:layout_constraintTop_toBottomOf="@id/txtNameHeader"
-        app:layout_constraintStart_toStartOf="@id/txtNameHeader"
-        app:layout_constraintEnd_toEndOf="@id/txtNameHeader"
-        android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
+        android:textAppearance="@style/TextAppearance.App.BodyMedium"
         android:textColor="?attr/colorOnPrimaryContainer"
         android:maxLines="1"
         android:ellipsize="end"
+        app:layout_constraintTop_toBottomOf="@id/txtNameHeader"
+        app:layout_constraintStart_toStartOf="@id/txtNameHeader"
+        app:layout_constraintEnd_toEndOf="@id/txtNameHeader"
         tools:text="mustafa.kocer@example.com" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

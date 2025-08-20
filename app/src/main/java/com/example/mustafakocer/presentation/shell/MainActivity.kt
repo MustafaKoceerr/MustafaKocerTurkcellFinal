@@ -1,18 +1,26 @@
 package com.example.mustafakocer.presentation.shell
 
 import android.content.Intent
+import android.content.res.Configuration
+import android.graphics.Color
 import android.os.Bundle
 import android.view.View
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
+import androidx.core.view.updatePadding
+import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.navOptions
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
-import androidx.navigation.ui.onNavDestinationSelected
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.bumptech.glide.Glide
@@ -26,11 +34,6 @@ import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
-/**
- * The main "shell" activity of the application that hosts the primary navigation graph,
- * toolbar, and navigation drawer. It is responsible for observing app-wide state,
- * such as the current user's profile, from the [MainViewModel].
- */
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
@@ -39,22 +42,56 @@ class MainActivity : AppCompatActivity() {
     private lateinit var navController: NavController
     private lateinit var appBarConfiguration: AppBarConfiguration
 
+    // Drawer kapandıktan sonra gideceğimiz menü id’sini burada tutacağız
+    private var pendingTopLevelDestination: Int? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         setSupportActionBar(binding.toolbar)
 
+        setupEdgeToEdge()
         setupNavigation()
         observeViewModel()
     }
 
-    /**
-     * Sets up the NavController, AppBarConfiguration, and connects the Toolbar and
-     * NavigationView to the navigation graph.
-     */
+    private fun setupEdgeToEdge() {
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+        window.statusBarColor = Color.TRANSPARENT
+        window.navigationBarColor = Color.TRANSPARENT
+
+        val isDark =
+            (resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES
+        WindowInsetsControllerCompat(window, window.decorView).apply {
+            isAppearanceLightStatusBars = !isDark
+            isAppearanceLightNavigationBars = !isDark
+        }
+
+        binding.drawerLayout.fitsSystemWindows = false
+        binding.drawerLayout.setStatusBarBackground(null)
+        binding.navView.fitsSystemWindows = false
+
+        ViewCompat.setOnApplyWindowInsetsListener(binding.appBar) { v, insets ->
+            val top = insets.getInsets(WindowInsetsCompat.Type.statusBars()).top
+            v.updatePadding(top = top)
+            insets
+        }
+        ViewCompat.setOnApplyWindowInsetsListener(binding.fragmentContainerView) { v, insets ->
+            val bottom = insets.getInsets(WindowInsetsCompat.Type.navigationBars()).bottom
+            v.updatePadding(bottom = bottom)
+            insets
+        }
+        ViewCompat.setOnApplyWindowInsetsListener(binding.navView) { v, insets ->
+            val sys = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.updatePadding(top = sys.top, bottom = sys.bottom)
+            insets
+        }
+    }
+
     private fun setupNavigation() {
-        val navHostFragment = supportFragmentManager.findFragmentById(R.id.fragmentContainerView) as NavHostFragment
+        val navHostFragment =
+            supportFragmentManager.findFragmentById(R.id.fragmentContainerView) as NavHostFragment
         navController = navHostFragment.navController
 
         appBarConfiguration = AppBarConfiguration(
@@ -66,7 +103,18 @@ class MainActivity : AppCompatActivity() {
         )
 
         setupActionBarWithNavController(navController, appBarConfiguration)
+        // Bunu bırak: destination değişince NavigationView seçim durumunu otomatik günceller
         binding.navView.setupWithNavController(navController)
+
+        // Drawer kapanınca bekleyen navigasyonu çalıştır
+        binding.drawerLayout.addDrawerListener(object : DrawerLayout.SimpleDrawerListener() {
+            override fun onDrawerClosed(drawerView: View) {
+                pendingTopLevelDestination?.let { dest ->
+                    navigateWithCrossfade(dest)
+                    pendingTopLevelDestination = null
+                }
+            }
+        })
 
         binding.navView.setNavigationItemSelectedListener { menuItem ->
             if (menuItem.itemId == R.id.nav_logout) {
@@ -75,53 +123,46 @@ class MainActivity : AppCompatActivity() {
                 return@setNavigationItemSelectedListener true
             }
 
-            val handled = menuItem.onNavDestinationSelected(navController)
-            if (handled) {
+            val currentDestId = navController.currentDestination?.id
+            if (currentDestId == menuItem.itemId) {
                 binding.drawerLayout.closeDrawers()
+                return@setNavigationItemSelectedListener true
             }
-            handled
+
+            // Animasyonu görebilmek için navigate’i drawer kapanınca yap
+            pendingTopLevelDestination = menuItem.itemId
+            binding.drawerLayout.closeDrawers()
+            true
         }
     }
 
-    /**
-     * Subscribes to the StateFlows and event channels from the [MainViewModel]
-     * to update the UI and handle global events like logout.
-     */
     private fun observeViewModel() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                // Observe the user state to update the navigation drawer header.
                 launch {
                     viewModel.userState.collect { resource ->
                         when (resource) {
                             is Resource.Success -> updateNavHeader(resource.data)
-                            is Resource.Error -> {
-                                // Değişiklik burada yapıldı: Toast -> Snackbar
-                                Snackbar.make(binding.root, R.string.toast_user_info_error, Snackbar.LENGTH_SHORT).show()
-                            }
-                            else -> { /* No-op for Loading/Idle */ }
+                            is Resource.Error ->
+                                Snackbar.make(
+                                    binding.root,
+                                    R.string.toast_user_info_error,
+                                    Snackbar.LENGTH_SHORT
+                                ).show()
+                            else -> Unit
                         }
                     }
                 }
-
-                // Observe the logout event to navigate back to the authentication flow.
                 launch {
-                    viewModel.logoutEvent.collect {
-                        goToAuthActivity()
-                    }
+                    viewModel.logoutEvent.collect { goToAuthActivity() }
                 }
             }
         }
     }
 
-    /**
-     * Updates the content of the NavigationView's header with the user's information.
-     * It uses ViewBinding for type-safe access to the header's views.
-     */
     private fun updateNavHeader(user: User) {
         val headerView: View = binding.navView.getHeaderView(0)
         val headerBinding = HeaderBinding.bind(headerView)
-
         headerBinding.apply {
             txtNameHeader.text = user.fullName
             txtMailHeader.text = user.email
@@ -129,10 +170,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    /**
-     * Navigates to the [AuthActivity] and clears the back stack, effectively
-     * ending the current user session from a UI perspective.
-     */
     private fun goToAuthActivity() {
         val intent = Intent(this, AuthActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
@@ -140,9 +177,29 @@ class MainActivity : AppCompatActivity() {
         startActivity(intent)
     }
 
-    /**
-     * Handles the "Up" button navigation, delegating to the NavController.
-     */
+    private fun navigateWithCrossfade(destId: Int) {
+        val options = navOptions {
+            anim {
+                enter = R.anim.fade_in
+                exit = R.anim.fade_out
+                popEnter = R.anim.fade_in
+                popExit = R.anim.fade_out
+            }
+            // stack şişmesin: her seçimde Home (start) hariç üsttekileri temizle
+            // (inclusive=false => Home kalır, geri tuşu Home’a döner)
+            popUpTo(navController.graph.startDestinationId) {
+                inclusive = false
+            }
+            launchSingleTop = true
+            // NOTE: restore/saveState kullanmıyoruz; animasyonu engelleyebiliyor
+        }
+        try {
+            navController.navigate(destId, null, options)
+        } catch (_: IllegalArgumentException) {
+            // ignore
+        }
+    }
+
     override fun onSupportNavigateUp(): Boolean {
         return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
     }

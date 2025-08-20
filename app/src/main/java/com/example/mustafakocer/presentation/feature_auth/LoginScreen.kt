@@ -15,25 +15,15 @@ import com.example.mustafakocer.presentation.feature_auth.contract.LoginEvent
 import com.example.mustafakocer.presentation.feature_auth.contract.LoginUiState
 import com.example.mustafakocer.presentation.feature_splash.components.SplashLogo
 
-/**
- * A "dumb" composable that is responsible for drawing the UI of the login screen.
- * It is driven entirely by the [state] and delegates all user interactions via [onEvent].
- * It also provides a host for displaying Snackbars.
- */
 @Composable
 fun LoginScreen(
     state: LoginUiState,
     onEvent: (LoginEvent) -> Unit,
-    // 1. SnackbarHostState, Route'dan parametre olarak alınır.
     snackbarHostState: SnackbarHostState
 ) {
-    // 2. Ekran, Snackbar'ı yerleştirebilmek için Scaffold ile sarmalanır.
-    Scaffold(
-        snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
-    ) { innerPadding ->
+    Scaffold(snackbarHost = { SnackbarHost(hostState = snackbarHostState) }) { innerPadding ->
         SplashBackground {
             Box(
-                // 3. Scaffold'un sağladığı padding, içeriğin üst/alt barların altına girmesini önler.
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(innerPadding)
@@ -68,22 +58,26 @@ fun LoginScreen(
                             LoginFields(
                                 state = state,
                                 onEvent = onEvent,
-                                onSubmit = { onEvent(LoginEvent.LoginClicked) })
+                                onSubmit = { onEvent(LoginEvent.LoginClicked) }
+                            )
 
                             Button(
                                 onClick = { onEvent(LoginEvent.LoginClicked) },
                                 modifier = Modifier.fillMaxWidth(),
                                 enabled = !state.isLoading
-                            ) { Text(text = stringResource(id = R.string.login_cta)) }
+                            ) {
+                                // Button metinleri labelLarge => Inter
+                                Text(text = stringResource(id = R.string.login_cta))
+                            }
 
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
                                 horizontalArrangement = Arrangement.SpaceBetween
                             ) {
-                                TextButton(onClick = { /*TODO*/ }, enabled = !state.isLoading) {
+                                TextButton(onClick = { /* TODO */ }, enabled = !state.isLoading) {
                                     Text(stringResource(id = R.string.login_forgot_password))
                                 }
-                                TextButton(onClick = { /*TODO*/ }, enabled = !state.isLoading) {
+                                TextButton(onClick = { /* TODO */ }, enabled = !state.isLoading) {
                                     Text(stringResource(id = R.string.login_create_account))
                                 }
                             }

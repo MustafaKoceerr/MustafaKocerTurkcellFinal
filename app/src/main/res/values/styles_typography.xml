@@ -1,0 +1,90 @@
+<!-- res/values/styles_typography.xml -->
+<resources>
+
+    <!-- Başlıklar (Manrope) -->
+    <style name="TextAppearance.App.TitleLarge" parent="TextAppearance.Material3.TitleLarge">
+        <item name="fontFamily">@font/manrope</item>
+        <item name="android:fontFamily">@font/manrope</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="TextAppearance.App.TitleMedium" parent="TextAppearance.Material3.TitleMedium">
+        <item name="fontFamily">@font/manrope</item>
+        <item name="android:fontFamily">@font/manrope</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="TextAppearance.App.TitleSmall" parent="TextAppearance.Material3.TitleSmall">
+        <item name="fontFamily">@font/manrope</item>
+        <item name="android:fontFamily">@font/manrope</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <!-- Gövde / Form (Inter) -->
+    <style name="TextAppearance.App.BodyLarge" parent="TextAppearance.Material3.BodyLarge">
+        <item name="fontFamily">@font/inter</item>
+        <item name="android:fontFamily">@font/inter</item>
+    </style>
+    <style name="TextAppearance.App.BodyMedium" parent="TextAppearance.Material3.BodyMedium">
+        <item name="fontFamily">@font/inter</item>
+        <item name="android:fontFamily">@font/inter</item>
+    </style>
+    <style name="TextAppearance.App.BodySmall" parent="TextAppearance.Material3.BodySmall">
+        <item name="fontFamily">@font/inter</item>
+        <item name="android:fontFamily">@font/inter</item>
+    </style>
+
+    <!-- Etiketler -->
+    <style name="TextAppearance.App.LabelSmall" parent="TextAppearance.Material3.LabelSmall">
+        <item name="fontFamily">@font/inter</item>
+        <item name="android:fontFamily">@font/inter</item>
+    </style>
+    <!-- Etiketler (Inter) -->
+    <style name="TextAppearance.App.LabelMedium" parent="TextAppearance.Material3.LabelMedium">
+        <item name="fontFamily">@font/inter</item>
+        <item name="android:fontFamily">@font/inter</item>
+    </style>
+
+    <!-- Fiyat metinleri (tabular figures) -->
+    <style name="TextAppearance.App.Price" parent="TextAppearance.Material3.TitleLarge">
+        <item name="fontFamily">@font/inter</item>
+        <item name="android:fontFamily">@font/inter</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:fontFeatureSettings">tnum</item>
+    </style>
+
+    <!-- DÜZELTME: Varsayılan TextView & EditText ebeveynleri -->
+    <style name="Widget.App.TextView" parent="@style/Widget.AppCompat.TextView">
+        <item name="fontFamily">@font/inter</item>
+        <item name="android:fontFamily">@font/inter</item>
+        <item name="android:textAppearance">@style/TextAppearance.App.BodyMedium</item>
+    </style>
+
+    <style name="Widget.App.EditText" parent="@style/Widget.AppCompat.EditText">
+        <item name="fontFamily">@font/inter</item>
+        <item name="android:fontFamily">@font/inter</item>
+        <item name="android:textAppearance">@style/TextAppearance.App.BodyMedium</item>
+    </style>
+
+    <!-- (Opsiyonel) Toolbar: Material3 yoksa AppCompat'a düşebilir -->
+    <style name="Widget.App.Toolbar" parent="@style/Widget.Material3.Toolbar">
+        <item name="titleTextAppearance">@style/TextAppearance.App.TitleLarge</item>
+        <item name="subtitleTextAppearance">@style/TextAppearance.App.BodySmall</item>
+    </style>
+
+    <!-- TextInputLayout iç metinleri -->
+    <style name="Widget.App.TextInputLayout" parent="Widget.Material3.TextInputLayout.OutlinedBox">
+        <item name="hintTextAppearance">@style/TextAppearance.App.BodyMedium</item>
+        <item name="helperTextTextAppearance">@style/TextAppearance.App.LabelSmall</item>
+        <item name="errorTextAppearance">@style/TextAppearance.App.LabelSmall</item>
+        <item name="counterTextAppearance">@style/TextAppearance.App.LabelSmall</item>
+    </style>
+
+    <style name="ThemeOverlay.MustiShop.ToolbarMenu" parent="ThemeOverlay.Material3.ActionBar">
+        <item name="textAppearanceBodyLarge">@style/TextAppearance.App.BodyLarge</item>
+        <item name="textAppearanceBodyMedium">@style/TextAppearance.App.BodyMedium</item>
+        <item name="textAppearanceBodySmall">@style/TextAppearance.App.BodySmall</item>
+        <item name="textAppearanceTitleSmall">@style/TextAppearance.App.TitleSmall</item>
+    </style>
+
+</resources>

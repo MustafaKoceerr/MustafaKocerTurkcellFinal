@@ -59,6 +59,7 @@ android {
 }
 
 dependencies {
+
     implementation("androidx.viewpager2:viewpager2:1.1.0")
 
     implementation("androidx.dynamicanimation:dynamicanimation-ktx:1.1.0")

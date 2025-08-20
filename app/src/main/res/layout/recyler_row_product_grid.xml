@@ -20,7 +20,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <!-- Görsel (1:1) -->
         <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/imgProduct"
             android:layout_width="0dp"
@@ -43,7 +42,7 @@
             android:paddingEnd="@dimen/badge_h"
             android:paddingTop="@dimen/badge_v"
             android:paddingBottom="@dimen/badge_v"
-            android:textAppearance="@style/TextAppearance.Material3.LabelSmall"
+            android:textAppearance="@style/TextAppearance.App.LabelSmall"
             android:textStyle="bold"
             android:textColor="?attr/colorOnPrimaryContainer"
             android:background="@drawable/bg_badge_label"
@@ -65,7 +64,7 @@
             android:paddingEnd="@dimen/badge_h"
             android:paddingTop="@dimen/badge_v"
             android:paddingBottom="@dimen/badge_v"
-            android:textAppearance="@style/TextAppearance.Material3.LabelSmall"
+            android:textAppearance="@style/TextAppearance.App.LabelSmall"
             android:textStyle="bold"
             android:textColor="?attr/colorOnTertiaryContainer"
             android:background="@drawable/bg_badge_label"
@@ -80,7 +79,6 @@
 
         <!-- İçerik alanı -->
         <LinearLayout
-            android:id="@+id/layoutContent"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:orientation="vertical"
@@ -96,7 +94,7 @@
                 android:layout_height="wrap_content"
                 android:maxLines="2"
                 android:ellipsize="end"
-                android:textAppearance="@style/TextAppearance.Material3.TitleSmall"
+                android:textAppearance="@style/TextAppearance.App.TitleSmall"
                 android:textColor="?attr/colorOnSurface"
                 tools:text="Apple iPhone 13 Pro Max 256GB Sierra Blue" />
 
@@ -125,14 +123,13 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/product_rating_value_gap"
-                    android:textAppearance="@style/TextAppearance.Material3.LabelMedium"
+                    android:textAppearance="@style/TextAppearance.App.LabelSmall"
                     android:textColor="?attr/colorOnSurfaceVariant"
                     tools:text="4.8" />
             </LinearLayout>
 
             <!-- Fiyatlar -->
             <LinearLayout
-                android:id="@+id/rowPrices"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/product_prices_top"
@@ -143,7 +140,7 @@
                     android:id="@+id/txtDiscountedPrice"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
+                    android:textAppearance="@style/TextAppearance.App.TitleMedium"
                     android:textStyle="bold"
                     android:textColor="?attr/colorPrimary"
                     tools:text="₺10.999" />
@@ -153,7 +150,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/product_original_price_gap_start"
-                    android:textAppearance="@style/TextAppearance.Material3.BodySmall"
+                    android:textAppearance="@style/TextAppearance.App.BodySmall"
                     android:textColor="?attr/colorOnSurfaceVariant"
                     tools:text="₺12.999" />
             </LinearLayout>

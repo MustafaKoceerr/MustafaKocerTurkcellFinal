@@ -9,7 +9,6 @@
     android:background="?attr/colorSurface"
     tools:context=".presentation.feature_orders.OrderDetailsFragment">
 
-    <!-- StateLayout ana kapsayıcı -->
     <com.example.mustafakocer.presentation.common.StateLayout
         android:id="@+id/state_layout"
         android:layout_width="0dp"
@@ -20,7 +19,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:errorIcon="@drawable/ic_cloud_off_24">
 
-        <!-- İçerik: NestedScrollView artık StateLayout'ın çocuğu -->
         <androidx.core.widget.NestedScrollView
             android:id="@+id/contentView"
             android:layout_width="match_parent"
@@ -32,7 +30,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
-                <!-- Özet kartı -->
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/cardOrderSummary"
                     android:layout_width="0dp"
@@ -56,20 +53,19 @@
                         android:paddingTop="@dimen/od_card_padding_top"
                         android:paddingBottom="@dimen/od_card_padding_bottom">
 
-                        <!-- Başlık (ID mevcut) -->
+                        <!-- Başlık -->
                         <TextView
                             android:id="@+id/txtSummaryTitle"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:text="@string/order_details_summary_title"
-                            android:textAppearance="@style/TextAppearance.Material3.TitleLarge"
+                            android:textAppearance="@style/TextAppearance.App.TitleLarge"
                             android:textColor="?attr/colorOnSurface"
                             app:layout_constraintTop_toTopOf="parent"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintEnd_toStartOf="@id/chipOrderStatus"
                             app:layout_goneMarginEnd="8dp" />
 
-                        <!-- Sipariş durumu (Assist Chip) -->
                         <com.google.android.material.chip.Chip
                             android:id="@+id/chipOrderStatus"
                             style="@style/Widget.Material3.Chip.Assist"
@@ -91,7 +87,7 @@
                             android:layout_marginTop="@dimen/od_row_spacing_sm"
                             android:text="@string/order_details_order_id_label"
                             android:textColor="?attr/colorOnSurfaceVariant"
-                            android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
+                            android:textAppearance="@style/TextAppearance.App.BodyMedium"
                             app:layout_constraintTop_toBottomOf="@id/txtSummaryTitle"
                             app:layout_constraintStart_toStartOf="parent" />
 
@@ -101,7 +97,7 @@
                             android:layout_height="wrap_content"
                             android:textStyle="bold"
                             android:textColor="?attr/colorOnSurface"
-                            android:textAppearance="@style/TextAppearance.Material3.BodyLarge"
+                            android:textAppearance="@style/TextAppearance.App.BodyLarge"
                             app:layout_constraintBaseline_toBaselineOf="@id/txtOrderIdLabel"
                             app:layout_constraintEnd_toEndOf="parent"
                             tools:text="#24" />
@@ -114,20 +110,19 @@
                             android:layout_marginTop="@dimen/od_row_spacing_xs"
                             android:text="@string/order_details_date_label"
                             android:textColor="?attr/colorOnSurfaceVariant"
-                            android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
+                            android:textAppearance="@style/TextAppearance.App.BodyMedium"
                             app:layout_constraintTop_toBottomOf="@id/txtOrderIdLabel"
                             app:layout_constraintStart_toStartOf="parent" />
 
                         <TextView
-                            android:id="@+id/txtOrderDate"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:textStyle="bold"
                             android:textColor="?attr/colorOnSurface"
-                            android:textAppearance="@style/TextAppearance.Material3.BodyLarge"
+                            android:textAppearance="@style/TextAppearance.App.BodyLarge"
                             app:layout_constraintBaseline_toBaselineOf="@id/txtOrderDateLabel"
                             app:layout_constraintEnd_toEndOf="parent"
-                            tools:text="11 Ağu 2025, 13:20" />
+                            android:text="@string/order_static_date" />
 
                         <!-- Ürün adedi -->
                         <TextView
@@ -137,7 +132,7 @@
                             android:layout_marginTop="@dimen/od_row_spacing_xs"
                             android:text="@string/order_details_items_label"
                             android:textColor="?attr/colorOnSurfaceVariant"
-                            android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
+                            android:textAppearance="@style/TextAppearance.App.BodyMedium"
                             app:layout_constraintTop_toBottomOf="@id/txtOrderDateLabel"
                             app:layout_constraintStart_toStartOf="parent" />
 
@@ -147,7 +142,7 @@
                             android:layout_height="wrap_content"
                             android:textStyle="bold"
                             android:textColor="?attr/colorOnSurface"
-                            android:textAppearance="@style/TextAppearance.Material3.BodyLarge"
+                            android:textAppearance="@style/TextAppearance.App.BodyLarge"
                             app:layout_constraintBaseline_toBaselineOf="@id/txtItemCountLabel"
                             app:layout_constraintEnd_toEndOf="parent"
                             tools:text="7 ürün" />
@@ -160,7 +155,7 @@
                             android:layout_marginTop="@dimen/od_row_spacing_sm"
                             android:text="@string/order_details_total_amount_label"
                             android:textColor="?attr/colorOnSurfaceVariant"
-                            android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
+                            android:textAppearance="@style/TextAppearance.App.BodyMedium"
                             app:layout_constraintTop_toBottomOf="@id/txtItemCountLabel"
                             app:layout_constraintStart_toStartOf="parent" />
 
@@ -170,7 +165,7 @@
                             android:layout_height="wrap_content"
                             android:textStyle="bold"
                             android:textColor="?attr/colorOnSurface"
-                            android:textAppearance="@style/TextAppearance.Material3.TitleLarge"
+                            android:textAppearance="@style/TextAppearance.App.Price"
                             app:layout_constraintBaseline_toBaselineOf="@id/txtTotalAmountLabel"
                             app:layout_constraintEnd_toEndOf="parent"
                             tools:text="₺1.594,33" />
@@ -185,12 +180,11 @@
                     android:layout_marginStart="@dimen/od_content_margin"
                     android:layout_marginTop="@dimen/od_section_spacing"
                     android:text="@string/order_details_products_section_title"
-                    android:textAppearance="@style/TextAppearance.Material3.TitleLarge"
+                    android:textAppearance="@style/TextAppearance.App.TitleLarge"
                     android:textColor="?attr/colorOnSurface"
                     app:layout_constraintTop_toBottomOf="@id/cardOrderSummary"
                     app:layout_constraintStart_toStartOf="parent" />
 
-                <!-- Ürünler listesi -->
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/productsRecyclerView"
                     android:layout_width="0dp"

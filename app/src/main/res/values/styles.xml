@@ -16,39 +16,38 @@
     </style>
 
 
-    <!-- App seviyesinde özelleştirilmiş Tag Chip -->
     <style name="App.Chip.Tag" parent="Widget.Material3.Chip.Assist.Elevated">
-        <!-- Metin ve ikon davranışları -->
+        <!-- Tipografi -->
+        <item name="android:textAppearance">@style/TextAppearance.App.LabelMedium</item>
         <item name="android:textAllCaps">false</item>
         <item name="android:ellipsize">end</item>
+
+        <!-- Erişilebilirlik -->
         <item name="ensureMinTouchTargetSize">false</item>
 
-        <!-- Start ikonu isterseniz bir drawable koyun; yoksa görünmez bırakın -->
+        <!-- İkon davranışları -->
         <item name="chipIconVisible">false</item>
-
-        <!-- Kapatma ikonu: yalnızca seçiliyken göster -->
         <item name="closeIconVisible">false</item>
         <item name="closeIconTint">?attr/colorOnSurface</item>
-
-        <!-- Seçim/Check desteği -->
         <item name="android:checkable">true</item>
         <item name="checkedIconVisible">false</item>
 
-        <!-- Renkler: durumlara göre state list -->
+        <!-- Renkler -->
         <item name="chipBackgroundColor">@color/chip_tag_bg</item>
         <item name="android:textColor">@color/chip_tag_text</item>
         <item name="chipStrokeColor">@color/chip_tag_stroke</item>
         <item name="chipStrokeWidth">1dp</item>
 
-        <!-- İç boşluklar ve “pill” görünüm -->
+        <!-- İç boşluklar -->
         <item name="chipStartPadding">10dp</item>
         <item name="chipEndPadding">6dp</item>
         <item name="iconStartPadding">6dp</item>
         <item name="iconEndPadding">2dp</item>
 
-        <!-- Yuvarlak köşeler -->
+        <!-- Şekil -->
         <item name="shapeAppearance">@style/App.Shape.Pill.16</item>
     </style>
+
 
     <!-- 16dp yarıçaplı “pill” -->
     <style name="App.Shape.Pill.16" parent="">

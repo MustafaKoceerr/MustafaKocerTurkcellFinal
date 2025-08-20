@@ -43,7 +43,7 @@
             android:layout_marginStart="@dimen/category_item_text_start_margin"
             android:ellipsize="end"
             android:maxLines="1"
-            android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
+            android:textAppearance="@style/TextAppearance.App.TitleMedium"
             android:textColor="@color/category_item_text"
             app:layout_constraintBottom_toBottomOf="@id/imgCategory"
             app:layout_constraintEnd_toEndOf="parent"

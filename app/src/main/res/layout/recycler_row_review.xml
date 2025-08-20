@@ -2,7 +2,6 @@
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/cardReview"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginHorizontal="12dp"
@@ -18,7 +17,7 @@
         android:minHeight="72dp"
         android:padding="16dp">
 
-        <!-- Avatar (baş harf gösterilecek) -->
+        <!-- Avatar (baş harf) -->
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/txtAvatar"
             android:layout_width="40dp"
@@ -27,6 +26,7 @@
             android:gravity="center"
             android:importantForAccessibility="no"
             android:textAllCaps="true"
+            android:textAppearance="@style/TextAppearance.App.TitleSmall"
             android:textColor="?attr/colorOnPrimary"
             android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
@@ -39,7 +39,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="12dp"
-            android:textAppearance="@style/TextAppearance.Material3.TitleSmall"
+            android:textAppearance="@style/TextAppearance.App.TitleSmall"
             android:textColor="?attr/colorOnSurface"
             app:layout_constraintEnd_toStartOf="@id/ratingBar"
             app:layout_constraintHorizontal_bias="0"
@@ -52,7 +52,7 @@
             android:id="@+id/txtDate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textAppearance="@style/TextAppearance.Material3.BodySmall"
+            android:textAppearance="@style/TextAppearance.App.BodySmall"
             android:textColor="?attr/colorOnSurfaceVariant"
             app:layout_constraintStart_toStartOf="@id/txtName"
             app:layout_constraintTop_toBottomOf="@id/txtName"
@@ -73,20 +73,17 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <!-- Yorum metni -->
-        <!-- Yorum metni -->
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/txtComment"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
-            android:textColor="?attr/colorOnSurface"
             android:lineSpacingExtra="2dp"
+            android:textAppearance="@style/TextAppearance.App.BodyMedium"
+            android:textColor="?attr/colorOnSurface"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/txtDate"
-            app:layout_constraintEnd_toEndOf="parent"
             tools:text="Excellent quality! Highly recommended. Fabric feels premium and stitching is solid." />
-
-
     </androidx.constraintlayout.widget.ConstraintLayout>
 </com.google.android.material.card.MaterialCardView>

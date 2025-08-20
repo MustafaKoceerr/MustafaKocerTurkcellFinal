@@ -1,10 +1,6 @@
 package com.example.mustafakocer.presentation.feature_auth.components
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -13,16 +9,8 @@ import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconToggleButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
@@ -37,15 +25,6 @@ import com.example.mustafakocer.R
 import com.example.mustafakocer.presentation.feature_auth.contract.LoginEvent
 import com.example.mustafakocer.presentation.feature_auth.contract.LoginUiState
 
-/**
- * A state-driven Composable that renders the username and password input fields for the login screen.
- * It handles user input, focus management, and displays validation errors.
- *
- * @param state The current [LoginUiState] to drive the UI.
- * @param onEvent A lambda to send [LoginEvent]s to the ViewModel.
- * @param modifier The modifier to be applied to the component.
- * @param onSubmit A lambda to be invoked when the user submits the form (e.g., clicks "Done").
- */
 @Composable
 fun LoginFields(
     state: LoginUiState,
@@ -57,10 +36,8 @@ fun LoginFields(
     val passwordFocus = remember { FocusRequester() }
     var isPasswordVisible by remember { mutableStateOf(false) }
 
-    Column(
-        verticalArrangement = Arrangement.spacedBy(4.dp)
-    ) {
-        // USERNAME
+    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+        // USERNAME — Inter bodyLarge
         OutlinedTextField(
             value = state.email,
             onValueChange = { onEvent(LoginEvent.EmailChanged(it)) },
@@ -68,15 +45,19 @@ fun LoginFields(
             enabled = !state.isLoading,
             shape = RoundedCornerShape(16.dp),
             singleLine = true,
-            label = { Text(stringResource(R.string.login_username_label)) },
-            placeholder = { Text(stringResource(R.string.login_username_placeholder)) },
+            textStyle = MaterialTheme.typography.bodyLarge, // <<< Inter
+            label = { Text(stringResource(R.string.login_username_label), style = MaterialTheme.typography.labelLarge) },
+            placeholder = { Text(stringResource(R.string.login_username_placeholder), style = MaterialTheme.typography.bodyLarge) },
             leadingIcon = { Icon(Icons.Filled.Person, contentDescription = null) },
             isError = !state.emailError.isNullOrBlank(),
             supportingText = {
                 if (!state.emailError.isNullOrBlank()) {
-                    Text(text = state.emailError, color = MaterialTheme.colorScheme.error)
+                    Text(
+                        text = state.emailError,
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.error
+                    )
                 } else {
-                    // This Spacer prevents the layout from jumping when an error message appears/disappears.
                     Spacer(Modifier.height(0.dp))
                 }
             },
@@ -89,7 +70,7 @@ fun LoginFields(
             )
         )
 
-        // PASSWORD
+        // PASSWORD — Inter bodyLarge
         OutlinedTextField(
             value = state.password,
             onValueChange = { onEvent(LoginEvent.PasswordChanged(it)) },
@@ -99,8 +80,9 @@ fun LoginFields(
             enabled = !state.isLoading,
             shape = RoundedCornerShape(16.dp),
             singleLine = true,
-            label = { Text(stringResource(R.string.login_password_label)) },
-            placeholder = { Text(stringResource(R.string.login_password_placeholder)) },
+            textStyle = MaterialTheme.typography.bodyLarge, // <<< Inter
+            label = { Text(stringResource(R.string.login_password_label), style = MaterialTheme.typography.labelLarge) },
+            placeholder = { Text(stringResource(R.string.login_password_placeholder), style = MaterialTheme.typography.bodyLarge) },
             leadingIcon = { Icon(Icons.Filled.Lock, contentDescription = null) },
             visualTransformation = if (isPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
             trailingIcon = {
@@ -120,7 +102,11 @@ fun LoginFields(
             isError = !state.passwordError.isNullOrBlank(),
             supportingText = {
                 if (!state.passwordError.isNullOrBlank()) {
-                    Text(text = state.passwordError, color = MaterialTheme.colorScheme.error)
+                    Text(
+                        text = state.passwordError,
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.error
+                    )
                 } else {
                     Spacer(Modifier.height(0.dp))
                 }

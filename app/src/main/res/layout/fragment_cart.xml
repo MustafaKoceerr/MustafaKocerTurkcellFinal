@@ -7,7 +7,6 @@
     android:background="?attr/colorSurface"
     tools:context=".presentation.feature_cart.CartFragment">
 
-    <!-- StateLayout ana içerik alanı -->
     <com.example.mustafakocer.presentation.common.StateLayout
         android:id="@+id/state_layout"
         android:layout_width="0dp"
@@ -16,13 +15,11 @@
         app:emptySubtitle="@string/cart_empty_subtitle"
         app:emptyTitle="@string/cart_empty_title"
         app:errorIcon="@drawable/ic_cloud_off_24"
-
         app:layout_constraintBottom_toTopOf="@id/cardSummary"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <!-- İçerik: RecyclerView -->
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/contentView"
             android:layout_width="match_parent"
@@ -35,7 +32,6 @@
             tools:itemCount="4" />
     </com.example.mustafakocer.presentation.common.StateLayout>
 
-    <!-- Alt özet kartı: StateLayout DIŞINDA -->
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/cardSummary"
         android:layout_width="0dp"
@@ -57,13 +53,12 @@
             android:paddingEnd="@dimen/cart_summary_padding"
             android:paddingBottom="@dimen/cart_summary_padding_bottom">
 
-            <!-- Etiket (ID korunur) -->
             <TextView
                 android:id="@+id/txtTotalLabel"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:text="@string/cart_summary_total_label"
-                android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
+                android:textAppearance="@style/TextAppearance.App.BodyMedium"
                 android:textColor="?attr/colorOnSurfaceVariant"
                 app:layout_constraintEnd_toStartOf="@id/btnCheckout"
                 app:layout_constraintHorizontal_bias="0"
@@ -71,14 +66,12 @@
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_goneMarginEnd="8dp" />
 
-            <!-- Toplam (ID korunur) -->
             <TextView
                 android:id="@+id/txtTotalPrice"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:textAppearance="@style/TextAppearance.Material3.TitleLarge"
+                android:textAppearance="@style/TextAppearance.App.Price"
                 android:textColor="?attr/colorOnSurface"
-                android:textStyle="bold"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@id/btnCheckout"
                 app:layout_constraintStart_toStartOf="parent"
@@ -86,7 +79,6 @@
                 app:layout_goneMarginEnd="8dp"
                 tools:text="$124.50" />
 
-            <!-- Ödeme butonu (ID korunur) -->
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnCheckout"
                 style="?attr/materialButtonStyle"
