@@ -3,23 +3,23 @@ package com.example.mustafakocer.domain.util
 import com.example.mustafakocer.domain.exception.AppException
 
 /**
- * Bir veri isteğinin durumunu temsil eden sealed bir sarmalayıcı sınıf.
+ * A sealed wrapper class representing the state of a data request.
  *
- * MİMARİ NOT: Bu sınıf, asenkron işlemlerin (API çağrıları gibi) durumunu
- * data/domain katmanlarından UI katmanına iletmek için temeldir. Yüklenme, başarı
- * ve hata durumlarını açıkça ele alarak, ViewModel ve UI'daki durum yönetimini
- * çok daha temiz ve öngörülebilir hale getirir.
+ * ARCHITECTURAL NOTE: This class is fundamental for communicating the status of
+ * asynchronous operations (like API calls) from the data/domain layers to the UI layer.
+ * By explicitly handling loading, success, and error states, it makes state management
+ * in ViewModels and UI components much cleaner and more predictable.
  */
 sealed class Resource<out T> {
-    /** İşlemin henüz başlamadığını veya bir eylem beklediğini belirtir. */
+    /** Indicates the operation has not yet started or is awaiting an action. */
     data object Idle : Resource<Nothing>()
 
-    /** İşlemin başladığını ve sonucun beklendiğini belirtir. */
+    /** Indicates the operation has started and the result is being awaited. */
     data object Loading : Resource<Nothing>()
 
-    /** İşlemin başarıyla tamamlandığını ve veri içerdiğini belirtir. */
+    /** Indicates the operation completed successfully and contains data. */
     data class Success<out T>(val data: T) : Resource<T>()
 
-    /** İşlem sırasında bir hata oluştuğunu belirtir. */
+    /** Indicates that an error occurred during the operation. */
     data class Error(val exception: AppException) : Resource<Nothing>()
 }

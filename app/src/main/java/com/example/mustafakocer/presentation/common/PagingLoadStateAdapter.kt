@@ -8,12 +8,18 @@ import androidx.paging.LoadStateAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.mustafakocer.databinding.ItemPagingFooterBinding
 
+/**
+ * A [LoadStateAdapter] for displaying a progress bar while data is loading,
+ * and an error message with a retry button when loading fails.
+ * This is typically used as a footer for a [PagingDataAdapter].
+ *
+ * @param retry A lambda function to be invoked when the retry button is clicked.
+ */
 class PagingLoadStateAdapter(
-    private val retry: () -> Unit
+    private val retry: () -> Unit,
 ) : LoadStateAdapter<PagingLoadStateAdapter.LoadStateViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, loadState: LoadState): LoadStateViewHolder {
-        // ViewBinding kullanımı burada tamamen aynı ve doğru.
         val binding = ItemPagingFooterBinding.inflate(
             LayoutInflater.from(parent.context),
             parent,
@@ -26,23 +32,28 @@ class PagingLoadStateAdapter(
         holder.bind(loadState)
     }
 
-    // ViewHolder sınıfı da ViewBinding kullanacak şekilde güncellendi.
+    /**
+     * The [RecyclerView.ViewHolder] for the load state item.
+     * It manages the visibility of the progress bar, error text, and retry button.
+     */
     class LoadStateViewHolder(
         private val binding: ItemPagingFooterBinding,
-        private val retry: () -> Unit // retry fonksiyonunu burada da alıyoruz.
+        private val retry: () -> Unit,
     ) : RecyclerView.ViewHolder(binding.root) {
 
         init {
-            // "Tekrar Dene" butonunun click listener'ını burada set ediyoruz.
             binding.btnRetry.setOnClickListener { retry.invoke() }
         }
 
+        /**
+         * Binds the current [LoadState] to the views.
+         */
         fun bind(loadState: LoadState) {
-            // `binding.apply` bloğu yerine doğrudan `binding` üzerinden erişim sağlıyoruz.
-            // Bu, ViewBinding için standart ve temiz bir kullanımdır.
-            binding.progressBar.isVisible = loadState is LoadState.Loading
-            binding.btnRetry.isVisible = loadState is LoadState.Error
-            binding.txtError.isVisible = loadState is LoadState.Error
+            binding.apply {
+                progressBar.isVisible = loadState is LoadState.Loading
+                btnRetry.isVisible = loadState is LoadState.Error
+                txtError.isVisible = loadState is LoadState.Error
+            }
         }
     }
 }

@@ -10,15 +10,22 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.TileMode
 
+/**
+ * A reusable Composable that provides a consistent gradient background for screens.
+ * It uses colors from the app's [MaterialTheme] to support theming (e.g., light/dark mode).
+ *
+ * @param content A lambda that defines the content to be placed on top of this background.
+ * The `BoxScope` receiver allows for alignment and layering of child components.
+ */
 @Composable
 fun SplashBackground(content: @Composable BoxScope.() -> Unit) {
-    val cs = MaterialTheme.colorScheme
+    val colorScheme = MaterialTheme.colorScheme
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(
                 Brush.verticalGradient(
-                    colors = listOf(cs.primaryContainer, cs.surface),
+                    colors = listOf(colorScheme.primaryContainer, colorScheme.surface),
                     tileMode = TileMode.Clamp
                 )
             ),

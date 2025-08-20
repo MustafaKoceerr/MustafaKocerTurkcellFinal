@@ -3,45 +3,43 @@ package com.example.mustafakocer.presentation.feature_details
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.example.mustafakocer.databinding.RecyclerRowReviewBinding // ViewBinding sınıfını import et
+import com.example.mustafakocer.databinding.RecyclerRowReviewBinding
 import com.example.mustafakocer.domain.model.Review
 
+/**
+ * A [RecyclerView.Adapter] for displaying a list of product [Review]s.
+ *
+ * @param reviews The list of reviews to be displayed.
+ */
 class ReviewAdapter(
     private val reviews: List<Review>
 ) : RecyclerView.Adapter<ReviewAdapter.ReviewViewHolder>() {
 
     /**
-     * ViewHolder, tek bir satırın (recycler_row_review.xml) view'larına referans tutar.
-     * ViewBinding kullanarak bu referansları güvenli ve verimli bir şekilde alırız.
-     * Bu, her seferinde `findViewById` çağırma maliyetinden kurtarır.
+     * A [RecyclerView.ViewHolder] that holds the view for a single review item.
+     * It uses ViewBinding to safely and efficiently access the views.
      */
     inner class ReviewViewHolder(private val binding: RecyclerRowReviewBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
         /**
-         * Bu yardımcı fonksiyon, bir `Review` nesnesini alıp ViewHolder'ın tuttuğu
-         * view'lara bağlar. Bu, `onBindViewHolder`'daki kodu temiz tutar.
+         * Binds a [Review] object to the views held by this ViewHolder.
          */
         fun bind(review: Review) {
             binding.apply {
                 txtName.text = review.reviewerName
                 txtDate.text = review.formattedDate
                 txtComment.text = review.comment
-                ratingBar.rating = review.rating.toFloat() // RatingBar float değer bekler
-
-                // Avatar için ismin baş harfini al, eğer isim boşsa boş bırak
+                ratingBar.rating = review.rating.toFloat()
                 txtAvatar.text = review.reviewerName.firstOrNull()?.toString()?.uppercase() ?: ""
             }
         }
     }
 
     /**
-     * RecyclerView yeni bir ViewHolder'a ihtiyaç duyduğunda çağrılır.
-     * Bu metot, XML layout'umuzu inflate eder (bir View nesnesine dönüştürür)
-     * ve onu bir ViewHolder içine sararak döndürür.
+     * Called when RecyclerView needs a new [ReviewViewHolder] to represent an item.
      */
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ReviewViewHolder {
-        // XML layout'u inflate etmek için LayoutInflater ve ViewBinding kullanılır.
         val binding = RecyclerRowReviewBinding.inflate(
             LayoutInflater.from(parent.context),
             parent,
@@ -51,19 +49,14 @@ class ReviewAdapter(
     }
 
     /**
-     * RecyclerView bir satırı ekranda göstermek istediğinde bu metodu çağırır.
-     * `position` parametresini kullanarak listeden doğru `Review` nesnesini alır
-     * ve ViewHolder'ın `bind` metodu aracılığıyla veriyi view'lara yerleştirir.
-     * Bu metot, scroll sırasında sürekli çağrılır.
+     * Called by RecyclerView to display the data at the specified position.
      */
     override fun onBindViewHolder(holder: ReviewViewHolder, position: Int) {
-        val currentReview = reviews[position]
-        holder.bind(currentReview)
+        holder.bind(reviews[position])
     }
 
     /**
-     * RecyclerView'a veri setinde toplam kaç tane eleman olduğunu söyler.
-     * Bu, RecyclerView'ın ne kadar scroll edeceğini bilmesi için gereklidir.
+     * Returns the total number of items in the data set held by the adapter.
      */
     override fun getItemCount(): Int {
         return reviews.size

@@ -25,33 +25,33 @@ class SplashViewModel @Inject constructor(
         checkAuthStatus()
     }
 
-    override fun onEvent(event: SplashEvent) {
-        when (event) {
-            // DEĞİŞTİ: UI "animasyon bitti" dediğinde, sakladığımız hedefi Effect olarak gönder.
-            SplashEvent.ExitAnimationFinished -> {
-                _navigationTarget.value?.let { target ->
-                    sendEffect(target)
+    override fun handleEvent(event: SplashEvent) {
+            when (event) {
+                // DEĞİŞTİ: UI "animasyon bitti" dediğinde, sakladığımız hedefi Effect olarak gönder.
+                SplashEvent.ExitAnimationFinished -> {
+                    _navigationTarget.value?.let { target ->
+                        sendEffect(target)
+                    }
                 }
             }
         }
-    }
 
-    private fun checkAuthStatus() {
-        viewModelScope.launch {
-            delay(1100) // Logo ve animasyonun görünmesi için bekleme süresi
+        private fun checkAuthStatus() {
+            viewModelScope.launch {
+                delay(1100) // Logo ve animasyonun görünmesi için bekleme süresi
 
-            val isLoggedIn = checkAuthStatusUseCase()
-            val targetEffect = if (isLoggedIn) {
-                SplashEffect.NavigateToHome
-            } else {
-                SplashEffect.NavigateToLogin
+                val isLoggedIn = checkAuthStatusUseCase()
+                val targetEffect = if (isLoggedIn) {
+                    SplashEffect.NavigateToHome
+                } else {
+                    SplashEffect.NavigateToLogin
+                }
+
+                // DEĞİŞTİ: Navigasyon hedefini state'imizde saklıyoruz.
+                _navigationTarget.value = targetEffect
+
+                // DEĞİŞTİ: Navigasyon komutu göndermek yerine, UI'a "animasyonu başlat" diyoruz.
+                setState { copy(isLoading = false, animateOut = true) }
             }
-
-            // DEĞİŞTİ: Navigasyon hedefini state'imizde saklıyoruz.
-            _navigationTarget.value = targetEffect
-
-            // DEĞİŞTİ: Navigasyon komutu göndermek yerine, UI'a "animasyonu başlat" diyoruz.
-            setState { copy(isLoading = false, animateOut = true) }
         }
     }
-}

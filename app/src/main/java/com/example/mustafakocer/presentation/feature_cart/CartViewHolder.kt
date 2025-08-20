@@ -8,18 +8,33 @@ import com.example.mustafakocer.databinding.RecylerRowProductCartBinding
 import com.example.mustafakocer.domain.model.CartItem
 import java.text.DecimalFormat
 
+/**
+ * A reusable, file-level formatter to avoid creating new instances for each ViewHolder.
+ */
+private val priceFormatter = DecimalFormat("₺#,##0.00")
+
+/**
+ * A private extension function to safely parse a formatted price string into a Double.
+ */
+private fun String.parsePriceToDouble(): Double {
+    return this.replace(Regex("[$,₺]"), "").replace(",", "").toDoubleOrNull() ?: 0.0
+}
+
+/**
+ * A [RecyclerView.ViewHolder] for displaying a single [CartItem].
+ *
+ * @param binding The ViewBinding instance for the item layout.
+ * @param onEvent The callback to send [CartEvent]s for user interactions.
+ */
 class CartViewHolder(
     private val binding: RecylerRowProductCartBinding,
     private val onEvent: (CartEvent) -> Unit
 ) : RecyclerView.ViewHolder(binding.root) {
 
-    // O anki ViewHolder'ın bağlandığı CartItem'ı tutacak bir değişken.
-    // Tıklama anında doğru ID'ye erişmek için kullanacağız.
     private var currentCartItem: CartItem? = null
-    private val displayFormat = DecimalFormat("#,##0.00")
 
     init {
-        // Tıklama dinleyicileri ViewHolder oluşturulurken SADECE BİR KEZ ayarlanır.
+        // Listeners are set only once for performance, referencing `currentCartItem`.
         binding.btnPlus.setOnClickListener {
             currentCartItem?.let { onEvent(CartEvent.OnIncrease(it.product.id)) }
         }
@@ -34,6 +49,9 @@ class CartViewHolder(
         }
     }
 
+    /**
+     * Binds a [CartItem] to the views in the ViewHolder.
+     */
     fun bind(cartItem: CartItem) {
         this.currentCartItem = cartItem
         val product = cartItem.product
@@ -42,20 +60,12 @@ class CartViewHolder(
             txtTitle.text = product.title
             txtQuantity.text = cartItem.quantity.toString()
 
-            // 1. Mapper'dan gelen güvenli String'i Double'a çevir.
-            // Bu, hesaplama için kullanılacak ham değerdir.
-            val priceAsDouble = product.discountedPrice
-                .replace("$", "")
-                .toDoubleOrNull() ?: 0.0
+            val priceAsDouble = product.discountedPrice.parsePriceToDouble()
+            val formattedPricePerUnit = priceFormatter.format(priceAsDouble)
+            txtPricePerUnit.text = "$formattedPricePerUnit / unit"
 
-            // 2. DÜZELTME: Birim fiyatı, kullanıcıya göstermek için formatla.
-            // Örnek: 8.94 -> "₺8,94"
-            val formattedPricePerUnit = "₺${displayFormat.format(priceAsDouble)}"
-            txtPricePerUnit.text = "$formattedPricePerUnit / adet"
-
-            // 3. Satır toplamını hesapla ve onu da gösterim için formatla.
             val lineTotal = priceAsDouble * cartItem.quantity
-            txtLineTotal.text = "₺${displayFormat.format(lineTotal)}"
+            txtLineTotal.text = priceFormatter.format(lineTotal)
 
             Glide.with(root.context)
                 .load(product.thumbnailUrl)
@@ -64,6 +74,9 @@ class CartViewHolder(
     }
 
     companion object {
+        /**
+         * A factory method to create a new [CartViewHolder] instance.
+         */
         fun create(parent: ViewGroup, onEvent: (CartEvent) -> Unit): CartViewHolder {
             val binding = RecylerRowProductCartBinding.inflate(
                 LayoutInflater.from(parent.context), parent, false

@@ -1,6 +1,5 @@
 package com.example.mustafakocer.presentation.base
 
-
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.mustafakocer.presentation.mvi.BaseUiEffect
@@ -12,13 +11,13 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
 /**
- * Tutarlı bir MVI modelini zorunlu kılan soyut bir ViewModel.
- * State ve effect akışlarını yönetir, tüm ViewModel'ler için yapısal bir temel sağlar.
+ * An abstract ViewModel that enforces a consistent MVI pattern.
+ * It manages the state and effect streams, providing a structured foundation for all ViewModels.
  *
- * @param State UI state'inin türü.
- * @param Event UI event'lerinin türü.
- * @param Effect Yan etkilerin türü.
- * @param initialState UI'ın başlangıç durumu.
+ * @param State The type of the UI state.
+ * @param Event The type of the UI events.
+ * @param Effect The type of the UI side-effects.
+ * @param initialState The initial state of the UI.
  */
 abstract class BaseViewModel<
         State : BaseUiState,
@@ -31,36 +30,42 @@ abstract class BaseViewModel<
     private val _uiState = MutableStateFlow(initialState)
     override val uiState: StateFlow<State> = _uiState.asStateFlow()
 
-    // SharedFlow yerine Channel kullanmak, effect'lerin sadece bir kez
-    // tüketileceğini garanti etmenin daha sağlam bir yoludur.
     private val _uiEffect = Channel<Effect>()
     override val uiEffect: Flow<Effect> = _uiEffect.receiveAsFlow()
 
     /**
-     * Gelen UI event'lerini işler. Bu, alt sınıflar tarafından implemente edilmelidir.
+     * The public entry point for the View to send events.
+     * This method delegates the event handling to the protected [handleEvent] method.
      */
-    abstract override fun onEvent(event: Event)
+    final override fun onEvent(event: Event) {
+        handleEvent(event)
+    }
 
     /**
-     * Mevcut UI state'ine sadece okunabilir erişim sağlar.
+     * Handles incoming UI events. This must be implemented by subclasses.
+     */
+    protected abstract fun handleEvent(event: Event)
+
+    /**
+     * Provides read-only access to the current UI state.
      */
     protected val currentState: State
         get() = _uiState.value
 
     /**
-     * Mevcut state'i alıp yeni bir state döndüren bir 'reduce' fonksiyonu uygulayarak
-     * UI state'ini değiştirilemez (immutable) bir şekilde günceller.
+     * Updates the UI state in an immutable way by applying a reducer function
+     * that transforms the current state into a new state.
      *
-     * @param reduce Mevcut state'i alıp yeni bir state döndüren lambda.
+     * @param reduce A lambda that receives the current state and returns a new state.
      */
     protected fun setState(reduce: State.() -> State) {
         _uiState.update { currentState.reduce() }
     }
 
     /**
-     * UI tarafından tüketilecek tek seferlik bir yan etki gönderir.
+     * Sends a one-time side-effect to be consumed by the UI.
      *
-     * @param effect Gönderilecek yan etki.
+     * @param effect The side-effect to be sent.
      */
     protected fun sendEffect(effect: Effect) {
         viewModelScope.launch {

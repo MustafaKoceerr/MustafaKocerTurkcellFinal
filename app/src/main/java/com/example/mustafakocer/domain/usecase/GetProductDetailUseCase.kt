@@ -7,20 +7,20 @@ import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 /**
- * Belirtilen ID'ye sahip ürünün detaylarını getirme iş kuralını kapsüller.
+ * Encapsulates the business logic for fetching the details of a specific product.
  */
 class GetProductDetailUseCase @Inject constructor(
     private val productRepository: ProductRepository
 ) {
     /**
-     * MİMARİ NOT: Bu UseCase, Presentation katmanını (ViewModel) Data katmanının
-     * implementasyon detaylarından soyutlar. ViewModel, sadece "bana ürün detayını ver"
-     * der, verinin API'den mi, veritabanından mı yoksa önbellekten mi geldiğini bilmez.
+     * ARCHITECTURAL NOTE: This UseCase abstracts the Presentation layer (ViewModel) from
+     * the implementation details of the Data layer. The ViewModel simply says
+     * "give me the product details," without knowing if the data comes from an API,
+     * a database, or a cache.
      *
-     * @param productId Detayları getirilecek ürünün ID'si.
-     * @return Ürün detaylarını içeren bir Resource akışı.
+     * @param productId The ID of the product whose details are to be fetched.
+     * @return A [Flow] of [Resource] containing the product details.
      */
-    operator fun invoke(productId: Int): Flow<Resource<ProductDetail>> {
-        return productRepository.getProductDetail(productId)
-    }
+    operator fun invoke(productId: Int): Flow<Resource<ProductDetail>> =
+        productRepository.getProductDetail(productId)
 }

@@ -7,22 +7,22 @@ import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 /**
- * Oturum açmış olan mevcut kullanıcının profil bilgilerini getirme iş kuralı.
+ * The business rule for fetching the profile of the currently logged-in user.
  *
- * MİMARİ NOT: Bu UseCase, "Single Source of Truth" (Room DB) prensibini benimseyen
- * UserRepository'den veri akışını alır. ViewModel, verinin nereden geldiği
- * (önce DB, sonra API'den tazeleme) gibi detayları bilmez, sadece bu UseCase'i
- * çağırır ve sonucu reaktif olarak dinler.
+ * ARCHITECTURAL NOTE: This UseCase gets its data stream from a UserRepository that
+ * adopts the "Single Source of Truth" (Room DB) principle. The ViewModel is unaware
+ * of the data's origin (e.g., DB first, then refreshed from API); it simply
+ * invokes this UseCase and reactively listens to the result.
  */
 class GetUserProfileUseCase @Inject constructor(
     private val userRepository: UserRepository,
 ) {
     /**
-     * @param forceRefresh `true` olarak ayarlanırsa, veritabanındaki veriyi
-     *                     gösterirken aynı zamanda ağdan yeni veri çekmeyi zorlar.
-     * @return Kullanıcı verisini içeren bir Resource akışı.
+     * Executes the use case.
+     * @param forceRefresh If set to `true`, it forces a network fetch to update the
+     *                     cached data, even if local data exists.
+     * @return A [Flow] of [Resource] containing the user's profile.
      */
-    operator fun invoke(forceRefresh: Boolean = true): Flow<Resource<User>> {
-        return userRepository.getUserProfile(forceRefresh)
-    }
+    operator fun invoke(forceRefresh: Boolean = true): Flow<Resource<User>> =
+        userRepository.getUserProfile(forceRefresh)
 }

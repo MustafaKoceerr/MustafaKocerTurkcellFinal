@@ -5,93 +5,82 @@ import com.example.mustafakocer.domain.model.User
 import com.example.mustafakocer.domain.repository.UserRepository
 import com.example.mustafakocer.domain.util.Resource
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
 import javax.inject.Inject
 
+/**
+ * Encapsulates the business logic for updating a user's profile.
+ * Its primary responsibility is to validate the user data before passing it to the repository.
+ */
 class UpdateUserProfileUseCase @Inject constructor(
     private val userRepository: UserRepository
 ) {
     operator fun invoke(user: User): Flow<Resource<User>> {
         val validationError = validateUser(user)
-
         if (validationError != null) {
-            return flow { emit(Resource.Error(validationError)) }
+            return flowOf(Resource.Error(validationError))
         }
-
         return userRepository.updateUserProfile(user)
     }
 
     /**
      * Orchestrates all validation checks for the User object.
-     * @return An `AppException.Data.InputError` if any check fails, otherwise null.
+     * @return An [AppException.Data.InputError] if any check fails, otherwise null.
      */
-    // DÜZELTME: Dönüş tipi doğru hata sınıfı olarak güncellendi.
     private fun validateUser(user: User): AppException.Data.InputError? {
-        return validateName(user.firstName, "İsim")
-            ?: validateName(user.lastName, "Soyisim")
+        return validateName(user.firstName, "First name")
+            ?: validateName(user.lastName, "Last name")
             ?: validateEmail(user.email)
             ?: validatePhoneNumber(user.phone)
             ?: validateAge(user.age)
     }
 
-    /**
-     * Validates that a name is not blank and contains only letters.
-     */
-    // DÜZELTME: Dönüş tipi ve döndürülen hata nesnesi güncellendi.
     private fun validateName(name: String, fieldName: String): AppException.Data.InputError? {
         if (name.isBlank()) {
-            return AppException.Data.InputError("$fieldName boş bırakılamaz.")
+            return AppException.Data.InputError("$fieldName cannot be empty.")
         }
         if (!name.all { it.isLetter() }) {
-            return AppException.Data.InputError("$fieldName sadece harf içermelidir.")
+            return AppException.Data.InputError("$fieldName must contain only letters.")
         }
         return null
     }
 
     /**
-     * Validates that an email is not blank and has a valid format.
+     * NOTE: This validation uses `android.util.Patterns`, creating a dependency on the
+     * Android framework within the domain layer. This is a pragmatic trade-off to avoid
+     * maintaining a complex regex, but violates strict Clean Architecture principles.
      */
-    // DÜZELTME: Dönüş tipi ve döndürülen hata nesnesi güncellendi.
     private fun validateEmail(email: String): AppException.Data.InputError? {
         if (email.isBlank()) {
-            return AppException.Data.InputError("E-posta adresi boş bırakılamaz.")
+            return AppException.Data.InputError("Email address cannot be empty.")
         }
-        if ('@' !in email || !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            return AppException.Data.InputError("Lütfen geçerli bir e-posta adresi girin.")
+        if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            return AppException.Data.InputError("Please enter a valid email address.")
         }
         return null
     }
 
-    /**
-     * Validates that a phone number is not blank, meets minimum length,
-     * and contains only digits (with an optional '+' prefix).
-     */
-    // DÜZELTME: Dönüş tipi ve döndürülen hata nesnesi güncellendi.
     private fun validatePhoneNumber(phone: String): AppException.Data.InputError? {
         if (phone.isBlank()) {
-            return AppException.Data.InputError("Telefon numarası boş bırakılamaz.")
+            return AppException.Data.InputError("Phone number cannot be empty.")
         }
-        val numberPart = if (phone.startsWith("+")) phone.substring(1) else phone
+        val numberPart = phone.removePrefix("+")
         if (numberPart.length < MIN_PHONE_LENGTH) {
-            return AppException.Data.InputError("Telefon numarası en az $MIN_PHONE_LENGTH rakam olmalıdır.")
+            return AppException.Data.InputError("Phone number must be at least $MIN_PHONE_LENGTH digits.")
         }
         return null
     }
 
-    /**
-     * Validates that the age is within a reasonable range.
-     */
-    // DÜZELTME: Dönüş tipi ve döndürülen hata nesnesi güncellendi.
     private fun validateAge(age: Int): AppException.Data.InputError? {
         return when {
-            age <= 0 -> AppException.Data.InputError("Lütfen geçerli bir yaş girin.")
-            age > MAX_AGE -> AppException.Data.InputError("Yaş $MAX_AGE'dan büyük olamaz.")
+            age <= 0 -> AppException.Data.InputError("Please enter a valid age.")
+            age > MAX_AGE -> AppException.Data.InputError("Age cannot be greater than $MAX_AGE.")
             else -> null
         }
     }
 
     private companion object {
         private const val MIN_PHONE_LENGTH = 10
-        private const val MAX_AGE = 120 // Yaş için bir üst limit eklemek iyi bir pratik.
+        private const val MAX_AGE = 120
     }
 }

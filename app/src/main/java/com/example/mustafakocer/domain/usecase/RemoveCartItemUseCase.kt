@@ -5,15 +5,17 @@ import com.example.mustafakocer.domain.util.Resource
 import javax.inject.Inject
 
 /**
- * Belirtilen bir ürünü sepetten tamamen kaldırma iş kuralını kapsüller.
+ * Encapsulates the business logic for completely removing a product from the cart,
+ * regardless of its quantity.
  */
 class RemoveCartItemUseCase @Inject constructor(
     private val cartRepository: CartRepository
 ) {
     /**
-     * Bu UseCase'i bir fonksiyon gibi çağrılabilir hale getirir.
+     * Executes the use case.
+     * @param productId The ID of the product to remove.
+     * @return A [Resource] indicating the outcome of the operation.
      */
-    suspend operator fun invoke( productId: Int): Resource<Unit> {
-        return cartRepository.removeCartItem( productId)
-    }
+    suspend operator fun invoke(productId: Int): Resource<Unit> =
+        cartRepository.removeCartItem(productId)
 }

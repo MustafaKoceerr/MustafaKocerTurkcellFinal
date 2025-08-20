@@ -6,28 +6,41 @@ import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.example.mustafakocer.databinding.RecylerRowProductGridBinding
-import com.example.mustafakocer.domain.model.Product // Artık CartItem değil, Product
+import com.example.mustafakocer.domain.model.Product
 
-// ViewHolder'ı da bu dosya içine alarak daha düzenli hale getirebiliriz.
+/**
+ * A private extension function to safely parse a formatted price string (e.g., "$1,234.56")
+ * into a Double, handling various currency symbols and separators.
+ */
+private fun String.parsePriceToDouble(): Double {
+    return this.replace(Regex("[$,₺]"), "").replace(",", "").toDoubleOrNull() ?: 0.0
+}
+
+/**
+ * A [PagingDataAdapter] for displaying a grid of [Product] items.
+ *
+ * @param onProductClick A lambda function to be invoked when a product item is clicked.
+ */
 class ProductListAdapter(
-    // DEĞİŞTİ: Artık karmaşık bir sealed class yerine basit bir lambda alıyoruz.
     private val onProductClick: (productId: Int) -> Unit,
 ) : PagingDataAdapter<Product, ProductListAdapter.ProductViewHolder>(ProductDiffCallback) {
 
+    /**
+     * ViewHolder for a single product item in the grid.
+     * It handles data binding and click events for its item.
+     */
     inner class ProductViewHolder(private val binding: RecylerRowProductGridBinding) :
-        androidx.recyclerview.widget.RecyclerView.ViewHolder(binding.root) {
+        RecyclerView.ViewHolder(binding.root) {
 
         init {
-            // Tıklama olayını burada yönetiyoruz.
             binding.root.setOnClickListener {
-                // Pozisyonun geçerli olduğundan ve bir ürün olduğundan emin ol.
                 val position = bindingAdapterPosition
-                if (position != androidx.recyclerview.widget.RecyclerView.NO_POSITION) {
+                if (position != RecyclerView.NO_POSITION) {
                     getItem(position)?.let { product ->
-                        // Lambda'yı ürünün ID'si ile çağır.
                         onProductClick(product.id)
                     }
                 }
@@ -42,35 +55,25 @@ class ProductListAdapter(
                 txtDiscountedPrice.text = product.discountedPrice
                 txtPrice.text = product.price
 
-                val originalPriceValue = product.price
-                    .replace("$", "").replace("₺", "").replace(",", "")
-                    .toDoubleOrNull() ?: 0.0
+                val originalPriceValue = product.price.parsePriceToDouble()
+                val discountedPriceValue = product.discountedPrice.parsePriceToDouble()
 
-                val discountedPriceValue = product.discountedPrice
-                    .replace("$", "").replace("₺", "").replace(",", "")
-                    .toDoubleOrNull() ?: 0.0
-
-                // 2. Fiyatları karşılaştır.
                 if (discountedPriceValue < originalPriceValue) {
-                    // İndirim varsa, orijinal fiyatı göster ve üzerini çiz.
                     txtPrice.isVisible = true
                     txtPrice.paintFlags = txtPrice.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
                 } else {
-                    // İndirim yoksa, orijinal fiyatı gizle ve (varsa) üzerindeki çizgiyi kaldır.
-                    // Bu 'else' bloğu, RecyclerView'ın view'ları yeniden kullanmasından
-                    // kaynaklanabilecek hataları (eski bir view'ın çizgili kalması gibi) önler.
+                    // This else block is crucial to prevent incorrect states on recycled views.
                     txtPrice.isVisible = false
                     txtPrice.paintFlags = txtPrice.paintFlags and Paint.STRIKE_THRU_TEXT_FLAG.inv()
                 }
 
-                // Görsel: animasyonu kapat, oran sabitse zıplama olmaz (XML’de ratio önerilir)
                 Glide.with(root.context)
                     .load(product.thumbnailUrl)
                     .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
                     .dontAnimate()
                     .into(imgProduct)
-                // Sepetle ilgili tüm görünümleri gizliyoruz.
-                badgeDiscount.isVisible = false // Bu mantık daha sonra eklenebilir.
+
+                badgeDiscount.isVisible = false
                 badgeStock.isVisible = false
             }
         }
@@ -89,6 +92,10 @@ class ProductListAdapter(
         getItem(position)?.let { holder.bind(it) }
     }
 
+    /**
+     * A [DiffUtil.ItemCallback] for calculating the difference between two non-null items in a list.
+     * This is essential for the [PagingDataAdapter] to efficiently update the RecyclerView.
+     */
     private object ProductDiffCallback : DiffUtil.ItemCallback<Product>() {
         override fun areItemsTheSame(oldItem: Product, newItem: Product): Boolean {
             return oldItem.id == newItem.id

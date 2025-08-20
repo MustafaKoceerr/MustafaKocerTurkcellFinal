@@ -1,32 +1,30 @@
 package com.example.mustafakocer.presentation.feature_auth
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.Button
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.example.mustafakocer.presentation.feature_auth.components.*
+import com.example.mustafakocer.R
+import com.example.mustafakocer.presentation.common.components.SplashBackground
+import com.example.mustafakocer.presentation.feature_auth.components.LoginFields
 import com.example.mustafakocer.presentation.feature_auth.contract.LoginEvent
 import com.example.mustafakocer.presentation.feature_auth.contract.LoginUiState
-import com.example.mustafakocer.presentation.common.components.SplashBackground
-import com.example.mustafakocer.R
 import com.example.mustafakocer.presentation.feature_splash.components.SplashLogo
 
+/**
+ * A "dumb" composable that is responsible for drawing the UI of the login screen.
+ * It is driven entirely by the [state] and delegates all user interactions via [onEvent].
+ */
 @Composable
 fun LoginScreen(
     state: LoginUiState,
     onEvent: (LoginEvent) -> Unit,
 ) {
-
-    SplashBackground { // aynı degrade – marka tutarlılığı
+    SplashBackground {
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -40,10 +38,8 @@ fun LoginScreen(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(20.dp)
             ) {
-                // Marka
                 SplashLogo()
 
-                // Form kartı
                 Surface(
                     tonalElevation = 3.dp,
                     shape = MaterialTheme.shapes.extraLarge,
@@ -56,7 +52,7 @@ fun LoginScreen(
                         verticalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
                         Text(
-                            text = stringResource(id = R.string.login_title), // "Welcome back"
+                            text = stringResource(id = R.string.login_title),
                             style = MaterialTheme.typography.headlineSmall
                         )
 
@@ -75,17 +71,16 @@ fun LoginScreen(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
-                            TextButton(onClick = { /*TODO: */ }, enabled = !state.isLoading) {
+                            TextButton(onClick = { /*TODO*/ }, enabled = !state.isLoading) {
                                 Text(stringResource(id = R.string.login_forgot_password))
                             }
-                            TextButton(onClick = { /*TODO: */ }, enabled = !state.isLoading) {
+                            TextButton(onClick = { /*TODO*/ }, enabled = !state.isLoading) {
                                 Text(stringResource(id = R.string.login_create_account))
                             }
                         }
                     }
                 }
 
-                // Alt bilgi (opsiyonel)
                 Text(
                     text = stringResource(id = R.string.login_terms_hint),
                     style = MaterialTheme.typography.labelMedium,

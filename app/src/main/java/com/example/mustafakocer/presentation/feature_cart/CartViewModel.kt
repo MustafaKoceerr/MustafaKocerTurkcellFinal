@@ -2,24 +2,27 @@ package com.example.mustafakocer.presentation.feature_cart
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.mustafakocer.domain.exception.AppException
 import com.example.mustafakocer.domain.model.CartItem
-import com.example.mustafakocer.domain.usecase.AddOrIncreaseCartItemUseCase
-import com.example.mustafakocer.domain.usecase.ClearCartUseCase
-import com.example.mustafakocer.domain.usecase.DecreaseOrRemoveCartItemUseCase
-import com.example.mustafakocer.domain.usecase.GetCartItemsUseCase
-import com.example.mustafakocer.domain.usecase.RemoveCartItemUseCase
+import com.example.mustafakocer.domain.usecase.*
 import com.example.mustafakocer.domain.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import java.text.DecimalFormat
 import javax.inject.Inject
 
+/**
+ * A private extension function to safely parse a formatted price string into a Double.
+ * This centralizes the parsing logic to avoid repetition.
+ */
+private fun String.parsePriceToDouble(): Double {
+    return this.replace(Regex("[$,₺]"), "").replace(",", "").toDoubleOrNull() ?: 0.0
+}
+
+/**
+ * Manages the UI state and business logic for the Cart screen.
+ * It observes cart items, handles user actions, and calculates the total price.
+ */
 @HiltViewModel
 class CartViewModel @Inject constructor(
     private val getCartItemsUseCase: GetCartItemsUseCase,
@@ -27,75 +30,54 @@ class CartViewModel @Inject constructor(
     private val decreaseOrRemoveCartItemUseCase: DecreaseOrRemoveCartItemUseCase,
     private val clearCartUseCase: ClearCartUseCase,
     private val removeCartItemUseCase: RemoveCartItemUseCase
-    // GetUserIdUseCase bağımlılığı kaldırıldı.
 ) : ViewModel() {
 
-    // State 1: Detaylı sepet listesi.
     private val _cartState = MutableStateFlow<Resource<List<CartItem>>>(Resource.Loading)
     val cartState: StateFlow<Resource<List<CartItem>>> = _cartState.asStateFlow()
 
-    // State 2: Toplam fiyat.
-    private val _totalPrice = MutableStateFlow("$0.00")
+    private val _totalPrice = MutableStateFlow("₺0.00")
     val totalPrice: StateFlow<String> = _totalPrice.asStateFlow()
 
-    // `currentUserId` değişkeni kaldırıldı.
+    /**
+     * A single, reusable formatter instance to improve performance.
+     */
+    private val priceFormatter = DecimalFormat("₺#,##0.00")
 
     init {
-        // Artık userId'yi beklemeye gerek yok, doğrudan sepeti dinlemeye başlıyoruz.
         observeCart()
     }
 
     private fun observeCart() {
         getCartItemsUseCase().onEach { resource ->
             _cartState.value = resource
-            if (resource is Resource.Success) {
-                calculateTotalPrice(resource.data)
-            } else if (resource is Resource.Error) {
-                _totalPrice.value = "$0.00"
+            when (resource) {
+                is Resource.Success -> calculateTotalPrice(resource.data)
+                is Resource.Error -> _totalPrice.value = "₺0.00"
+                else -> { /* No-op for Loading/Idle */ }
             }
         }.launchIn(viewModelScope)
     }
 
-    fun onIncreaseClicked(productId: Int) {
-        // Artık `currentUserId` kontrolüne gerek yok.
-        viewModelScope.launch {
-            addOrIncreaseCartItemUseCase(productId)
-        }
+    fun onIncreaseClicked(productId: Int) = viewModelScope.launch {
+        addOrIncreaseCartItemUseCase(productId)
     }
 
-    fun onDecreaseClicked(productId: Int) {
-        // Artık `currentUserId` kontrolüne gerek yok.
-        viewModelScope.launch {
-            decreaseOrRemoveCartItemUseCase(productId)
-        }
+    fun onDecreaseClicked(productId: Int) = viewModelScope.launch {
+        decreaseOrRemoveCartItemUseCase(productId)
     }
 
-    fun onRemoveItemConfirmed(productId: Int) {
-        // Artık `currentUserId` kontrolüne gerek yok.
-        viewModelScope.launch {
-            removeCartItemUseCase(productId)
-        }
+    fun onRemoveItemConfirmed(productId: Int) = viewModelScope.launch {
+        removeCartItemUseCase(productId)
     }
 
-    fun onClearCartConfirmed() {
-        // Artık `currentUserId` kontrolüne gerek yok.
-        viewModelScope.launch {
-            clearCartUseCase()
-        }
+    fun onClearCartConfirmed() = viewModelScope.launch {
+        clearCartUseCase()
     }
-
 
     private fun calculateTotalPrice(items: List<CartItem>) {
         val total = items.sumOf {
-            // DÜZELTME: Mapper'da formatladığımız String'i,
-            // yine aynı güvenli yöntemle Double'a geri çeviriyoruz.
-            val priceAsString = it.product.discountedPrice.replace("$", "")
-            val priceAsDouble = priceAsString.toDoubleOrNull() ?: 0.0
-            priceAsDouble * it.quantity
+            it.product.discountedPrice.parsePriceToDouble() * it.quantity
         }
-
-        // Gösterim formatı, cihazın diline uygun olabilir, bu sorun değil.
-        val displayFormat = DecimalFormat("₺#,##0.00")
-        _totalPrice.value = displayFormat.format(total)
+        _totalPrice.value = priceFormatter.format(total)
     }
 }

@@ -1,6 +1,5 @@
 package com.example.mustafakocer.presentation.feature_auth.components
 
-
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -38,26 +37,30 @@ import com.example.mustafakocer.R
 import com.example.mustafakocer.presentation.feature_auth.contract.LoginEvent
 import com.example.mustafakocer.presentation.feature_auth.contract.LoginUiState
 
+/**
+ * A state-driven Composable that renders the username and password input fields for the login screen.
+ * It handles user input, focus management, and displays validation errors.
+ *
+ * @param state The current [LoginUiState] to drive the UI.
+ * @param onEvent A lambda to send [LoginEvent]s to the ViewModel.
+ * @param modifier The modifier to be applied to the component.
+ * @param onSubmit A lambda to be invoked when the user submits the form (e.g., clicks "Done").
+ */
 @Composable
 fun LoginFields(
     state: LoginUiState,
     onEvent: (LoginEvent) -> Unit,
     modifier: Modifier = Modifier,
-    emailError: String? = null,
-    passwordError: String? = null,
     onSubmit: () -> Unit = { onEvent(LoginEvent.LoginClicked) }
 ) {
     val focusManager = LocalFocusManager.current
     val passwordFocus = remember { FocusRequester() }
     var isPasswordVisible by remember { mutableStateOf(false) }
 
-    // DEĞİŞTİ: İki alanı bir Column içine alarak aralarındaki boşluğu
-    // Spacer yerine Column'un kendi `spacedBy` özelliği ile yöneteceğiz.
-    // Bu, daha temiz bir yaklaşımdır.
     Column(
-        verticalArrangement = Arrangement.spacedBy(4.dp) // Boşluğu buradan kontrol et.
+        verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
-        // E-POSTA
+        // USERNAME
         OutlinedTextField(
             value = state.email,
             onValueChange = { onEvent(LoginEvent.EmailChanged(it)) },
@@ -68,14 +71,13 @@ fun LoginFields(
             label = { Text(stringResource(R.string.login_username_label)) },
             placeholder = { Text(stringResource(R.string.login_username_placeholder)) },
             leadingIcon = { Icon(Icons.Filled.Person, contentDescription = null) },
-            isError = !emailError.isNullOrBlank(),
+            isError = !state.emailError.isNullOrBlank(),
             supportingText = {
-                if (!emailError.isNullOrBlank()) {
-                    Text(text = emailError, color = MaterialTheme.colorScheme.error)
+                if (!state.emailError.isNullOrBlank()) {
+                    Text(text = state.emailError, color = MaterialTheme.colorScheme.error)
                 } else {
-                    // Hata olmadığında, layout'un zıplamasını önlemek için
-                    // sabit bir boşluk bırakıyoruz. Bu, TextField'ın yüksekliğini sabit tutar.
-                    Spacer(Modifier.height(0.dp)) // Veya çok küçük bir değer
+                    // This Spacer prevents the layout from jumping when an error message appears/disappears.
+                    Spacer(Modifier.height(0.dp))
                 }
             },
             keyboardOptions = KeyboardOptions(
@@ -87,7 +89,7 @@ fun LoginFields(
             )
         )
 
-        // ŞİFRE
+        // PASSWORD
         OutlinedTextField(
             value = state.password,
             onValueChange = { onEvent(LoginEvent.PasswordChanged(it)) },
@@ -115,12 +117,11 @@ fun LoginFields(
                     )
                 }
             },
-            isError = !passwordError.isNullOrBlank(),
+            isError = !state.passwordError.isNullOrBlank(),
             supportingText = {
-                if (!passwordError.isNullOrBlank()) {
-                    Text(text = passwordError, color = MaterialTheme.colorScheme.error)
+                if (!state.passwordError.isNullOrBlank()) {
+                    Text(text = state.passwordError, color = MaterialTheme.colorScheme.error)
                 } else {
-                    // Aynı şekilde, hata olmadığında sabit bir boşluk bırakıyoruz.
                     Spacer(Modifier.height(0.dp))
                 }
             },

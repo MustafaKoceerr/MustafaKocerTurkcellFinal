@@ -200,4 +200,17 @@
 
     <string name="search_idle_title">Aramaya Başla</string>
     <string name="search_idle_subtitle">Ürünleri, markaları ve daha fazlasını keşfet.</string>
+
+
+    <!-- Cart Confirmation Dialogs -->
+    <string name="dialog_title_clear_cart">Clear Cart</string>
+    <string name="dialog_message_clear_cart">Are you sure you want to remove all items from your cart?</string>
+    <string name="dialog_title_remove_item">Remove Item</string>
+    <string name="dialog_message_remove_item">Are you sure you want to completely remove this item from your cart?</string>
+
+    <!-- Dialog Actions -->
+    <string name="action_confirm">Yes</string>
+    <string name="action_cancel">No</string>
+    <string name="pd_rating_format">%.1f (%d)</string>
+
 </resources>
