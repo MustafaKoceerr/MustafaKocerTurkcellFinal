@@ -1,13 +1,12 @@
 package com.example.mustafakocer.presentation.navigation.contracts
 
-
 /**
- * Splash ekranından tetiklenebilecek navigasyon eylemlerini tanımlar.
+ * Defines the navigation actions that can be triggered from the Splash screen.
  *
- * MİMARİ NOT: Bu arayüz, 'feature_splash'in, 'feature_auth' veya 'MainActivity'
- * hakkında hiçbir şey bilmeden navigasyon talep etmesini sağlayan bir sözleşmedir.
- * Bağımlılığı tersine çeviririz: Splash bu arayüze bağımlıdır, asıl navigasyon
- * mantığı ise bu arayüzü uygular.
+ * ARCHITECTURAL NOTE: This interface is a contract that allows the 'feature_splash'
+ * module to request navigation without knowing anything about 'feature_auth' or 'MainActivity'.
+ * It inverts the dependency: Splash depends on this interface, and the actual
+ * navigation logic implements it.
  */
 interface SplashNavActions {
     fun navigateToHome()

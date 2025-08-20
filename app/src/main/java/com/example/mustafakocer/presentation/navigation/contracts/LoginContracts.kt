@@ -1,7 +1,7 @@
 package com.example.mustafakocer.presentation.navigation.contracts
 
 /**
- * Login ekranından tetiklenebilecek navigasyon eylemlerini tanımlar.
+ * Defines the navigation actions that can be triggered from the Login feature.
  */
 interface LoginNavActions {
     fun navigateToHome()
