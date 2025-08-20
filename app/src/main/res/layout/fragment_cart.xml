@@ -1,7 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- CartFragment -->
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<?xml version="1.0" encoding="utf-8"?><!-- res/layout/fragment_cart.xml (StateLayout ile refactor) -->
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -9,81 +7,54 @@
     android:background="?attr/colorSurface"
     tools:context=".presentation.feature_cart.CartFragment">
 
-    <!-- Sepet ürünleri -->
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/contentView"
+    <!-- StateLayout ana içerik alanı -->
+    <com.example.mustafakocer.presentation.common.StateLayout
+        android:id="@+id/state_layout"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:clipToPadding="false"
-        android:paddingStart="@dimen/home_content_margin"
-        android:paddingEnd="@dimen/home_content_margin"
-        android:paddingTop="@dimen/home_content_margin_top"
-        android:paddingBottom="@dimen/recycler_view_bottom_padding"
-        app:layout_constraintTop_toTopOf="parent"
+        app:emptyIcon="@drawable/ic_empty_cart_24"
+        app:emptySubtitle="@string/cart_empty_subtitle"
+        app:emptyTitle="@string/cart_empty_title"
+        app:errorIcon="@drawable/ic_cloud_off_24"
+
         app:layout_constraintBottom_toTopOf="@id/cardSummary"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        tools:itemCount="4" />
-
-    <!-- 2. Yüklenme Durumu (Merkezde) -->
-    <ViewStub
-        android:id="@+id/viewLoadingStub"
-        android:layout="@layout/layout_state_loading"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/cardSummary"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:visibility="gone"
-        tools:visibility="visible"/>
+        app:layout_constraintTop_toTopOf="parent">
 
-    <!-- 3. Hata Durumu (Merkezde) -->
-    <ViewStub
-        android:id="@+id/viewErrorStub"
-        android:layout="@layout/layout_state_error"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/cardSummary"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:visibility="gone" />
+        <!-- İçerik: RecyclerView -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/contentView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:paddingStart="@dimen/home_content_margin"
+            android:paddingTop="@dimen/home_content_margin_top"
+            android:paddingEnd="@dimen/home_content_margin"
+            android:paddingBottom="@dimen/recycler_view_bottom_padding"
+            tools:itemCount="4" />
+    </com.example.mustafakocer.presentation.common.StateLayout>
 
-    <!-- 4. Boş Durumu (Merkezde) -->
-    <ViewStub
-        android:id="@+id/viewEmptyStub"
-        android:layout="@layout/layout_state_empty"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/cardSummary"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:visibility="gone" />
-
-
-    <!-- Alt özet kartı: toplam + ödeme -->
+    <!-- Alt özet kartı: StateLayout DIŞINDA -->
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/cardSummary"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        app:cardElevation="@dimen/cart_summary_elevation"
         app:cardBackgroundColor="?attr/colorSurface"
-        app:cardUseCompatPadding="false"
-        app:strokeWidth="0dp"
+        app:cardCornerRadius="@dimen/cart_summary_corner_radius"
+        app:cardElevation="@dimen/cart_summary_elevation"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:cardCornerRadius="@dimen/cart_summary_corner_radius">
+        app:layout_constraintStart_toStartOf="parent"
+        app:strokeWidth="0dp">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:minHeight="@dimen/cart_summary_min_height"
             android:paddingStart="@dimen/cart_summary_padding"
-            android:paddingEnd="@dimen/cart_summary_padding"
             android:paddingTop="@dimen/cart_summary_padding_top"
+            android:paddingEnd="@dimen/cart_summary_padding"
             android:paddingBottom="@dimen/cart_summary_padding_bottom">
 
             <!-- Etiket (ID korunur) -->
@@ -94,10 +65,10 @@
                 android:text="@string/cart_summary_total_label"
                 android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
                 android:textColor="?attr/colorOnSurfaceVariant"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toStartOf="@id/btnCheckout"
                 app:layout_constraintHorizontal_bias="0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
                 app:layout_goneMarginEnd="8dp" />
 
             <!-- Toplam (ID korunur) -->
@@ -106,12 +77,12 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:textAppearance="@style/TextAppearance.Material3.TitleLarge"
-                android:textStyle="bold"
                 android:textColor="?attr/colorOnSurface"
-                app:layout_constraintTop_toBottomOf="@id/txtTotalLabel"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toStartOf="@id/btnCheckout"
+                android:textStyle="bold"
                 app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/btnCheckout"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/txtTotalLabel"
                 app:layout_goneMarginEnd="8dp"
                 tools:text="$124.50" />
 
@@ -121,19 +92,19 @@
                 style="?attr/materialButtonStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:minWidth="0dp"
-                android:insetLeft="0dp"
-                android:insetRight="0dp"
-                android:insetTop="0dp"
-                android:insetBottom="0dp"
-                android:text="@string/cart_checkout_button"
                 android:contentDescription="@string/cd_checkout"
+                android:insetLeft="0dp"
+                android:insetTop="0dp"
+                android:insetRight="0dp"
+                android:insetBottom="0dp"
+                android:minWidth="0dp"
+                android:text="@string/cart_checkout_button"
                 app:icon="@drawable/ic_lock_24"
-                app:iconPadding="@dimen/cart_checkout_icon_padding"
                 app:iconGravity="textStart"
-                app:layout_constraintTop_toTopOf="parent"
+                app:iconPadding="@dimen/cart_checkout_icon_padding"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent" />
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </com.google.android.material.card.MaterialCardView>
 

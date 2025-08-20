@@ -13,31 +13,21 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.mustafakocer.R
 import com.example.mustafakocer.databinding.FragmentCartBinding
-import com.example.mustafakocer.databinding.LayoutStateEmptyBinding
-import com.example.mustafakocer.domain.model.CartItem
 import com.example.mustafakocer.domain.util.Resource
 import com.example.mustafakocer.presentation.base.BaseFragment
-import com.example.mustafakocer.presentation.common.UiErrorMapper
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class CartFragment : BaseFragment<FragmentCartBinding>(FragmentCartBinding::inflate) {
 
     private val viewModel: CartViewModel by viewModels()
     private lateinit var cartListAdapter: CartListAdapter
-
-    @Inject
-    lateinit var injectedUiErrorMapper: UiErrorMapper
-    override val uiErrorMapper: UiErrorMapper by lazy { injectedUiErrorMapper }
-    override fun onRetry() { /* Firebase is reactive, no manual retry needed. */ }
-
-    private var emptyBinding: LayoutStateEmptyBinding? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -53,12 +43,17 @@ class CartFragment : BaseFragment<FragmentCartBinding>(FragmentCartBinding::infl
                 is CartEvent.OnDecrease -> viewModel.onDecreaseClicked(event.productId)
                 is CartEvent.OnRemove -> showRemoveItemConfirmationDialog(event.productId)
                 is CartEvent.OnProductClick -> {
-                    val action = CartFragmentDirections.actionCartFragmentToProductDetailFragment(event.productId)
+                    val action =
+                        CartFragmentDirections.actionCartFragmentToProductDetailFragment(event.productId)
                     findNavController().navigate(action)
                 }
             }
         }
-        binding.contentView.apply {
+
+        // Retry butonu StateLayout tarafından yönetiliyor (reaktif akışta opsiyonel).
+        binding.stateLayout.onRetry = { /* no-op */ }
+
+        binding.stateLayout.findViewById<RecyclerView>(R.id.contentView).apply {
             adapter = cartListAdapter
             layoutManager = LinearLayoutManager(requireContext())
         }
@@ -67,63 +62,43 @@ class CartFragment : BaseFragment<FragmentCartBinding>(FragmentCartBinding::infl
     private fun observeViewModel() {
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                // Observe the main cart state
+                // 1) Ana sepet durumu
                 launch {
                     viewModel.cartState.collect { resource ->
-                        handleUiState(resource)
-                        requireActivity().invalidateOptionsMenu() // Update menu visibility
+                        // Alt özet kartı sadece dolu sepet olduğunda görünür.
+                        binding.cardSummary.isVisible =
+                            resource is Resource.Success && resource.data.isNotEmpty()
+
+                        // Menü görünürlüğünü güncelle
+                        requireActivity().invalidateOptionsMenu()
+
+                        when (resource) {
+                            is Resource.Loading -> binding.stateLayout.showLoading()
+                            is Resource.Error -> binding.stateLayout.showError(
+                                subtitle = resource.exception.message
+                            )
+
+                            is Resource.Success -> {
+                                val items = resource.data
+                                if (items.isEmpty()) {
+                                    binding.stateLayout.showEmpty()
+                                } else {
+                                    cartListAdapter.submitList(items)
+                                    binding.stateLayout.showContent()
+                                }
+                            }
+
+                            is Resource.Idle -> Unit
+                        }
                     }
                 }
-                // Observe the total price separately
+                // 2) Toplam fiyat
                 launch {
                     viewModel.totalPrice.collectLatest { totalPrice ->
                         binding.txtTotalPrice.text = totalPrice
                     }
                 }
             }
-        }
-    }
-
-    private fun handleUiState(resource: Resource<List<CartItem>>) {
-        val isLoading = resource is Resource.Loading
-        binding.viewLoadingStub.isVisible = isLoading
-
-        when (resource) {
-            is Resource.Success -> {
-                val items = resource.data
-                handleUiVisibility(items.isNotEmpty())
-                handleEmptyState(items.isEmpty())
-                cartListAdapter.submitList(items)
-                hideErrorState()
-            }
-            is Resource.Error -> {
-                handleUiVisibility(false)
-                handleEmptyState(false)
-                handleErrorState(binding.viewErrorStub, resource.exception)
-            }
-            else -> { /* Loading or Idle */
-                handleUiVisibility(false)
-                handleEmptyState(false)
-                hideErrorState()
-            }
-        }
-    }
-
-    private fun handleUiVisibility(isSuccessAndNotEmpty: Boolean) {
-        binding.contentView.isVisible = isSuccessAndNotEmpty
-        binding.cardSummary.isVisible = isSuccessAndNotEmpty
-    }
-
-    private fun handleEmptyState(isSuccessAndEmpty: Boolean) {
-        if (isSuccessAndEmpty) {
-            if (emptyBinding == null) {
-                emptyBinding = LayoutStateEmptyBinding.bind(binding.viewEmptyStub.inflate())
-            }
-            emptyBinding?.root?.isVisible = true
-            emptyBinding?.txtEmptyTitle?.setText(R.string.cart_empty_title)
-            emptyBinding?.txtEmptySubtitle?.setText(R.string.cart_empty_subtitle)
-        } else {
-            emptyBinding?.root?.isVisible = false
         }
     }
 
@@ -136,7 +111,8 @@ class CartFragment : BaseFragment<FragmentCartBinding>(FragmentCartBinding::infl
             override fun onPrepareMenu(menu: Menu) {
                 val clearCartItem = menu.findItem(R.id.action_clear_cart)
                 val currentState = viewModel.cartState.value
-                clearCartItem?.isVisible = currentState is Resource.Success && currentState.data.isNotEmpty()
+                clearCartItem?.isVisible =
+                    currentState is Resource.Success && currentState.data.isNotEmpty()
             }
 
             override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
