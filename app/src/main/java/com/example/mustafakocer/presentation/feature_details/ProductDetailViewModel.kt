@@ -7,15 +7,12 @@ import com.example.mustafakocer.domain.model.ProductDetail
 import com.example.mustafakocer.domain.usecase.*
 import com.example.mustafakocer.domain.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-/**
- * Manages the UI state and business logic for the Product Detail screen.
- *
- * @param savedStateHandle Injected by Hilt to access navigation arguments, like `productId`.
- */
+@OptIn(ExperimentalCoroutinesApi::class) // flatMapLatest için gerekli
 @HiltViewModel
 class ProductDetailViewModel @Inject constructor(
     private val getProductDetailUseCase: GetProductDetailUseCase,
@@ -28,59 +25,46 @@ class ProductDetailViewModel @Inject constructor(
     private val productId: Int = savedStateHandle.get<Int>("productId")
         ?: throw IllegalStateException("productId must be passed to ProductDetailViewModel")
 
-    /**
-     * A flow that holds the state of the product detail fetching operation.
-     * It uses `stateIn` to convert the cold Flow from the use case into a hot StateFlow.
-     */
+    // 1. TETİKLEYİCİ: Artık bir Int sayacı. Her onRetry çağrısında artacak.
+    private val retryTrigger = MutableStateFlow(0)
+
     val productDetailState: StateFlow<Resource<ProductDetail>> =
-        getProductDetailUseCase(productId)
-            .stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(5000),
-                initialValue = Resource.Loading
-            )
+        retryTrigger.flatMapLatest {
+            // retryTrigger her yeni bir değer aldığında (0, 1, 2...),
+            // bu blok yeniden çalışacak ve use case'i yeniden tetikleyecek.
+            getProductDetailUseCase(productId)
+        }.stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = Resource.Loading
+        )
 
-    /**
-     * A flow that holds the current quantity of this product in the user's cart.
-     */
-    val quantityInCart: StateFlow<Int> =
-        getCartQuantityUseCase(productId)
-            .stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(5000),
-                initialValue = 0
-            )
-
+    // ... quantityInCart ve isDescriptionExpanded flow'ları aynı kalıyor ...
+    val quantityInCart: StateFlow<Int> = getCartQuantityUseCase(productId)
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0)
     private val _isDescriptionExpanded = MutableStateFlow(false)
     val isDescriptionExpanded: StateFlow<Boolean> = _isDescriptionExpanded.asStateFlow()
 
-    /**
-     * Toggles the expanded/collapsed state of the product description.
-     */
+
     fun onToggleDescription() {
         _isDescriptionExpanded.update { !it }
     }
 
-    /**
-     * Handles the event when the user clicks the increase quantity button.
-     */
     fun onIncreaseClicked() = viewModelScope.launch {
         addOrIncreaseCartItemUseCase(productId)
     }
 
-    /**
-     * Handles the event when the user clicks the decrease quantity button.
-     */
     fun onDecreaseClicked() = viewModelScope.launch {
         decreaseOrRemoveCartItemUseCase(productId)
     }
 
     /**
-     * Retries fetching the product detail if the initial load failed.
+     * Retries fetching the product detail.
+     * It increments the retryTrigger, which causes the flatMapLatest to re-execute the use case.
      */
     fun onRetry() {
-        // The productDetailState is a self-restarting flow, but if we want to
-        // explicitly re-trigger, we would need to adjust the use case or repository.
-        // For now, this is a placeholder. A common pattern is to use a trigger Flow.
+        // 2. İŞLEVSELLİK: Sayacı bir artır. Değer değiştiği için (örn: 0 -> 1),
+        // StateFlow kesinlikle yeni bir değer yayınlayacak ve akışı tetikleyecek.
+        retryTrigger.value++
     }
 }

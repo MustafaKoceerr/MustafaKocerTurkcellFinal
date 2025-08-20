@@ -1,3 +1,4 @@
+// com/example/mustafakocer/presentation/feature_details/ProductDetailFragment.kt (Refactor Edilmiş Hali)
 package com.example.mustafakocer.presentation.feature_details
 
 import android.graphics.Paint
@@ -25,14 +26,13 @@ import com.example.mustafakocer.domain.model.ProductDetail
 import com.example.mustafakocer.domain.model.Review
 import com.example.mustafakocer.domain.util.Resource
 import com.example.mustafakocer.presentation.base.BaseFragment
-import com.example.mustafakocer.presentation.common.UiErrorMapper
 import com.example.mustafakocer.presentation.feature_details.util.enableAutoRepeat
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import com.google.android.material.tabs.TabLayoutMediator
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class ProductDetailFragment :
@@ -41,10 +41,11 @@ class ProductDetailFragment :
     private val viewModel: ProductDetailViewModel by viewModels()
     private var pagerMediator: TabLayoutMediator? = null
 
-    @Inject
-    lateinit var injectedUiErrorMapper: UiErrorMapper
-    override val uiErrorMapper: UiErrorMapper by lazy { injectedUiErrorMapper }
-    override fun onRetry() = viewModel.onRetry()
+    // --- KALDIRILANLAR ---
+    // @Inject lateinit var injectedUiErrorMapper: UiErrorMapper
+    // override val uiErrorMapper: UiErrorMapper by lazy { injectedUiErrorMapper }
+    // override fun onRetry() = viewModel.onRetry()
+    // ---------------------
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -55,32 +56,51 @@ class ProductDetailFragment :
     private fun observeViewModel() {
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
+                // 1) Ana ürün detayı durumu (Loading / Error / Success)
                 launch { viewModel.productDetailState.collect(::handleProductDetailState) }
+                // 2) Sepet miktarı
                 launch { viewModel.quantityInCart.collect(::handleCartQuantityState) }
+                // 3) Açıklama genişletme durumu
                 launch { viewModel.isDescriptionExpanded.collect(::handleDescriptionExpandedState) }
             }
         }
     }
 
     private fun setupClickListeners() {
+        // Retry butonu artık StateLayout tarafından yönetiliyor.
+        binding.stateLayout.onRetry = { viewModel.onRetry() }
+
         binding.btnAddToCart.setOnClickListener { viewModel.onIncreaseClicked() }
         binding.btnPlus.enableAutoRepeat { viewModel.onIncreaseClicked() }
         binding.btnMinus.enableAutoRepeat { viewModel.onDecreaseClicked() }
-        binding.btnToggleDescription.setOnClickListener { viewModel.onToggleDescription() }
+
+        // İçerik StateLayout içinde olduğundan, gerekirse contentView üzerinden erişiyoruz.
+        binding.contentView.findViewById<View>(R.id.btnToggleDescription).setOnClickListener {
+            viewModel.onToggleDescription()
+        }
     }
 
     private fun handleProductDetailState(resource: Resource<ProductDetail>) {
-        binding.viewLoadingStub.isVisible = resource is Resource.Loading
-        binding.contentView.isVisible = resource is Resource.Success
+        // Aksiyon barı sadece içerik başarıyla yüklendiğinde görünür.
         binding.cardActionBar.isVisible = resource is Resource.Success
 
         when (resource) {
+            is Resource.Loading -> {
+                binding.stateLayout.showLoading()
+            }
+
+            is Resource.Error -> {
+                binding.stateLayout.showError(subtitle = resource.exception.message)
+            }
+
             is Resource.Success -> {
                 populateUi(resource.data)
-                hideErrorState()
+                binding.stateLayout.showContent()
             }
-            is Resource.Error -> handleErrorState(binding.viewErrorStub, resource.exception)
-            else -> { /* No-op */ }
+
+            is Resource.Idle -> {
+                // No-op
+            }
         }
     }
 
@@ -94,24 +114,35 @@ class ProductDetailFragment :
     private fun handleDescriptionExpandedState(isExpanded: Boolean) {
         val transition = TransitionSet().apply {
             ordering = TransitionSet.ORDERING_TOGETHER
-            addTransition(ChangeBounds().apply {
-                duration = 350L
-                interpolator = AnimationUtils.loadInterpolator(requireContext(), android.R.interpolator.fast_out_slow_in)
-            })
+            addTransition(
+                ChangeBounds().apply {
+                    duration = 350L
+                    interpolator =
+                        AnimationUtils.loadInterpolator(
+                            requireContext(),
+                            android.R.interpolator.fast_out_slow_in
+                        )
+                }
+            )
             addTransition(Fade(Fade.IN or Fade.OUT).apply { duration = 200L })
         }
         TransitionManager.beginDelayedTransition(binding.cardDescription, transition)
 
         binding.txtDescription.maxLines = if (isExpanded) Int.MAX_VALUE else 3
-        binding.btnToggleDescription.setText(if (isExpanded) R.string.pd_action_show_less else R.string.pd_action_read_more)
-        binding.btnToggleDescription.setIconResource(if (isExpanded) R.drawable.ic_expand_less_24 else R.drawable.ic_expand_more_24)
+        binding.btnToggleDescription.setText(
+            if (isExpanded) R.string.pd_action_show_less else R.string.pd_action_read_more
+        )
+        binding.btnToggleDescription.setIconResource(
+            if (isExpanded) R.drawable.ic_expand_less_24 else R.drawable.ic_expand_more_24
+        )
     }
 
     private fun populateUi(product: ProductDetail) {
         binding.apply {
             setupPager(product.images)
             txtTitle.text = product.title
-            txtRatingValue.text = getString(R.string.pd_rating_format, product.rating, product.ratingCount)
+            txtRatingValue.text =
+                getString(R.string.pd_rating_format, product.rating, product.ratingCount)
             updateChips(chipGroupMeta, product.tags)
             setupPricing(product)
             setupDescription(product)
@@ -140,7 +171,8 @@ class ProductDetailFragment :
             txtDescription.ellipsize = TextUtils.TruncateAt.END
             txtDescription.doOnPreDraw {
                 val layout = txtDescription.layout
-                btnToggleDescription.isVisible = layout != null && layout.lineCount > 0 && layout.getEllipsisCount(layout.lineCount - 1) > 0
+                btnToggleDescription.isVisible =
+                    layout != null && layout.lineCount > 0 && layout.getEllipsisCount(layout.lineCount - 1) > 0
             }
         }
     }
@@ -172,7 +204,9 @@ class ProductDetailFragment :
         val size = resources.getDimensionPixelSize(R.dimen.pd_pager_dot_size)
         val margin = resources.getDimensionPixelSize(R.dimen.pd_pager_dot_spacing)
         return View(ctx).apply {
-            layoutParams = ViewGroup.MarginLayoutParams(size, size).also { it.setMargins(margin, margin, margin, margin) }
+            layoutParams = ViewGroup.MarginLayoutParams(size, size).also {
+                it.setMargins(margin, margin, margin, margin)
+            }
             background = AppCompatResources.getDrawable(ctx, R.drawable.bg_pd_pager_dot_selector)
             importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO
         }
