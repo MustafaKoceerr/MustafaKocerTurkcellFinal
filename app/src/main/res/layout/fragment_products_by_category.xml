@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><!-- ProductsByCategoryFragment (SwipeRefreshLayout kaldırıldı) -->
+<?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -7,63 +7,37 @@
     android:background="?attr/colorSurface"
     tools:context=".presentation.feature_product_category.ProductsByCategoryFragment">
 
-    <!-- Ürün grid listesi -->
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/contentView"
+    <!-- 1. StateLayout'ı ana view olarak ekliyoruz. -->
+    <com.example.mustafakocer.presentation.common.StateLayout
+        android:id="@+id/state_layout"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:clipToPadding="false"
-        android:paddingStart="@dimen/home_content_margin"
-        android:paddingTop="@dimen/home_content_margin_top"
-        android:paddingEnd="@dimen/home_content_margin"
-        android:paddingBottom="@dimen/home_content_margin_bottom"
+        app:emptyIcon="@drawable/ic_search_off_24"
+        app:emptySubtitle="@string/pbc_empty_subtitle"
+        app:emptyTitle="@string/pbc_empty_title"
+        app:errorIcon="@drawable/ic_cloud_off_24"
+
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:itemCount="8"
-        tools:listitem="@layout/recyler_row_product_grid" />
+        app:layout_constraintTop_toTopOf="parent">
+        <!-- 2. Bu ekrana özel varsayılan durumları belirliyoruz. -->
 
+        <!-- 3. RecyclerView (contentView) artık StateLayout'ın bir çocuğu. -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/contentView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:paddingStart="@dimen/home_content_margin"
+            android:paddingTop="@dimen/home_content_margin_top"
+            android:paddingEnd="@dimen/home_content_margin"
+            android:paddingBottom="@dimen/home_content_margin_bottom"
+            tools:listitem="@layout/recyler_row_product_grid" />
 
-    <!-- 2. Yüklenme Durumu (Merkezde) -->
-    <ViewStub
-        android:id="@+id/viewLoadingStub"
-        android:layout="@layout/layout_state_loading"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:visibility="visible" />
+    </com.example.mustafakocer.presentation.common.StateLayout>
 
-    <!-- 3. Hata Durumu (Merkezde) -->
-    <ViewStub
-        android:id="@+id/viewErrorStub"
-        android:layout="@layout/layout_state_error"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <!-- 4. Boş Durumu (Merkezde) -->
-    <ViewStub
-        android:id="@+id/viewEmptyStub"
-        android:layout="@layout/layout_state_empty"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-
-    <!-- En üste dön FAB (Home ile aynı deneyim) -->
+    <!-- FAB gibi diğer view'lar StateLayout'ın DIŞINDA kalabilir. -->
     <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
         android:id="@+id/fabScrollTop"
         android:layout_width="wrap_content"
@@ -71,11 +45,7 @@
         android:layout_margin="@dimen/fab_margin"
         android:contentDescription="@string/cd_scroll_to_top"
         android:text="@string/action_scroll_to_top"
-        android:textColor="?attr/colorOnTertiaryContainer"
         android:visibility="gone"
-        app:backgroundTint="?attr/colorTertiaryContainer"
-        app:icon="@drawable/ic_arrow_upward_24"
-        app:iconTint="?attr/colorOnTertiaryContainer"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         tools:visibility="visible" />
