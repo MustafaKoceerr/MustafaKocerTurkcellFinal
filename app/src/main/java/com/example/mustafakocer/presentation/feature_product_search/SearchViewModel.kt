@@ -1,88 +1,55 @@
+// com/example/mustafakocer/presentation/feature_product_search/SearchViewModel.kt (Refactor Edilmiş Hali)
 package com.example.mustafakocer.presentation.feature_product_search
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.paging.CombinedLoadStates
-import androidx.paging.LoadState
+import androidx.paging.PagingData
 import androidx.paging.cachedIn
-import com.example.mustafakocer.domain.mapper.ErrorMapper
+import com.example.mustafakocer.domain.model.Product
 import com.example.mustafakocer.domain.usecase.SearchProductsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.flatMapLatest
 import javax.inject.Inject
 
 @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
 @HiltViewModel
 class SearchViewModel @Inject constructor(
     private val searchProductsUseCase: SearchProductsUseCase,
-    private val errorMapper: ErrorMapper
 ) : ViewModel() {
 
+    // 1. UI'ın dinleyeceği tek ve ana veri akışı bu olacak.
+    val productsFlow: Flow<PagingData<Product>>
+
+    // 2. Arama sorgusunu tutan ve arama mantığını tetikleyen StateFlow.
     private val _searchQuery = MutableStateFlow("")
 
-    private val _uiState = MutableStateFlow(SearchUiState())
-    val uiState: StateFlow<SearchUiState> = _uiState.asStateFlow()
-
     init {
-        // Arama sorgusu değiştiğinde PagingData akışını tetikle
-        viewModelScope.launch {
-            _searchQuery
-                .debounce(400L)
-                .distinctUntilChanged()
-                .flatMapLatest { query ->
-                    // Paging verisini al, ama henüz UI state'e ekleme
+        productsFlow = _searchQuery
+            .debounce(300L) // Kullanıcı yazmayı bırakınca 300ms bekle
+            .distinctUntilChanged() // Aynı sorguyu tekrar gönderme
+            .flatMapLatest { query ->
+                // Sadece sorgu yeterli uzunluktaysa use case'i çağır.
+                // Değilse, boş bir PagingData akışı döndür.
+                if (query.length >= SearchProductsUseCase.MIN_QUERY_LENGTH) {
                     searchProductsUseCase(query)
+                } else {
+                    MutableStateFlow(PagingData.empty())
                 }
-                .cachedIn(viewModelScope)
-                .collect { pagingData ->
-                    // Yeni PagingData geldiğinde, bunu Content state'ine koy.
-                    // Eğer mevcut durum zaten Content ise, sadece PagingData'yı güncelle.
-                    // Değilse, yeni bir Content state'i oluştur.
-                    val currentState = _uiState.value.screenState
-                    if (currentState is ScreenState.Content || _searchQuery.value.length >= SearchProductsUseCase.MIN_QUERY_LENGTH) {
-                        _uiState.update { it.copy(screenState = ScreenState.Content(pagingData)) }
-                    }
-                }
-        }
-    }
-
-    fun onSearchQueryChanged(query: String) {
-        _searchQuery.value = query
-        // Sorgu değiştiğinde, UI state'ini de anında güncelle.
-        // Eğer sorgu kısaysa, hemen Idle durumuna geç.
-        if (query.length < SearchProductsUseCase.MIN_QUERY_LENGTH) {
-            _uiState.update { it.copy(searchQuery = query, screenState = ScreenState.Idle) }
-        } else {
-            _uiState.update { it.copy(searchQuery = query) }
-        }
+            }
+            .cachedIn(viewModelScope) // Sonuçları scope içinde cache'le
     }
 
     /**
-     * Fragment'tan gelen Paging yükleme durumlarını alır ve bunu
-     * ScreenState'i güncellemek için kullanır.
+     * Fragment'tan çağrılacak olan metod.
+     * Kullanıcı arama kutusuna bir şey yazdığında bu tetiklenir.
      */
-    fun onPagingLoadStateChanged(loadStates: CombinedLoadStates, itemCount: Int) {
-        // Eğer sorgu kısaysa, Paging'in durumu ne olursa olsun Idle'da kal.
-        if (_searchQuery.value.length < SearchProductsUseCase.MIN_QUERY_LENGTH) {
-            _uiState.update { it.copy(screenState = ScreenState.Idle) }
-            return
-        }
-
-        val refreshState = loadStates.refresh
-
-        val newScreenState = when {
-            refreshState is LoadState.Loading && itemCount == 0 -> ScreenState.Loading
-            refreshState is LoadState.Error && itemCount == 0 -> ScreenState.Error(errorMapper.map(refreshState.error))
-            refreshState is LoadState.NotLoading && itemCount == 0 -> ScreenState.Empty
-            // Eğer liste doluysa, mevcut Content state'ini koru.
-            // Bu, arka planda refresh olurken ekranın yanıp sönmesini engeller.
-            _uiState.value.screenState is ScreenState.Content -> _uiState.value.screenState
-            else -> ScreenState.Idle // Beklenmedik bir durum için fallback
-        }
-
-        _uiState.update { it.copy(screenState = newScreenState) }
+    fun onSearchQueryChanged(query: String) {
+        _searchQuery.value = query.trim()
     }
 }

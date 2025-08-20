@@ -7,82 +7,52 @@
     android:background="?attr/colorSurface"
     tools:context=".presentation.feature_product_search.SearchFragment">
 
-    <!-- Arama alanı her zaman görünür -->
+    <!-- Arama alanı her zaman görünür ve StateLayout'ın DIŞINDADIR. -->
     <androidx.appcompat.widget.SearchView
         android:id="@+id/searchView"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
         android:background="@drawable/bg_search_view"
-        app:queryHint="@string/search_hint"
         app:iconifiedByDefault="false"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:queryHint="@string/search_hint" />
 
-    <!-- 1. Ana İçerik: RecyclerView -->
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/contentView"
+    <!--
+        1. StateLayout, SearchView'ın altında kalan tüm alanı kaplar.
+    -->
+    <com.example.mustafakocer.presentation.common.StateLayout
+        android:id="@+id/state_layout"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginTop="16dp"
-        android:clipToPadding="false"
-        android:paddingHorizontal="8dp"
-        app:layout_constraintTop_toBottomOf="@id/searchView"
+        app:emptyIcon="@drawable/ic_search_off_24"
+        app:emptyTitle="@string/search_empty_title"
+        app:errorIcon="@drawable/ic_cloud_off_24"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+
+
         app:layout_constraintEnd_toEndOf="parent"
-        tools:listitem="@layout/recyler_row_product_grid" />
-
-    <!-- 2. Yüklenme Durumu (Merkezde, içeriğin üstünde) -->
-    <ViewStub
-        android:id="@+id/viewLoadingStub"
-        android:layout="@layout/layout_state_loading"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/searchView"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:visibility="gone"
-        tools:visibility="visible"/>
-
-    <!-- 3. Hata Durumu (Merkezde, içeriğin üstünde) -->
-    <ViewStub
-        android:id="@+id/viewErrorStub"
-        android:layout="@layout/layout_state_error"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@id/searchView"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:visibility="gone" />
+        app:promptIcon="@drawable/ic_search_24"
+        app:promptSubtitle="@string/search_idle_subtitle"
+        app:promptTitle="@string/search_idle_title">
+        <!--
+            2. Bu ekrana özel varsayılan durumları XML'den belirliyoruz.
+               Bu, component'imizin ne kadar esnek olduğunu gösterir.
+        -->
+        <!-- 3. RecyclerView (contentView) artık StateLayout'ın bir çocuğu. -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/contentView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:paddingHorizontal="8dp"
+            tools:listitem="@layout/recyler_row_product_grid" />
 
-    <!-- 4. Boş Durumu (Merkezde, içeriğin üstünde)
-     Arama yapıldı ancak sonuç bulunamadı. -->
-    <ViewStub
-        android:id="@+id/viewEmptyStub"
-        android:layout="@layout/layout_state_empty"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/searchView"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:visibility="gone" />
-
-    <!-- 5. Giriş Durumu
-     Arama yapılmadı query < 3 durumunda-->
-
-    <ViewStub
-        android:id="@+id/viewIdleStub"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout="@layout/layout_state_idle_search"
-        app:layout_constraintTop_toBottomOf="@id/searchView"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+    </com.example.mustafakocer.presentation.common.StateLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
