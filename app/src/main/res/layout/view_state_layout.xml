@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:parentTag="com.example.mustafakocer.presentation.common.StateLayout"> <!-- Paket adını kendi projenle değiştir -->
+
+
+    <!-- Loading State -->
+    <include
+        android:id="@+id/state_loading_view"
+        layout="@layout/layout_state_loading"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"
+        tools:visibility="gone" />
+
+    <!-- Error State -->
+    <include
+        android:id="@+id/state_error_view"
+        layout="@layout/layout_state_error"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"
+        tools:visibility="gone" />
+
+    <!-- Empty State -->
+    <include
+        android:id="@+id/state_empty_view"
+        layout="@layout/layout_state_empty"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"
+        tools:visibility="gone" />
+
+    <!-- Prompt State -->
+    <include
+        android:id="@+id/state_prompt_view"
+        layout="@layout/layout_state_prompt"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"
+        tools:visibility="visible" /> <!-- Önizlemede bir şey görebilmek için bunu 'visible' yapabiliriz. -->
+
+</merge>
