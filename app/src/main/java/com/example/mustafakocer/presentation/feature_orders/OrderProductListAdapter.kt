@@ -6,9 +6,15 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.example.mustafakocer.R
 import com.example.mustafakocer.databinding.RecyclerRowOrderProductBinding
 import com.example.mustafakocer.domain.model.OrderProduct
 
+/**
+ * A [ListAdapter] for displaying a list of [OrderProduct] items within an order detail screen.
+ *
+ * @param onProductClick A lambda to be invoked when a product item is clicked.
+ */
 class OrderProductListAdapter(
     private val onProductClick: (productId: Int) -> Unit,
 ) : ListAdapter<OrderProduct, OrderProductListAdapter.OrderProductViewHolder>(
@@ -22,22 +28,25 @@ class OrderProductListAdapter(
             binding.root.setOnClickListener {
                 val position = bindingAdapterPosition
                 if (position != RecyclerView.NO_POSITION) {
-                    // Tıklanan öğeyi al
                     val product = getItem(position)
-                    // ve ID'sini lambda aracılığıyla dışarıya bildir.
                     onProductClick(product.id)
                 }
             }
         }
 
         fun bind(product: OrderProduct) {
-            binding.txtProductTitle.text = product.title
-            binding.txtPricePerUnit.text = product.discountedPricePerUnit
-            binding.txtQuantity.text = "Adet: ${product.quantity}"
+            binding.apply {
+                txtProductTitle.text = product.title
+                txtPricePerUnit.text = product.discountedPricePerUnit
+                txtQuantity.text = root.context.getString(
+                    R.string.order_item_quantity_format,
+                    product.quantity
+                )
 
-            Glide.with(binding.root.context)
-                .load(product.thumbnail)
-                .into(binding.imgProduct)
+                Glide.with(root.context)
+                    .load(product.thumbnail)
+                    .into(imgProduct)
+            }
         }
     }
 
