@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><!-- CategoryFragment (SwipeRefreshLayout kaldırıldı) -->
+<?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -7,58 +7,34 @@
     android:background="?attr/colorSurface"
     tools:context=".presentation.feature_product_category.CategoryFragment">
 
-    <!-- Liste -->
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/contentView"
+    <!-- 1. StateLayout'ı ana view olarak ekliyoruz. -->
+    <com.example.mustafakocer.presentation.common.StateLayout
+        android:id="@+id/state_layout"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+
+    app:errorIcon="@drawable/ic_cloud_off_24"
+    app:emptyIcon="@drawable/ic_category_24"
+    app:emptyTitle="@string/empty_categories_title"
+    app:emptySubtitle="@string/empty_categories_subtitle">
+        <!-- 2. Bu ekrana özel varsayılan durumları belirliyoruz. -->
+
+    <!-- 3. RecyclerView (contentView) artık StateLayout'ın bir çocuğu. -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/contentView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:clipToPadding="false"
         android:paddingStart="@dimen/category_content_inset"
         android:paddingTop="@dimen/category_content_inset_top"
         android:paddingEnd="@dimen/category_content_inset"
         android:paddingBottom="@dimen/category_content_inset_bottom"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:itemCount="12"
         tools:listitem="@layout/recycler_row_category" />
 
-    <!-- 2. Yüklenme Durumu (Merkezde) -->
-    <ViewStub
-        android:id="@+id/viewLoadingStub"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout="@layout/layout_state_loading"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:visibility="visible" />
+</com.example.mustafakocer.presentation.common.StateLayout>
 
-    <!-- 3. Hata Durumu (Merkezde) -->
-    <ViewStub
-        android:id="@+id/viewErrorStub"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout="@layout/layout_state_error"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <!-- 4. Boş Durumu (Merkezde) -->
-    <ViewStub
-        android:id="@+id/viewEmptyStub"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout="@layout/layout_state_empty"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>

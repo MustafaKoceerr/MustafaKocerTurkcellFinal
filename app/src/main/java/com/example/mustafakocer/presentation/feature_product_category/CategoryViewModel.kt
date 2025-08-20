@@ -11,52 +11,51 @@ import com.example.mustafakocer.domain.usecase.GetProductsByCategoryUseCase
 import com.example.mustafakocer.domain.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.*
 import javax.inject.Inject
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 
+/**
+ * Manages the UI state and business logic for screens related to product categories.
+ * It handles fetching the list of all categories and also provides a reactive stream
+ * of paginated products for a selected category.
+ */
 @HiltViewModel
 class CategoryViewModel @Inject constructor(
     private val getCategoriesUseCase: GetCategoriesUseCase,
     private val getProductsByCategoryUseCase: GetProductsByCategoryUseCase,
 ) : ViewModel() {
-    // --- Kategorileri Listeleme State'i (Bu değişmedi) ---
-    private val _categoriesState = MutableStateFlow<Resource<List<Category>>>(Resource.Idle)
-    val categoriesState : StateFlow<Resource<List<Category>>> = _categoriesState.asStateFlow()
 
-    // --- Kategoriye Göre Ürünleri Listeleme State'i (Bu DEĞİŞTİ) ---
-    // 1. Seçilen kategori adını tutacak bir StateFlow.
+    private val _categoriesState = MutableStateFlow<Resource<List<Category>>>(Resource.Idle)
+    val categoriesState: StateFlow<Resource<List<Category>>> = _categoriesState.asStateFlow()
+
     private val _selectedCategory = MutableStateFlow<String?>(null)
 
-    // 2. Kategori adı değiştikçe, yeni PagingData akışını tetikleyecek olan ana Flow.
+    /**
+     * A reactive flow of paginated products that automatically updates when a new category is selected.
+     *
+     * It uses `flatMapLatest` to listen to changes in `_selectedCategory`. When the category
+     * changes, the old product flow is cancelled, and a new one is created with the new
+     * category name. This is a highly efficient way to handle dynamic data streams.
+     *
+     * The `.cachedIn(viewModelScope)` operator ensures the PagingData survives configuration changes.
+     */
     @OptIn(ExperimentalCoroutinesApi::class)
     val productsByCategoryFlow: Flow<PagingData<Product>> = _selectedCategory
-        .flatMapLatest { categoryName->
-            // Eğer kategori adı null veya boş değilse, UseCase'i çağır.
-            // Değilse, boş bir PagingData akışı döndür.
-            if (!categoryName.isNullOrBlank()){
+        .flatMapLatest { categoryName ->
+            if (!categoryName.isNullOrBlank()) {
                 getProductsByCategoryUseCase(categoryName)
-            }else{
+            } else {
                 flowOf(PagingData.empty())
             }
         }
         .cachedIn(viewModelScope)
-    // PagingData'yı ViewModelScope'ta önbelleğe alarak konfigürasyon
-    // değişikliklerinde verinin korunmasını sağlıyoruz.
 
     init {
-        // ViewModel oluşturulduğunda, kategori listesini otomatik olarak çek.
         fetchCategories()
     }
 
     /**
-     * Tüm kategorilerin listesini getirmek için UseCase'i tetikler.
+     * Triggers the use case to fetch the list of all available categories.
      */
     fun fetchCategories() {
         getCategoriesUseCase().onEach { resource ->
@@ -64,14 +63,14 @@ class CategoryViewModel @Inject constructor(
         }.launchIn(viewModelScope)
     }
 
+
     /**
-     * Fragment'tan gelen kategori adını güncelleyerek ürün akışını tetikler.
-     * Bu fonksiyon, ProductsByCategoryFragment tarafından çağrılacak.
+     * Called by the UI to set the currently selected category, which in turn triggers
+     * the `productsByCategoryFlow` to emit new data.
      *
-     * @param categoryName Ürünleri getirilecek olan kategorinin 'slug' adı.
+     * @param categoryName The 'slug' name of the category to fetch products for.
      */
     fun onCategorySelected(categoryName: String) {
         _selectedCategory.value = categoryName
     }
-
 }

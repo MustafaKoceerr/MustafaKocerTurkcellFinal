@@ -9,10 +9,10 @@ import com.example.mustafakocer.databinding.RecyclerRowCategoryBinding
 import com.example.mustafakocer.domain.model.Category
 
 /**
- * Kategori listesini RecyclerView'da göstermek için kullanılan ListAdapter.
+ * A [ListAdapter] for displaying a list of [Category] items in a RecyclerView.
  *
- * @param onCategoryClick Bir kategori öğesine tıklandığında çağrılacak olan lambda.
- *                        Tıklanan kategorinin 'slug' adını parametre olarak alır.
+ * @param onCategoryClick A lambda to be invoked when a category item is clicked,
+ *                        providing the clicked [Category] object.
  */
 class CategoryListAdapter(
     private val onCategoryClick: (Category) -> Unit
@@ -25,15 +25,12 @@ class CategoryListAdapter(
             binding.root.setOnClickListener {
                 val position = bindingAdapterPosition
                 if (position != RecyclerView.NO_POSITION) {
-                    val category = getItem(position)
-                    // DEĞİŞTİ: Tıklanan kategorinin kendisini callback ile dışarıya bildir.
-                    onCategoryClick(category)
+                    onCategoryClick(getItem(position))
                 }
             }
         }
 
         fun bind(category: Category) {
-            // Gelen 'Category' nesnesinin 'name' alanını TextView'e ata.
             binding.rowCategoryName.text = category.name
         }
     }
@@ -51,7 +48,6 @@ class CategoryListAdapter(
         holder.bind(getItem(position))
     }
 
-    // ListAdapter'ın verimli çalışması için DiffUtil.ItemCallback.
     private object CategoryDiffCallback : DiffUtil.ItemCallback<Category>() {
         override fun areItemsTheSame(oldItem: Category, newItem: Category): Boolean {
             return oldItem.slug == newItem.slug
