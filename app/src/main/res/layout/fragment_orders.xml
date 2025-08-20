@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><!-- OrdersFragment (SwipeRefreshLayout kaldırıldı) -->
+<?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -7,80 +7,38 @@
     android:background="?attr/colorSurface"
     tools:context=".presentation.feature_orders.OrdersFragment">
 
-    <!-- Sipariş listesi -->
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/contentView"
+    <!-- 1. StateLayout'ı ana view olarak ekliyoruz. -->
+    <com.example.mustafakocer.presentation.common.StateLayout
+        android:id="@+id/state_layout"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:clipToPadding="false"
-        android:paddingStart="@dimen/orders_content_inset"
-        android:paddingTop="@dimen/orders_content_inset_top"
-        android:paddingEnd="@dimen/orders_content_inset"
-        android:paddingBottom="@dimen/orders_content_inset_bottom"
+        app:emptyIcon="@drawable/ic_orders_empty_24"
+        app:emptySubtitle="@string/empty_orders_subtitle"
+        app:emptyTitle="@string/empty_orders_title"
+        app:errorIcon="@drawable/ic_cloud_off_24"
+
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:itemCount="6"
-        tools:listitem="@layout/recycler_row_order" />
+        app:layout_constraintTop_toTopOf="parent">
+        <!-- 2. Bu ekrana özel varsayılan durumları belirliyoruz. -->
 
-    <!-- Yüklenme göstergesi (ID korunur) -->
-    <com.google.android.material.progressindicator.CircularProgressIndicator
-        android:id="@+id/progressbar"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:visibility="gone"
-        app:indicatorInset="8dp"
-        app:indicatorSize="32dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:trackThickness="3dp"
-        tools:visibility="visible" />
+        <!-- 3. RecyclerView (contentView) artık StateLayout'ın bir çocuğu. -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/contentView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:paddingStart="@dimen/orders_content_inset"
+            android:paddingTop="@dimen/orders_content_inset_top"
+            android:paddingEnd="@dimen/orders_content_inset"
+            android:paddingBottom="@dimen/orders_content_inset_bottom"
+            tools:listitem="@layout/recycler_row_order" />
 
-    <!-- 2. Yüklenme Durumu (Merkezde) -->
-    <!-- Eski ProgressBar kaldırıldı, yerine ortak ViewStub geldi -->
-    <ViewStub
-        android:id="@+id/viewLoadingStub"
-        android:layout="@layout/layout_state_loading"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:visibility="visible" />
-
-    <!-- 3. Hata Durumu (Merkezde) -->
-    <!-- Eski stateErrorGroup kaldırıldı, yerine ortak ViewStub geldi -->
-    <ViewStub
-        android:id="@+id/viewErrorStub"
-        android:layout="@layout/layout_state_error"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <!-- 4. Boş Durumu (Merkezde) -->
-    <!-- Eski txtEmptyOrders kaldırıldı, yerine ortak ViewStub geldi -->
-    <ViewStub
-        android:id="@+id/viewEmptyStub"
-        android:layout="@layout/layout_state_empty"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+    </com.example.mustafakocer.presentation.common.StateLayout>
 
 
-    <!-- En üste dön FAB -->
+    <!-- FAB gibi diğer view'lar StateLayout'ın DIŞINDA kalabilir. -->
     <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
         android:id="@+id/fabScrollTop"
         android:layout_width="wrap_content"
@@ -88,11 +46,7 @@
         android:layout_margin="@dimen/fab_margin"
         android:contentDescription="@string/cd_scroll_to_top"
         android:text="@string/action_scroll_to_top"
-        android:textColor="?attr/colorOnTertiaryContainer"
         android:visibility="gone"
-        app:backgroundTint="?attr/colorTertiaryContainer"
-        app:icon="@drawable/ic_arrow_upward_24"
-        app:iconTint="?attr/colorOnTertiaryContainer"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         tools:visibility="visible" />

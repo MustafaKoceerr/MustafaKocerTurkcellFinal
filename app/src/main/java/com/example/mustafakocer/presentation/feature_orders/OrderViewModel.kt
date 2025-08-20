@@ -10,16 +10,21 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
+/**
+ * Manages the UI state and business logic for the Orders screen.
+ */
 @HiltViewModel
 class OrderViewModel @Inject constructor(
     private val getOrdersUseCase: GetOrdersUseCase,
 ) : ViewModel() {
 
-    // `ordersFlow` artık doğrudan UseCase'i çağırıyor.
-    // UseCase, hangi userId'yi kullanacağını SessionManager sayesinde biliyor.
+    /**
+     * A flow of [PagingData] representing the user's orders.
+     *
+     * The `.cachedIn(viewModelScope)` operator is crucial for Paging 3. It caches the
+     * content of the Flow in the ViewModel's scope, making the data survive
+     * configuration changes (like screen rotations) and keeping the scroll position.
+     */
     val ordersFlow: Flow<PagingData<Order>> = getOrdersUseCase()
-        // PagingData'yı ViewModelScope'ta önbelleğe al.
-        // Bu, ekran döndüğünde veya konfigürasyon değiştiğinde verinin kaybolmasını önler.
         .cachedIn(viewModelScope)
-
 }
