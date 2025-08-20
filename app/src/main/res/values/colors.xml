@@ -46,5 +46,6 @@
 
     <color name="cart_increase">#2E7D32</color> <!-- green 800 -->
     <color name="cart_decrease">#C62828</color> <!-- red 800 -->
+    <color name="md_theme_onSurfaceVariant">#49454F</color>
 
 </resources>

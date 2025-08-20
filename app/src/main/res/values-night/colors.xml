@@ -43,5 +43,6 @@
     <color name="inverse_on_surface">#0E1320</color>
     <color name="inverse_primary">#1F3A5F</color>
     <color name="scrim">#000000</color>
+    <color name="md_theme_onSurfaceVariant">#CAC4D0</color>
 
 </resources>

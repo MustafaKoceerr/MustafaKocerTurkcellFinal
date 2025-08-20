@@ -6,7 +6,6 @@
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="title_activity_login">LoginActivity</string>
 
-    <string name="order_product_count_format">%1$d Ürün (%2$d Adet)</string>
     <string name="empty_orders_message">Henüz verilmiş bir siparişiniz bulunmuyor.</string>
 
 
@@ -195,8 +194,6 @@
     <string name="cart_empty_subtitle">Hemen alışverişe başlayarak sepetinizi doldurun.</string>
 
     <string name="order_details_item_count_format">%d ürün</string>
-    <string name="empty_categories_title">Kategori Bulunamadı</string>
-    <string name="empty_categories_subtitle">Görünüşe göre şu an gösterilecek bir kategori yok.</string>
 
     <string name="search_idle_title">Aramaya Başla</string>
     <string name="search_idle_subtitle">Ürünleri, markaları ve daha fazlasını keşfet.</string>
@@ -212,5 +209,27 @@
     <string name="action_confirm">Yes</string>
     <string name="action_cancel">No</string>
     <string name="pd_rating_format">%.1f (%d)</string>
+    <string name="order_product_count_format">%d products, %d items</string>
+    <string name="order_item_quantity_format">Quantity: %d</string>
+
+    <string name="empty_categories_title">No Categories Found</string>
+    <string name="empty_categories_subtitle">We couldn\'t find any product categories at the moment.</string>
+
+    <string name="toast_no_changes_made">No changes were made.</string>
+    <string name="toast_update_failed">Update failed.</string>
+    <string name="toast_profile_updated">Profile updated successfully!</string>
+    <!-- Search Screen -->
+    <string name="toast_user_info_error">Could not retrieve user information.</string>
+
+    <string name="state_empty_default_title">Sonuç Bulunamadı</string>
+    <string name="state_empty_default_subtitle">Lütfen daha sonra tekrar deneyin.</string>
+    <string name="state_error_default_title">Bir Sorun Oluştu</string>
+    <string name="state_error_default_subtitle">Lütfen internet bağlantınızı kontrol edin.</string>
+    <string name="state_error_retry_button">Tekrar Dene</string>
+    <string name="state_prompt_default_title">Aramaya Başlayın</string>
+    <string name="state_prompt_default_subtitle">En az 3 karakter girerek arama yapabilirsiniz.</string>
+
+    <string name="error_title_generic">Bir Sorun Oluştu</string>
+    <string name="error_message_order_not_found">Sipariş detayları bulunamadı. Lütfen tekrar deneyin veya destek ile iletişime geçin.</string>
 
 </resources>
