@@ -1,48 +1,49 @@
-<?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <!-- Brand & MD3 Scheme (Dark) -->
-    <color name="primary">#ABC2FF</color>
-    <color name="on_primary">#0B1B3A</color>
-    <color name="primary_container">#133250</color>
-    <color name="on_primary_container">#D6E3FF</color>
+    <!-- Brand & MD3 Scheme (Dark Softer) -->
+    <color name="primary">#90A9D9</color> <!-- Logonun açılmış tonu -->
+    <color name="on_primary">#0D1B2E</color>
+    <color name="primary_container">#314768</color>
+    <color name="on_primary_container">#DEE6F7</color>
 
-    <color name="secondary">#B7C4D0</color>
-    <color name="on_secondary">#1B2630</color>
-    <color name="secondary_container">#3B4854</color>
-    <color name="on_secondary_container">#DFE7EF</color>
+    <color name="secondary">#A7B4C4</color>
+    <color name="on_secondary">#1A252F</color>
+    <color name="secondary_container">#3D4B5C</color>
+    <color name="on_secondary_container">#E2E9F1</color>
 
-    <!-- Accent rengi tertiarya eşlenir -->
-    <color name="tertiary">#7AD3FF</color>
-    <color name="on_tertiary">#002638</color>
-    <color name="tertiary_container">#004B63</color>
-    <color name="on_tertiary_container">#CBEFFF</color>
+    <!-- Accent (tertiary) biraz canlı kalsın -->
+    <color name="tertiary">#64C8F0</color>
+    <color name="on_tertiary">#002331</color>
+    <color name="tertiary_container">#195973</color>
+    <color name="on_tertiary_container">#CFF4FF</color>
 
-    <!-- Hata renkleri: MD3 dark önerilerine yakın -->
-    <color name="error">#FFB4AB</color>
-    <color name="on_error">#690005</color>
+    <!-- Hata renkleri (MD3 dark önerilerine yakın) -->
+    <color name="error">#FFB4A9</color>
+    <color name="on_error">#680003</color>
     <color name="error_container">#93000A</color>
-    <color name="on_error_container">#FFDAD6</color>
+    <color name="on_error_container">#FFDAD4</color>
 
-    <!-- Arka plan / yüzeyler -->
-    <color name="background">#0B121A</color>
-    <color name="on_background">#E5E7EB</color>
+    <!-- Arka plan / yüzeyler (daha açık gri-mavi tabanlı) -->
+    <color name="background">#161C26</color>
+    <color name="on_background">#E4E6EB</color>
 
-    <color name="surface">#0F141B</color>
-    <color name="on_surface">#E5E7EB</color>
-    <color name="surface_variant">#3F4A58</color>
-    <color name="on_surface_variant">#C7D0DA</color>
+    <color name="surface">#1D232E</color>
+    <color name="on_surface">#E4E6EB</color>
+    <color name="surface_variant">#3E495A</color>
+    <color name="on_surface_variant">#C8D0DA</color>
 
-    <!-- Çizgi/ayraç ve varyantları -->
-    <color name="outline">#8A98A7</color>
-    <color name="outline_variant">#3F4A58</color>
+    <!-- Çizgi/ayraç -->
+    <color name="outline">#8A95A3</color>
+    <color name="outline_variant">#46505F</color>
 
-    <!-- Diğer yardımcı tonlar -->
-    <color name="surface_tint">#ABC2FF</color>
+    <!-- MD3 yardımcı tonlar -->
+    <color name="surface_tint">#90A9D9</color>
     <color name="inverse_surface">#F7F8FA</color>
-    <color name="inverse_on_surface">#0E1320</color>
+    <color name="inverse_on_surface">#1D232E</color>
     <color name="inverse_primary">#1F3A5F</color>
     <color name="scrim">#000000</color>
-    <color name="md_theme_onSurfaceVariant">#CAC4D0</color>
 
+    <!-- Cart Actions (Dark) -->
+    <color name="cart_increase">#66BB6A</color> <!-- Green 400 -->
+    <color name="cart_decrease">#EF5350</color> <!-- Red 400 -->
 </resources>

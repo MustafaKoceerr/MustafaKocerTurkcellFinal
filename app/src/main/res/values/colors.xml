@@ -1,24 +1,23 @@
-<?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <!-- Brand & MD3 Scheme -->
-    <color name="primary">#1F3A5F</color>
+    <!-- Brand & MD3 Scheme (Light Softer) -->
+    <color name="primary">#1F3A5F</color> <!-- Logo rengi -->
     <color name="on_primary">#FFFFFF</color>
-    <color name="primary_container">#D6E3FF</color>
-    <color name="on_primary_container">#001A43</color>
+    <color name="primary_container">#DEE6F7</color>
+    <color name="on_primary_container">#0B1C36</color>
 
     <color name="secondary">#5B7083</color>
     <color name="on_secondary">#FFFFFF</color>
-    <color name="secondary_container">#DFE7EF</color>
-    <color name="on_secondary_container">#14202A</color>
+    <color name="secondary_container">#E3E9F1</color>
+    <color name="on_secondary_container">#18222C</color>
 
-    <!-- Accent rengi tertiarya eşlenir -->
+    <!-- Accent (tertiary) -->
     <color name="tertiary">#0EA5E9</color>
     <color name="on_tertiary">#FFFFFF</color>
-    <color name="tertiary_container">#CBEFFF</color>
-    <color name="on_tertiary_container">#001F29</color>
+    <color name="tertiary_container">#CFEFFF</color>
+    <color name="on_tertiary_container">#002031</color>
 
-    <!-- Hata renkleri: MD3 uyumlu -->
+    <!-- Hata renkleri -->
     <color name="error">#B3261E</color>
     <color name="on_error">#FFFFFF</color>
     <color name="error_container">#F9DEDC</color>
@@ -26,19 +25,27 @@
 
     <!-- Arka plan / yüzeyler -->
     <color name="background">#F7F8FA</color>
+    <color name="on_background">#0E1320</color>
 
     <color name="surface">#FFFFFF</color>
     <color name="on_surface">#0E1320</color>
     <color name="surface_variant">#E5EAF0</color>
-    <color name="on_surface_variant">#425266</color>
+    <color name="on_surface_variant">#435366</color>
 
-    <!-- Çizgi/ayraç ve varyantları -->
+    <!-- Çizgi/ayraç -->
     <color name="outline">#8A98A7</color>
     <color name="outline_variant">#C7D0DA</color>
 
-    <!-- Diğer yardımcı tonlar -->
+    <!-- MD3 yardımcı tonlar -->
+    <color name="surface_tint">#1F3A5F</color>
+    <color name="inverse_surface">#1D232E</color>
+    <color name="inverse_on_surface">#E4E6EB</color>
+    <color name="inverse_primary">#90A9D9</color>
+    <color name="scrim">#000000</color>
 
-    <color name="cart_increase">#2E7D32</color> <!-- green 800 -->
-    <color name="cart_decrease">#C62828</color> <!-- red 800 -->
+
+    <!-- Cart Actions -->
+    <color name="cart_increase">#2E7D32</color> <!-- Green 800 -->
+    <color name="cart_decrease">#C62828</color> <!-- Red 800 -->
 
 </resources>
