@@ -45,4 +45,20 @@
             tools:listitem="@layout/recyler_row_product_grid" />
     </com.example.mustafakocer.presentation.common.StateLayout>
 
+    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+        android:id="@+id/fabScrollTop"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/fab_margin"
+        android:contentDescription="@string/cd_scroll_to_top"
+        android:text="@string/action_scroll_to_top"
+        android:textColor="?attr/colorOnTertiaryContainer"
+        android:visibility="gone"
+        app:backgroundTint="?attr/colorTertiaryContainer"
+        app:icon="@drawable/ic_arrow_upward_24"
+        app:iconTint="?attr/colorOnTertiaryContainer"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        tools:visibility="visible" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

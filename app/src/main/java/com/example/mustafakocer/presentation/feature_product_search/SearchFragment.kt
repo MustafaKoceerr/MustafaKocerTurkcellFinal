@@ -25,6 +25,7 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>(FragmentSearchBinding
 
     private val viewModel: SearchViewModel by viewModels()
     private lateinit var productListAdapter: ProductListAdapter
+    private lateinit var recyclerView: RecyclerView // RecyclerView referansı
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -33,6 +34,7 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>(FragmentSearchBinding
         setupRecyclerView()
         setupSearchView()
         observeViewModel()
+        setupFab() // Scroll-to-top FAB
     }
 
     private fun setupRecyclerView() {
@@ -41,12 +43,29 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>(FragmentSearchBinding
                 SearchFragmentDirections.actionSearchFragmentToProductDetailFragment(productId)
             findNavController().navigate(action)
         }
-        binding.stateLayout.findViewById<RecyclerView>(R.id.contentView).apply {
+        recyclerView = binding.stateLayout.findViewById<RecyclerView>(R.id.contentView).apply {
             adapter = productListAdapter.withLoadStateFooter(
                 footer = PagingLoadStateAdapter { productListAdapter.retry() }
             )
             layoutManager = GridLayoutManager(requireContext(), 2)
         }
+    }
+
+    private fun setupFab() {
+        binding.fabScrollTop.setOnClickListener {
+            recyclerView.smoothScrollToPosition(0)
+        }
+
+        recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(rv: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(rv, dx, dy)
+                if (dy > 0 && !binding.fabScrollTop.isShown) {
+                    binding.fabScrollTop.show()
+                } else if (dy < 0 && binding.fabScrollTop.isShown) {
+                    binding.fabScrollTop.hide()
+                }
+            }
+        })
     }
 
     private fun setupSearchView() {
@@ -61,7 +80,7 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>(FragmentSearchBinding
                 return true
             }
         })
-        // ... SearchView EditText stil kodları aynı kalıyor ...
+        // … (EditText stil ayarların aynen kalabilir)
     }
 
     private fun observeViewModel() {
@@ -72,50 +91,37 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>(FragmentSearchBinding
 
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                // 1. ViewModel'den gelen PagingData'yı dinle ve adaptöre gönder.
+                // 1) PagingData akışını topla
                 launch {
                     viewModel.productsFlow.collectLatest { pagingData ->
                         productListAdapter.submitData(pagingData)
                     }
                 }
 
-                // 2. PagingDataAdapter'ın durumunu dinleyerek UI'ı güncelle.
+                // 2) LoadState'e göre UI state yönetimi
                 launch {
                     productListAdapter.loadStateFlow.collectLatest { loadStates ->
-                        // O anki arama sorgusunu al.
                         val query = binding.searchView.query.toString()
 
-                        // Ana yükleme durumuna (refresh) odaklan.
                         when (val refreshState = loadStates.refresh) {
                             is LoadState.NotLoading -> {
-                                // Yükleme bittiğinde:
                                 if (query.length < 3) {
-                                    // Sorgu yetersizse, PROMPT durumunu göster.
                                     binding.stateLayout.showPrompt()
                                 } else if (productListAdapter.itemCount < 1) {
-                                    // Sorgu yeterli ama sonuç yoksa, EMPTY durumunu göster.
                                     val subtitle = getString(R.string.search_empty_subtitle, query)
                                     binding.stateLayout.showEmpty(subtitle = subtitle)
                                 } else {
-                                    // Sonuç varsa, CONTENT'i göster.
                                     binding.stateLayout.showContent()
                                 }
                             }
-
                             is LoadState.Loading -> {
-                                // Yükleme başladığında:
                                 if (query.length >= 3) {
-                                    // Sadece sorgu yeterliyse LOADING göster.
                                     binding.stateLayout.showLoading()
                                 } else {
-                                    // Yetersiz sorgu için yükleme animasyonu gösterme, PROMPT'ta kal.
                                     binding.stateLayout.showPrompt()
                                 }
                             }
-
                             is LoadState.Error -> {
-                                // Hata oluştuğunda:
-                                // Hata mesajını alıp ERROR durumunu göster.
                                 val errorMessage = (refreshState.error as? Exception)?.message
                                 binding.stateLayout.showError(subtitle = errorMessage)
                             }
