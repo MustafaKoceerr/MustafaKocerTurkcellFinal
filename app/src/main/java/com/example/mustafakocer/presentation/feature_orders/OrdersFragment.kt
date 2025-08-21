@@ -96,49 +96,49 @@ class OrdersFragment : BaseFragment<FragmentOrdersBinding>(FragmentOrdersBinding
 
     /**
      * Subscribes to the PagingData flow and the adapter's LoadState flow
-     * to update the UI accordingly.
+     * to update the UI accordingly. This is the definitive, race-condition-free implementation.
      */
     private fun observeState() {
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                // Observe the PagingData from the ViewModel and submit it to the adapter.
+                // PagingData akışını dinle
                 launch {
                     viewModel.ordersFlow.collectLatest { pagingData ->
                         orderListAdapter.submitData(pagingData)
                     }
                 }
-                // Observe the adapter's load state to show/hide loading, error, and empty states.
+                // LoadState akışını dinle
                 launch {
                     orderListAdapter.loadStateFlow.collectLatest { loadStates ->
-                        // --- DEĞİŞİKLİK BAŞLANGICI ---
-                        // Race condition'ı önlemek için UI durumunu `refresh` state'ine göre
-                        // hiyerarşik bir şekilde kontrol ediyoruz.
-                        when (val refreshState = loadStates.refresh) {
+                        // --- NİHAİ ÇÖZÜM ---
+                        val refresh = loadStates.refresh
+
+                        // Kural 1: İçerik her zaman önceliklidir. Listede veri varsa, göster.
+                        val hasContent = orderListAdapter.itemCount > 0
+                        if (hasContent) {
+                            binding.stateLayout.showContent()
+                            return@collectLatest // Başka bir şey yapmaya gerek yok.
+                        }
+
+                        // Kural 2: İçerik yoksa, `refresh` durumuna göre karar ver.
+                        when (refresh) {
                             is LoadState.Loading -> {
-                                // Sadece liste tamamen boşken tam ekran yükleme göster.
-                                if (orderListAdapter.itemCount == 0) {
-                                    binding.stateLayout.showLoading()
-                                }
+                                binding.stateLayout.showLoading()
                             }
-
-                            is LoadState.NotLoading -> {
-                                // Yükleme bittiğinde, listenin boş olup olmadığını güvenle kontrol edebiliriz.
-                                if (orderListAdapter.itemCount < 1) {
-                                    binding.stateLayout.showEmpty()
-                                } else {
-                                    binding.stateLayout.showContent()
-                                }
-                            }
-
                             is LoadState.Error -> {
-                                // Sadece ilk yüklemede hata alınırsa tam ekran hata göster.
-                                if (orderListAdapter.itemCount == 0) {
-                                    val errorMessage = (refreshState.error as? Exception)?.message
-                                    binding.stateLayout.showError(subtitle = errorMessage)
+                                val errorMessage = (refresh.error as? Exception)?.message
+                                binding.stateLayout.showError(subtitle = errorMessage)
+                            }
+                            is LoadState.NotLoading -> {
+                                // İçerik yok ve yükleme bitti.
+                                // Paging kütüphanesi "daha fazla sayfa kalmadı" diyorsa,
+                                // o zaman liste GERÇEKTEN boştur.
+                                val endOfPagination = loadStates.append.endOfPaginationReached
+                                if (endOfPagination) {
+                                    binding.stateLayout.showEmpty()
                                 }
                             }
                         }
-                        // --- DEĞİŞİKLİK SONU ---
                     }
                 }
             }

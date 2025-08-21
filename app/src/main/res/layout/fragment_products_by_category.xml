@@ -34,6 +34,10 @@
 
     <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
         android:id="@+id/fabScrollTop"
+        android:textColor="?attr/colorOnTertiaryContainer"
+        app:backgroundTint="?attr/colorTertiaryContainer"
+        app:icon="@drawable/ic_arrow_upward_24"
+        app:iconTint="?attr/colorOnTertiaryContainer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/fab_margin"

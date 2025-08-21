@@ -94,8 +94,8 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
     }
 
     /**
-     * Subscribes to the adapter's load state to manage the UI (loading, error, empty states),
-     * preventing race conditions by checking for the end of pagination.
+     * Subscribes to the adapter's load state to manage the UI (loading, error, empty states).
+     * This is the definitive, race-condition-free implementation.
      */
     private fun observeLoadState() {
         binding.stateLayout.onRetry = {
@@ -105,34 +105,38 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 productListAdapter.loadStateFlow.collectLatest { loadStates ->
-                    // --- DEĞİŞİKLİK BAŞLANGICI ---
-                    // Race condition'ı önlemek için UI durumunu `refresh` state'ine göre
-                    // hiyerarşik bir şekilde kontrol ediyoruz.
-                    when (val refreshState = loadStates.refresh) {
+                    // --- NİHAİ ÇÖZÜM ---
+                    val refresh = loadStates.refresh
+
+                    // Kural 1: İçerik her zaman önceliklidir. Listede veri varsa, göster.
+                    // Bu, swipe-to-refresh sırasında içeriğin kaybolmasını engeller.
+                    val hasContent = productListAdapter.itemCount > 0
+                    if (hasContent) {
+                        binding.stateLayout.showContent()
+                        return@collectLatest // Başka bir şey yapmaya gerek yok.
+                    }
+
+                    // Kural 2: İçerik yoksa, `refresh` durumuna göre karar ver.
+                    when (refresh) {
                         is LoadState.Loading -> {
-                            // Sadece liste tamamen boşken tam ekran yükleme göster.
-                            // Bu, "swipe-to-refresh" sırasında içeriğin kaybolmasını engeller.
-                            if (productListAdapter.itemCount == 0) {
-                                binding.stateLayout.showLoading()
-                            }
-                        }
-                        is LoadState.NotLoading -> {
-                            // Yükleme bittiğinde, listenin boş olup olmadığını güvenle kontrol edebiliriz.
-                            if (productListAdapter.itemCount < 1) {
-                                binding.stateLayout.showEmpty()
-                            } else {
-                                binding.stateLayout.showContent()
-                            }
+                            // İçerik yok ve yükleniyor -> Tam ekran yükleme göster.
+                            binding.stateLayout.showLoading()
                         }
                         is LoadState.Error -> {
-                            // Sadece ilk yüklemede hata alınırsa tam ekran hata göster.
-                            if (productListAdapter.itemCount == 0) {
-                                val errorMessage = (refreshState.error as? Exception)?.message
-                                binding.stateLayout.showError(subtitle = errorMessage)
+                            // İçerik yok ve hata var -> Tam ekran hata göster.
+                            val errorMessage = (refresh.error as? Exception)?.message
+                            binding.stateLayout.showError(subtitle = errorMessage)
+                        }
+                        is LoadState.NotLoading -> {
+                            // İçerik yok ve yükleme bitti.
+                            // Paging kütüphanesi "daha fazla sayfa kalmadı" diyorsa,
+                            // o zaman liste GERÇEKTEN boştur.
+                            val endOfPagination = loadStates.append.endOfPaginationReached
+                            if (endOfPagination) {
+                                binding.stateLayout.showEmpty()
                             }
                         }
                     }
-                    // --- DEĞİŞİKLİK SONU ---
                 }
             }
         }

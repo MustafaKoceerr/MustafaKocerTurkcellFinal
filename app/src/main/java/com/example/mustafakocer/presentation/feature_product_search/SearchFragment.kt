@@ -96,7 +96,7 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>(FragmentSearchBinding
 
     /**
      * Subscribes to the PagingData flow and the adapter's LoadState flow
-     * to update the UI accordingly.
+     * to update the UI accordingly. This is the definitive, race-condition-free implementation.
      */
     private fun observeViewModel() {
         binding.stateLayout.onRetry = {
@@ -105,51 +105,51 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>(FragmentSearchBinding
 
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                // Observe the PagingData from the ViewModel and submit it to the adapter.
+                // PagingData akışını dinle
                 launch {
                     viewModel.productsFlow.collectLatest { pagingData ->
                         productListAdapter.submitData(pagingData)
                     }
                 }
-                // Observe the adapter's load state to show/hide loading, error, and empty states.
+                // LoadState akışını dinle
                 launch {
                     productListAdapter.loadStateFlow.collectLatest { loadStates ->
+                        // --- NİHAİ ÇÖZÜM ---
                         val query = binding.searchView.query.toString()
-                        when (val refreshState = loadStates.refresh) {
-                            is LoadState.NotLoading -> {
-                                // --- DEĞİŞİKLİK BAŞLANGICI ---
-                                // Listenin gerçekten boş olduğundan emin olmak için,
-                                // sadece itemCount'u değil, aynı zamanda sayfalama işleminin
-                                // tamamen bittiğini de kontrol ediyoruz.
-                                val isListEmpty = productListAdapter.itemCount < 1
-                                if (query.length < 3) {
-                                    binding.stateLayout.showPrompt()
-                                } else if (isListEmpty) {
-                                    // Eğer refresh işlemi NotLoading durumundaysa ve liste boşsa,
-                                    // bu durum ya gerçekten sonuç olmadığını ya da henüz yüklemenin
-                                    // başlamadığını gösterir. Yükleme durumu (Loading) kendi
-                                    // bloğunda ele alındığı için, burası sadece "gerçekten boş"
-                                    // durumunu yönetir ve race condition'ı engeller.
-                                    val subtitle = getString(R.string.search_empty_subtitle, query)
-                                    binding.stateLayout.showEmpty(subtitle = subtitle)
-                                } else {
-                                    binding.stateLayout.showContent()
-                                }
-                                // --- DEĞİŞİKLİK SONU ---
-                            }
+                        val refresh = loadStates.refresh
+
+                        // Kural 0: Arama sorgusu yeterince uzun değilse, her zaman yönlendirme göster.
+                        // Bu, diğer tüm durumları ezer.
+                        if (query.length < 3) {
+                            binding.stateLayout.showPrompt()
+                            return@collectLatest
+                        }
+
+                        // Kural 1: İçerik her zaman önceliklidir. Listede veri varsa, göster.
+                        val hasContent = productListAdapter.itemCount > 0
+                        if (hasContent) {
+                            binding.stateLayout.showContent()
+                            return@collectLatest
+                        }
+
+                        // Kural 2: İçerik yoksa, `refresh` durumuna göre karar ver.
+                        when (refresh) {
                             is LoadState.Loading -> {
-                                // Yükleme durumu her zaman önceliklidir.
-                                // Eğer yeni bir arama yapıldıysa ve adaptör temizlendiyse bile,
-                                // bu blok çalışacağı için "Boş Ekran" gösterilmez.
-                                if (query.length >= 3) {
-                                    binding.stateLayout.showLoading()
-                                } else {
-                                    binding.stateLayout.showPrompt()
-                                }
+                                binding.stateLayout.showLoading()
                             }
                             is LoadState.Error -> {
-                                val errorMessage = (refreshState.error as? Exception)?.message
+                                val errorMessage = (refresh.error as? Exception)?.message
                                 binding.stateLayout.showError(subtitle = errorMessage)
+                            }
+                            is LoadState.NotLoading -> {
+                                // İçerik yok ve yükleme bitti.
+                                // Paging kütüphanesi "daha fazla sayfa kalmadı" diyorsa,
+                                // o zaman liste GERÇEKTEN boştur.
+                                val endOfPagination = loadStates.append.endOfPaginationReached
+                                if (endOfPagination) {
+                                    val subtitle = getString(R.string.search_empty_subtitle, query)
+                                    binding.stateLayout.showEmpty(subtitle = subtitle)
+                                }
                             }
                         }
                     }

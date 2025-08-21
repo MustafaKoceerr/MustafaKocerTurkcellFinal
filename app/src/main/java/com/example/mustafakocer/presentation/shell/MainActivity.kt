@@ -58,6 +58,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun setupEdgeToEdge() {
         WindowCompat.setDecorFitsSystemWindows(window, false)
+        // Not: Bu renk atamaları temanızda zaten var, burada olmaları zararsız ama zorunlu değil.
         window.statusBarColor = Color.TRANSPARENT
         window.navigationBarColor = Color.TRANSPARENT
 
@@ -67,6 +68,13 @@ class MainActivity : AppCompatActivity() {
             isAppearanceLightStatusBars = !isDark
             isAppearanceLightNavigationBars = !isDark
         }
+
+        // --- DEĞİŞİKLİK BAŞLANGICI ---
+        // AppBarLayout'un arka planını şeffaf yap ve gölgesini kaldır.
+        // Sorunun ana çözümü bu iki satırdır.
+        binding.appBar.setBackgroundColor(Color.TRANSPARENT)
+        binding.appBar.elevation = 0f
+        // --- DEĞİŞİKLİK SONU ---
 
         binding.drawerLayout.fitsSystemWindows = false
         binding.drawerLayout.setStatusBarBackground(null)
