@@ -219,7 +219,7 @@ app/src/main/java/com/example/mustafakocer/
 
 If you want to see the full experience of the application in action, check out the video below:
 
-👉 **[Watch Full Demo on YouTube »](https://youtu.be/)**
+👉 **[Watch Full Demo on YouTube »](https://youtu.be/UCwxp5EJidw)**
 
 ---
 
