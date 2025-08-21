@@ -8,6 +8,10 @@ import androidx.room.Query
 import com.example.mustafakocer.data.model.entity.ProductEntity
 import kotlinx.coroutines.flow.Flow
 
+/**
+ * Data Access Object for the products table.
+ * Provides methods to interact with product data, including PagingSource for pagination.
+ */
 @Dao
 interface ProductDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)

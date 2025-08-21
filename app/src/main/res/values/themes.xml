@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <!-- Tüm renk eşlemeleri burada -->
+    <!-- Uygulama tabanı: renk haritası + tipografi tokenları + varsayılan widget stilleri -->
     <style name="Theme.MustiShop.Base" parent="Theme.Material3.DayNight.NoActionBar">
 
         <!-- Primary -->
@@ -38,10 +38,26 @@
         <!-- Outlines -->
         <item name="colorOutline">@color/outline</item>
         <item name="colorOutlineVariant">@color/outline_variant</item>
-        <!-- DİKKAT: colorSurfaceTint / colorInverse* burada YOK (opsiyonel). -->
+
+        <!-- Tipografi token eşlemeleri (Manrope başlık, Inter gövde/label) -->
+        <item name="textAppearanceTitleLarge">@style/TextAppearance.App.TitleLarge</item>
+        <item name="textAppearanceTitleMedium">@style/TextAppearance.App.TitleMedium</item>
+        <item name="textAppearanceTitleSmall">@style/TextAppearance.App.TitleSmall</item>
+
+        <item name="textAppearanceBodyLarge">@style/TextAppearance.App.BodyLarge</item>
+        <item name="textAppearanceBodyMedium">@style/TextAppearance.App.BodyMedium</item>
+        <item name="textAppearanceBodySmall">@style/TextAppearance.App.BodySmall</item>
+
+        <item name="textAppearanceLabelSmall">@style/TextAppearance.App.LabelSmall</item>
+
+        <!-- Varsayılan widget stilleri -->
+        <item name="android:textViewStyle">@style/Widget.App.TextView</item>
+        <item name="android:editTextStyle">@style/Widget.App.EditText</item>
+        <item name="textInputStyle">@style/Widget.App.TextInputLayout</item>
+        <item name="toolbarStyle">@style/Widget.App.Toolbar</item>
     </style>
 
-    <!-- Light genel: API sınırı olmayan sistem-UI ayarları -->
+    <!-- Light genel -->
     <style name="Theme.MustiShop" parent="Theme.MustiShop.Base">
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:navigationBarColor">@android:color/transparent</item>

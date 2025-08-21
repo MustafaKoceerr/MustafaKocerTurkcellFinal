@@ -4,10 +4,16 @@ import com.example.mustafakocer.domain.repository.CartRepository
 import com.example.mustafakocer.domain.util.Resource
 import javax.inject.Inject
 
+/**
+ * Encapsulates the business logic for clearing all items from the user's shopping cart.
+ */
 class ClearCartUseCase @Inject constructor(
     private val cartRepository: CartRepository
 ) {
-    suspend operator fun invoke(userId: String): Resource<Unit> {
-        return cartRepository.clearCart(userId)
-    }
+    /**
+     * Executes the use case.
+     * @return A [Resource] indicating the outcome of the operation.
+     */
+    suspend operator fun invoke(): Resource<Unit> =
+        cartRepository.clearCart()
 }

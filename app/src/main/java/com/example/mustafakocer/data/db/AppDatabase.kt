@@ -7,7 +7,9 @@ import com.example.mustafakocer.data.model.entity.ProductEntity
 import com.example.mustafakocer.data.model.entity.HomeRemoteKeyEntity
 import com.example.mustafakocer.data.model.entity.UserEntity
 
-
+/**
+ * The main Room database for the application.
+ */
 @Database(
     entities = [
         ProductEntity::class,
@@ -15,17 +17,13 @@ import com.example.mustafakocer.data.model.entity.UserEntity
         HomeRemoteKeyEntity::class,
         CategoryRemoteKeyEntity::class,
     ],
-    version = 4, // Şema değiştiği için versiyonu artır
+    version = 5,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
 
     abstract fun createProductDao(): ProductDao
-
     abstract fun createUserDao(): UserDao
-
     abstract fun createHomeRemoteKeyDao(): HomeRemoteKeyDao
-
     abstract fun createCategoryRemoteKeyDao(): CategoryRemoteKeyDao
-
 }

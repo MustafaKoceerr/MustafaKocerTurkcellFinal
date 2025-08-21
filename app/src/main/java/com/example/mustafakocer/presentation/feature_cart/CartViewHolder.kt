@@ -4,21 +4,21 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.example.mustafakocer.R
 import com.example.mustafakocer.databinding.RecylerRowProductCartBinding
 import com.example.mustafakocer.domain.model.CartItem
-import java.text.DecimalFormat
+import com.example.mustafakocer.presentation.common.util.parsePriceToDouble
+import java.text.NumberFormat
+import java.util.Locale
 
 class CartViewHolder(
     private val binding: RecylerRowProductCartBinding,
-    private val onEvent: (CartEvent) -> Unit
+    private val onEvent: (CartEvent) -> Unit,
 ) : RecyclerView.ViewHolder(binding.root) {
 
-    // O anki ViewHolder'ın bağlandığı CartItem'ı tutacak bir değişken.
-    // Tıklama anında doğru ID'ye erişmek için kullanacağız.
     private var currentCartItem: CartItem? = null
 
     init {
-        // Tıklama dinleyicileri ViewHolder oluşturulurken SADECE BİR KEZ ayarlanır.
         binding.btnPlus.setOnClickListener {
             currentCartItem?.let { onEvent(CartEvent.OnIncrease(it.product.id)) }
         }
@@ -34,27 +34,38 @@ class CartViewHolder(
     }
 
     fun bind(cartItem: CartItem) {
-        // 1. Tıklama olaylarının doğru ID'yi kullanabilmesi için o anki item'ı sakla.
-        this.currentCartItem = cartItem
-
-        // 2. UI bileşenlerini veriye göre güncelle.
+        currentCartItem = cartItem
         val product = cartItem.product
-        val priceFormat = DecimalFormat("$#,##0.00")
+        val context = binding.root.context
+
+        // Geçerli locale ile para formatı (binlik ayırıcı aktif)
+        val locale = context.resources.configuration.locales[0]
+        val currency = NumberFormat.getCurrencyInstance(locale).apply {
+            isGroupingUsed = true
+            minimumFractionDigits = 2
+            maximumFractionDigits = 2
+        }
 
         binding.apply {
             txtTitle.text = product.title
             txtQuantity.text = cartItem.quantity.toString()
-            txtPricePerUnit.text = "${product.discountedPrice} / adet"
 
-            val priceAsDouble = product.discountedPrice.replace("$", "").replace(",", "").toDoubleOrNull() ?: 0.0
-            val lineTotal = priceAsDouble * cartItem.quantity
-            txtLineTotal.text = priceFormat.format(lineTotal)
+            val unitPrice = product.discountedPrice.parsePriceToDouble()
+            val unitPriceText = currency.format(unitPrice)
 
-            Glide.with(root.context)
-                .load(product.thumbnailUrl)
-                .into(imgProduct)
+            val lineTotal = unitPrice * cartItem.quantity
+            val lineTotalText = currency.format(lineTotal)
+
+            // İsimler değişmedi: artık %1$s bekliyorlar
+            txtPricePerUnit.text =
+                context.getString(R.string.price_per_unit_format_dollar, unitPriceText)
+            txtLineTotal.text =
+                context.getString(R.string.price_format_dollar, lineTotalText)
+
+            Glide.with(context).load(product.thumbnailUrl).into(imgProduct)
         }
     }
+
 
     companion object {
         fun create(parent: ViewGroup, onEvent: (CartEvent) -> Unit): CartViewHolder {

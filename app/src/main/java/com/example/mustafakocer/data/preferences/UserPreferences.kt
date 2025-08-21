@@ -6,14 +6,26 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
+import javax.inject.Singleton
 
+/**
+ * Creates a singleton instance of DataStore for user-related preferences.
+ */
 private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "user_preferences")
 
+/**
+ * Manages the persistence of non-sensitive, user-specific data using Jetpack DataStore.
+ * This class is designed to be a singleton, managed by Hilt.
+ *
+ * @param context The application context, provided by Hilt.
+ */
+@Singleton
 class UserPreferences @Inject constructor(
-    private val context: Context
+    @ApplicationContext private val context: Context
 ) {
     private val dataStore = context.dataStore
 
@@ -22,7 +34,7 @@ class UserPreferences @Inject constructor(
     }
 
     /**
-     * Oturum açan kullanıcının ID'sini DataStore'a kaydeder.
+     * Persists the user's ID to DataStore.
      */
     suspend fun saveUserId(userId: Int) {
         dataStore.edit { preferences ->
@@ -31,7 +43,7 @@ class UserPreferences @Inject constructor(
     }
 
     /**
-     * Kaydedilmiş kullanıcı ID'sini bir Flow olarak okur.
+     * A flow that emits the stored user ID, or null if it's not set.
      */
     val userId: Flow<Int?> = dataStore.data
         .map { preferences ->
@@ -39,7 +51,7 @@ class UserPreferences @Inject constructor(
         }
 
     /**
-     * Kaydedilmiş kullanıcı ID'sini temizler.
+     * Removes the stored user ID from DataStore.
      */
     suspend fun clear() {
         dataStore.edit { preferences ->

@@ -1,5 +1,6 @@
 package com.example.mustafakocer.presentation.feature_cart
 
+import android.content.DialogInterface
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuInflater
@@ -13,14 +14,22 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.mustafakocer.R
+import androidx.recyclerview.widget.RecyclerView
 import com.example.mustafakocer.databinding.FragmentCartBinding
 import com.example.mustafakocer.domain.util.Resource
 import com.example.mustafakocer.presentation.base.BaseFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import com.example.mustafakocer.R
+import java.text.NumberFormat
 
+/**
+ * Displays the user's shopping cart.
+ * This fragment is responsible for setting up the UI, observing state changes from the
+ * [CartViewModel], and delegating user interactions back to the ViewModel.
+ */
 @AndroidEntryPoint
 class CartFragment : BaseFragment<FragmentCartBinding>(FragmentCartBinding::inflate) {
 
@@ -29,80 +38,92 @@ class CartFragment : BaseFragment<FragmentCartBinding>(FragmentCartBinding::infl
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         setupMenu()
         setupRecyclerView()
         observeViewModel()
     }
 
+    /**
+     * Initializes the RecyclerView, its adapter, and handles item click events.
+     */
     private fun setupRecyclerView() {
-        // DEĞİŞTİ: Adapter artık tek bir 'onEvent' lambdası alıyor.
         cartListAdapter = CartListAdapter { event ->
-            // Gelen olayın türüne göre doğru ViewModel fonksiyonunu çağırıyoruz.
             when (event) {
                 is CartEvent.OnIncrease -> viewModel.onIncreaseClicked(event.productId)
                 is CartEvent.OnDecrease -> viewModel.onDecreaseClicked(event.productId)
-                is CartEvent.OnRemove -> {
-                    showRemoveItemConfirmationDialog(event.productId)
-                }
-
+                is CartEvent.OnRemove -> showRemoveItemConfirmationDialog(event.productId)
                 is CartEvent.OnProductClick -> {
-                    // 1. Safe Args ile action'ı oluştur ve productId'yi parametre olarak geç.
-                    val action = CartFragmentDirections.actionCartFragmentToProductDetailFragment(
-                        productId = event.productId
-                    )
-                    // 2. NavController'ı kullanarak navigasyonu gerçekleştir.
+                    val action =
+                        CartFragmentDirections.actionCartFragmentToProductDetailFragment(event.productId)
                     findNavController().navigate(action)
                 }
             }
         }
 
-        binding.cartRecyclerView.apply {
+        binding.stateLayout.onRetry = { /* no-op */ }
+
+        binding.stateLayout.findViewById<RecyclerView>(R.id.contentView).apply {
             adapter = cartListAdapter
             layoutManager = LinearLayoutManager(requireContext())
         }
     }
 
-    // observeViewModel, setupMenu ve showClearCartConfirmationDialog fonksiyonları
-    // bir önceki versiyondaki gibi kalır, onlarda bir değişiklik gerekmez.
-
+    /**
+     * Subscribes to the StateFlows exposed by the [CartViewModel] to update the UI
+     * in a lifecycle-aware manner.
+     */
     private fun observeViewModel() {
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
+                // Observe the main cart state (loading, error, success, empty)
                 launch {
                     viewModel.cartState.collect { resource ->
-                        binding.progressbar.isVisible = resource is Resource.Loading
-                        val isSuccessAndEmpty =
-                            resource is Resource.Success && resource.data.isEmpty()
-
-                        binding.txtEmptyCart.isVisible = isSuccessAndEmpty
                         binding.cardSummary.isVisible =
-                            !isSuccessAndEmpty && resource !is Resource.Loading
+                            resource is Resource.Success && resource.data.isNotEmpty()
+
+                        requireActivity().invalidateOptionsMenu()
 
                         when (resource) {
-                            is Resource.Success -> cartListAdapter.submitList(resource.data)
-                            is Resource.Error -> {
-                                binding.txtEmptyCart.isVisible = true
-                                binding.txtEmptyCart.text =
-                                    resource.exception.message ?: "Bir hata oluştu."
+                            is Resource.Loading -> binding.stateLayout.showLoading()
+                            is Resource.Error -> binding.stateLayout.showError(
+                                subtitle = resource.exception.message
+                            )
+
+                            is Resource.Success -> {
+                                val items = resource.data
+                                if (items.isEmpty()) {
+                                    binding.stateLayout.showEmpty()
+                                } else {
+                                    cartListAdapter.submitList(items)
+                                    binding.stateLayout.showContent()
+                                }
                             }
 
-                            else -> { /* Idle, Loading */
-                            }
+                            is Resource.Idle -> Unit
                         }
-                        requireActivity().invalidateOptionsMenu()
                     }
                 }
-
+                // Observe the total price separately
                 launch {
-                    viewModel.totalPrice.collect { totalPrice ->
-                        binding.txtTotalPrice.text = totalPrice
+                    viewModel.totalPrice.collectLatest { price ->
+                        val locale = requireContext().resources.configuration.locales[0]
+                        val currency = NumberFormat.getCurrencyInstance(locale).apply {
+                            isGroupingUsed = true
+                            minimumFractionDigits = 2
+                            maximumFractionDigits = 2
+                        }
+                        val priceText = currency.format(price)
+                        binding.txtTotalPrice.text =
+                            getString(R.string.price_format_dollar, priceText) // %1$s
                     }
                 }
             }
         }
     }
 
+    /**
+     * Sets up the toolbar menu for this fragment.
+     */
     private fun setupMenu() {
         requireActivity().addMenuProvider(object : MenuProvider {
             override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
@@ -117,38 +138,36 @@ class CartFragment : BaseFragment<FragmentCartBinding>(FragmentCartBinding::infl
             }
 
             override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
-                return when (menuItem.itemId) {
-                    R.id.action_clear_cart -> {
-                        showClearCartConfirmationDialog()
-                        true
-                    }
-
-                    else -> false
-                }
+                return if (menuItem.itemId == R.id.action_clear_cart) {
+                    showClearCartConfirmationDialog()
+                    true
+                } else false
             }
         }, viewLifecycleOwner, Lifecycle.State.RESUMED)
     }
 
     private fun showClearCartConfirmationDialog() {
         MaterialAlertDialogBuilder(requireContext())
-            .setTitle("Sepeti Temizle")
-            .setMessage("Sepetinizdeki tüm ürünleri silmek istediğinize emin misiniz?")
-            .setNegativeButton("Hayır") { dialog, _ -> dialog.dismiss() }
-            .setPositiveButton("Evet") { dialog, _ ->
+            .setTitle(R.string.dialog_title_clear_cart)
+            .setMessage(R.string.dialog_message_clear_cart)
+            .setNegativeButton(R.string.action_cancel) { dialog: DialogInterface, _ ->
+                dialog.dismiss()
+            }
+            .setPositiveButton(R.string.action_confirm) { dialog: DialogInterface, _ ->
                 viewModel.onClearCartConfirmed()
                 dialog.dismiss()
             }
             .show()
     }
 
-    // YENİ FONKSİYON: Tek bir ürünü silmek için onay diyaloğu gösterir.
     private fun showRemoveItemConfirmationDialog(productId: Int) {
         MaterialAlertDialogBuilder(requireContext())
-            .setTitle("Ürünü Kaldır")
-            .setMessage("Bu ürünü sepetinizden tamamen kaldırmak istediğinize emin misiniz?")
-            .setNegativeButton("Hayır") { dialog, _ -> dialog.dismiss() }
-            .setPositiveButton("Evet") { dialog, _ ->
-                // Kullanıcı "Evet" derse, ViewModel'deki ilgili fonksiyonu çağır.
+            .setTitle(R.string.dialog_title_remove_item)
+            .setMessage(R.string.dialog_message_remove_item)
+            .setNegativeButton(R.string.action_cancel) { dialog: DialogInterface, _ ->
+                dialog.dismiss()
+            }
+            .setPositiveButton(R.string.action_confirm) { dialog: DialogInterface, _ ->
                 viewModel.onRemoveItemConfirmed(productId)
                 dialog.dismiss()
             }

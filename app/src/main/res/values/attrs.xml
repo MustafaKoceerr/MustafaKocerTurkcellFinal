@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="StateLayout">
+
+        <!-- Prompt State Attributes -->
+        <attr name="promptIcon" format="reference" />
+        <attr name="promptTitle" format="string" />
+        <attr name="promptSubtitle" format="string" />
+
+        <!-- Empty State Attributes -->
+        <attr name="emptyIcon" format="reference" />
+        <attr name="emptyTitle" format="string" />
+        <attr name="emptySubtitle" format="string" />
+
+        <!-- Error State Attributes -->
+        <attr name="errorIcon" format="reference" />
+        <attr name="errorTitle" format="string" />
+        <attr name="errorSubtitle" format="string" />
+
+    </declare-styleable>
+</resources>

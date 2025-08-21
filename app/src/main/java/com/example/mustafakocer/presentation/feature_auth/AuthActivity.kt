@@ -13,22 +13,22 @@ import com.example.mustafakocer.presentation.feature_auth.ui.LoginScreenComposeT
 import com.example.mustafakocer.presentation.navigation.AppNavHost
 import dagger.hilt.android.AndroidEntryPoint
 
+/**
+ * The main entry point activity for the application's UI.
+ * It sets up the Jetpack Compose content and hosts the navigation graph via [AppNavHost].
+ */
 @AndroidEntryPoint
 class AuthActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            // Temanızı uygulayın.
             LoginScreenComposeTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    // 1. NavController'ı en üst seviyede oluşturun.
                     val navController = rememberNavController()
-
-                    // 2. Tüm navigasyon mantığını yönetmesi için AppNavHost'u çağırın.
                     AppNavHost(navController = navController)
                 }
             }

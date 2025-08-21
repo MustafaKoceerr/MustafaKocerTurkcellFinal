@@ -1,34 +1,37 @@
 package com.example.mustafakocer.domain.repository
 
-import com.example.mustafakocer.data.model.dto.UserUpdateDto
 import com.example.mustafakocer.domain.model.User
 import com.example.mustafakocer.domain.util.Resource
 import kotlinx.coroutines.flow.Flow
 
 /**
- * Kullanıcı verileriyle ilgili tüm operasyonlar için sözleşme.
+ * A contract for the data layer to handle all user profile data operations,
+ * typically following a Single Source of Truth (SSOT) pattern.
  */
 interface UserRepository {
-
     /**
-     * Mevcut kullanıcının profil bilgilerini bir akış olarak döndürür.
+     * Retrieves the user's profile.
+     * The implementation should provide data from a local cache first, and then
+     * potentially update it from the network.
      *
-     * MİMARİ NOT: Bu fonksiyon, "Single Source of Truth" (Room DB) prensibini uygular.
-     * Önce veritabanındaki mevcut veriyi anında yayınlar. Ardından, arka planda
-     * API'den veriyi tazeleyip veritabanını günceller. Veritabanındaki değişiklik,
-     * Flow tarafından otomatik olarak yakalanır ve UI'a yansıtılır.
-     *
-     * @param forceRefresh Arka planda API'den veri tazelemesini zorunlu kılmak için.
-     * @return Kullanıcı verisini içeren bir Resource akışı.
+     * @param forceRefresh If true, a network fetch should be triggered regardless of the
+     * cache state. If false, the network should only be used if the cache is empty.
+     * @return A flow emitting the resource state of the user profile.
      */
     fun getUserProfile(forceRefresh: Boolean = true): Flow<Resource<User>>
 
     /**
-     * Yerel veritabanındaki mevcut kullanıcı verilerini temizler.
-     * Bu, 'logout' işlemi sırasında kullanılır.
+     * Updates the user's profile data.
+     * The implementation should send the update to the network and, on success,
+     * refresh the local cache.
+     *
+     * @param user The [User] object with the updated information.
+     * @return A flow emitting the resource state of the update operation.
+     */
+    fun updateUserProfile(user: User): Flow<Resource<User>>
+
+    /**
+     * Clears any locally cached user data. This is typically called on logout.
      */
     suspend fun clearLocalUser()
-
-
-    fun updateUserProfile(userUpdateDto: UserUpdateDto): Flow<Resource<User>>
 }

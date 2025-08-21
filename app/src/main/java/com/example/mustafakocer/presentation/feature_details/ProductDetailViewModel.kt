@@ -7,76 +7,65 @@ import com.example.mustafakocer.domain.model.ProductDetail
 import com.example.mustafakocer.domain.usecase.*
 import com.example.mustafakocer.domain.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class ProductDetailViewModel @Inject constructor(
     private val getProductDetailUseCase: GetProductDetailUseCase,
-    // YENİ: Sepetle ilgili UseCase'ler
     private val getCartQuantityUseCase: GetCartQuantityUseCase,
     private val addOrIncreaseCartItemUseCase: AddOrIncreaseCartItemUseCase,
     private val decreaseOrRemoveCartItemUseCase: DecreaseOrRemoveCartItemUseCase,
-    private val getUserIdUseCase: GetUserIdUseCase,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
-    private val _productDetailState = MutableStateFlow<Resource<ProductDetail>>(Resource.Loading)
-    val productDetailState: StateFlow<Resource<ProductDetail>> = _productDetailState.asStateFlow()
+    private val productId: Int = savedStateHandle.get<Int>("productId")
+        ?: throw IllegalStateException("productId must be passed to ProductDetailViewModel")
 
-    private val _quantityInCart = MutableStateFlow(0)
-    val quantityInCart: StateFlow<Int> = _quantityInCart.asStateFlow()
+    /**
+     * A trigger that causes the product detail flow to be re-executed when its value changes.
+     */
+    private val retryTrigger = MutableStateFlow(0)
 
-    private val productId: Int = savedStateHandle.get<Int>("productId")!!
+    /**
+     * A reactive flow for product details. It uses `flatMapLatest` to re-subscribe to the
+     * `getProductDetailUseCase` whenever the `retryTrigger` emits a new value.
+     */
+    val productDetailState: StateFlow<Resource<ProductDetail>> =
+        retryTrigger.flatMapLatest {
+            getProductDetailUseCase(productId)
+        }.stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = Resource.Loading
+        )
 
-    // YENİ: Açıklamanın durumunu tutan StateFlow
+    val quantityInCart: StateFlow<Int> = getCartQuantityUseCase(productId)
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0)
+
     private val _isDescriptionExpanded = MutableStateFlow(false)
     val isDescriptionExpanded: StateFlow<Boolean> = _isDescriptionExpanded.asStateFlow()
 
     fun onToggleDescription() {
-        _isDescriptionExpanded.value = !_isDescriptionExpanded.value
+        _isDescriptionExpanded.update { !it }
     }
 
-    init {
-        getProductDetail()
-        observeCartQuantity()
+    fun onIncreaseClicked() = viewModelScope.launch {
+        addOrIncreaseCartItemUseCase(productId)
     }
 
-    fun getProductDetail() {
-        getProductDetailUseCase(productId).onEach { resource ->
-            _productDetailState.value = resource
-        }.launchIn(viewModelScope)
+    fun onDecreaseClicked() = viewModelScope.launch {
+        decreaseOrRemoveCartItemUseCase(productId)
     }
 
-    private fun observeCartQuantity() {
-        viewModelScope.launch {
-            // Önce kullanıcı ID'sini al
-            val userId = getUserIdUseCase().first()?.toString()
-            if (userId != null) {
-                // Sonra bu kullanıcı ve ürün için miktarı dinlemeye başla
-                getCartQuantityUseCase(userId, productId).collect { quantity ->
-                    _quantityInCart.value = quantity
-                }
-            }
-        }
-    }
-
-    fun onIncreaseClicked() {
-        viewModelScope.launch {
-            val userId = getUserIdUseCase().first()?.toString()
-            userId?.let {
-                addOrIncreaseCartItemUseCase(it, productId)
-            }
-        }
-    }
-
-    fun onDecreaseClicked() {
-        viewModelScope.launch {
-            val userId = getUserIdUseCase().first()?.toString()
-            userId?.let {
-                decreaseOrRemoveCartItemUseCase(it, productId)
-            }
-        }
+    /**
+     * Retries fetching the product detail by incrementing the retryTrigger,
+     * which causes the `flatMapLatest` operator to re-execute the use case.
+     */
+    fun onRetry() {
+        retryTrigger.value++
     }
 }

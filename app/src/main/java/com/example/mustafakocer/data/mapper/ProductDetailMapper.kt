@@ -9,74 +9,66 @@ import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
-// DTO -> Domain Model
+// Reusable formatters to avoid creating new instances on every function call.
+private val currencyFormatter = DecimalFormat("$#,##0.00")
+private val percentageFormatter = DecimalFormat("#'%'")
+private val inputDateFormatter = DateTimeFormatter.ISO_ZONED_DATE_TIME
+private val outputDateFormatter = DateTimeFormatter.ofPattern("d MMM yyyy", Locale.getDefault())
+
+// Private extension functions for clean and reusable formatting logic.
+private fun Double.toCurrencyString(): String = currencyFormatter.format(this)
+private fun Double.toPercentageString(): String = percentageFormatter.format(this)
+
+/**
+ * Converts a [ProductDetailDto] from the data layer to a [ProductDetail] in the domain layer.
+ * This mapping includes price calculations, tag aggregation, and formatting.
+ */
 fun ProductDetailDto.toDomain(): ProductDetail {
-    // --- Fiyat Hesaplamaları ---
-    val originalPrice = this.price ?: 0.0
-    val discountPercentage = this.discountPercentage ?: 0.0
+    val originalPrice = price ?: 0.0
+    val discountPercentage = discountPercentage ?: 0.0
     val calculatedDiscountedPrice = originalPrice * (1 - (discountPercentage / 100.0))
-    val priceFormat = DecimalFormat("$#,##0.00")
-    val savingsFormat = DecimalFormat("#'%'")
 
-    // --- Etiketleri Oluşturma Mantığı ---
-    // Tekrar edenleri engellemek için bir Set kullanıyoruz.
-    val tagSet = mutableSetOf<String>()
-
-    // Metinleri formatlamak için yeniden kullanılabilir bir lambda.
     val formatTag: (String) -> String = { tag ->
         tag.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }
     }
 
-    // 1. Markayı al, formatla ve Set'e ekle.
-    this.brand?.takeIf { it.isNotBlank() }?.let { tagSet.add(formatTag(it)) }
-
-    // 2. Kategoriyi al, formatla ve Set'e ekle.
-    this.category?.takeIf { it.isNotBlank() }?.let { tagSet.add(formatTag(it)) }
-
-    // 3. API'den gelen "tags" dizisindeki tüm etiketleri formatla ve Set'e ekle.
-    this.tags?.forEach { tag ->
-        if (tag.isNotBlank()) {
-            tagSet.add(formatTag(tag))
+    val tagSet = mutableSetOf<String>().apply {
+        brand?.takeIf { it.isNotBlank() }?.let { add(formatTag(it)) }
+        category?.takeIf { it.isNotBlank() }?.let { add(formatTag(it)) }
+        tags?.forEach { tag ->
+            if (tag.isNotBlank()) add(formatTag(tag))
         }
     }
 
-    // --- Domain Modelini Oluşturma ---
     return ProductDetail(
-        id = this.id ?: 0,
-        title = this.title.orEmpty(),
-        description = this.description.orEmpty(),
-        formattedPrice = priceFormat.format(originalPrice),
-        formattedDiscountedPrice = priceFormat.format(calculatedDiscountedPrice),
-        savingsInfo = "Tasarruf: ${savingsFormat.format(discountPercentage)}",
-        rating = (this.rating ?: 0.0).toFloat(),
-        ratingCount = this.reviews?.size ?: 0,
-        stock = this.stock ?: 0,
-        // Set'i nihai bir List'e çevirip atıyoruz.
+        id = id ?: 0,
+        title = title.orEmpty(),
+        description = description.orEmpty(),
+        formattedPrice = originalPrice.toCurrencyString(),
+        formattedDiscountedPrice = calculatedDiscountedPrice.toCurrencyString(),
+        savingsInfo = "Savings: ${discountPercentage.toPercentageString()}",
+        rating = (rating ?: 0.0).toFloat(),
+        ratingCount = reviews?.size ?: 0,
+        stock = stock ?: 0,
         tags = tagSet.toList(),
-        images = this.images ?: emptyList(),
-        reviews = this.reviews?.map { it.toDomain() } ?: emptyList()
+        images = images ?: emptyList(),
+        reviews = reviews?.map { it.toDomain() } ?: emptyList()
     )
 }
 
-
-fun ReviewDto.toDomain(): Review {
-    // API'den gelen tarih formatı: "2024-05-23T08:56:21.629Z" (ISO_ZONED_DATE_TIME)
-    // Bizim istediğimiz format: "23 May 2024"
-    val inputFormatter = DateTimeFormatter.ISO_ZONED_DATE_TIME
-    val outputFormatter = DateTimeFormatter.ofPattern("d MMM yyyy", Locale.getDefault())
-
-    val formattedDate = try {
-        val zonedDateTime = ZonedDateTime.parse(this.date, inputFormatter)
-        zonedDateTime.format(outputFormatter)
-    } catch (e: Exception) {
-        // Tarih parse edilemezse, boş bir string veya ham veriyi döndür.
-        this.date.orEmpty().substringBefore("T") // "2024-05-23"
-    }
-
-    return Review(
-        rating = this.rating ?: 0,
-        comment = this.comment.orEmpty(),
-        reviewerName = this.reviewerName.orEmpty(),
-        formattedDate = formattedDate
-    )
-}
+/**
+ * Converts a [ReviewDto] from the data layer to a [Review] in the domain layer.
+ * It also formats the date string from ISO format to a more readable format.
+ */
+fun ReviewDto.toDomain(): Review = Review(
+    rating = rating ?: 0,
+    comment = comment.orEmpty(),
+    reviewerName = reviewerName.orEmpty(),
+    formattedDate = date?.let {
+        try {
+            ZonedDateTime.parse(it, inputDateFormatter).format(outputDateFormatter)
+        } catch (e: Exception) {
+            it.substringBefore("T") // Fallback to "YYYY-MM-DD"
+        }
+    } ?: ""
+)

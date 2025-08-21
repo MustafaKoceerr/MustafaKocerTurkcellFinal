@@ -1,50 +1,90 @@
 package com.example.mustafakocer.data.mapper
 
 import com.example.mustafakocer.data.model.dto.UserDetailDto
+import com.example.mustafakocer.data.model.dto.UserUpdateDto
 import com.example.mustafakocer.data.model.entity.UserEntity
 import com.example.mustafakocer.domain.model.User
 
-// DTO -> Entity (DÜZELTİLDİ)
-fun UserDetailDto.toEntity(): UserEntity {
-    return UserEntity(
-        id = this.id ?: 0,
-        email = this.email.orEmpty(),
-        username = this.username.orEmpty(),
-        firstName = this.firstName.orEmpty(),
-        lastName = this.lastName.orEmpty(),
-        image = this.image.orEmpty(),
-        phone = this.phone.orEmpty(),
-        birthDate = this.birthDate.orEmpty(),
-        age = this.age ?: 0 // DÜZELTME: Eksik olan 'age' alanı eklendi.
-    )
-}
+/**
+ * Private factory function to create a [User] domain model.
+ * Encapsulates the common mapping logic to prevent code duplication.
+ */
+private fun createUserDomainModel(
+    id: Int,
+    firstName: String,
+    lastName: String,
+    email: String,
+    phone: String,
+    username: String,
+    age: Int,
+    imageUrl: String,
+    gender: String
+): User = User(
+    id = id,
+    firstName = firstName,
+    lastName = lastName,
+    email = email,
+    phone = phone,
+    username = username,
+    age = age,
+    imageUrl = imageUrl,
+    gender = gender
+)
 
-// Entity -> Domain (GÜNCELLENDİ)
-fun UserEntity.toDomain(): User {
-    return User(
-        id = this.id,
-        firstName = this.firstName,
-        lastName = this.lastName,
-        // fullName'i burada atamaya gerek yok, kendi kendini hesaplayacak.
-        email = this.email,
-        phone = this.phone,
-        username = this.username,
-        age = this.age,
-        imageUrl = this.image
-    )
-}
+/**
+ * Converts a [UserDetailDto] from the data layer to a [UserEntity] for database caching.
+ */
+fun UserDetailDto.toEntity(): UserEntity = UserEntity(
+    id = id,
+    email = email.orEmpty(),
+    username = username.orEmpty(),
+    firstName = firstName.orEmpty(),
+    lastName = lastName.orEmpty(),
+    image = image.orEmpty(),
+    phone = phone.orEmpty(),
+    birthDate = birthDate.orEmpty(),
+    age = age ?: 0,
+    gender = gender.orEmpty()
+)
 
-// UserDetailDto -> Domain (GÜNCELLENDİ)
-fun UserDetailDto.toDomain(): User {
-    return User(
-        id = this.id ?: 0,
-        firstName = this.firstName.orEmpty(),
-        lastName = this.lastName.orEmpty(),
-        // fullName'i burada atamaya gerek yok.
-        email = this.email.orEmpty(),
-        phone = this.phone.orEmpty(),
-        username = this.username.orEmpty(),
-        age = this.age ?: 0,
-        imageUrl = this.image.orEmpty()
-    )
-}
+/**
+ * Converts a [UserEntity] from the database to a [User] in the domain layer.
+ */
+fun UserEntity.toDomain(): User = createUserDomainModel(
+    id = id,
+    firstName = firstName,
+    lastName = lastName,
+    email = email,
+    phone = phone,
+    username = username,
+    age = age,
+    imageUrl = image,
+    gender = gender
+)
+
+/**
+ * Converts a [UserDetailDto] from the data layer to a [User] in the domain layer.
+ */
+fun UserDetailDto.toDomain(): User = createUserDomainModel(
+    id = id,
+    firstName = firstName.orEmpty(),
+    lastName = lastName.orEmpty(),
+    email = email.orEmpty(),
+    phone = phone.orEmpty(),
+    username = username.orEmpty(),
+    age = age ?: 0,
+    imageUrl = image.orEmpty(),
+    gender = gender.orEmpty()
+)
+
+/**
+ * Converts a [User] from the domain layer to a [UserUpdateDto] for the data layer.
+ * This is used when sending updated user data to the server.
+ */
+fun User.toUpdateDto(): UserUpdateDto = UserUpdateDto(
+    firstName = firstName,
+    lastName = lastName,
+    email = email,
+    phone = phone,
+    age = age
+)

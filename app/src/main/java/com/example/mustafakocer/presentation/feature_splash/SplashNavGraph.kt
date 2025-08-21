@@ -7,20 +7,20 @@ import com.example.mustafakocer.presentation.navigation.contracts.SplashNavActio
 import com.example.mustafakocer.presentation.navigation.destinations.SplashScreenRoute
 
 /**
- * Splash özelliğinin navigasyon grafiğini tanımlar.
+ * Defines the navigation graph for the splash feature.
  *
- * @param navController Ana navigasyon kontrolcüsü.
- * @param navActions Splash ekranından tetiklenecek navigasyon eylemleri.
+ * @param navController The main NavController.
+ * @param navActions The navigation actions that can be triggered from the splash screen.
  */
 fun NavGraphBuilder.splashNavGraph(
     navController: NavController,
     navActions: SplashNavActions,
 ) {
     composable<SplashScreenRoute> {
-        // SplashRoute, ViewModel ile UI arasındaki bağlantıyı kurar.
+        // The SplashRoute composable connects the ViewModel to the SplashScreen UI.
         SplashRoute(navActions = navActions)
     }
 
-    // Bu grafiğe ait diğer ekranlar (eğer olsaydı) buraya eklenebilirdi.
-    // Örneğin, bir "Uygulama Güncellemesi Gerekli" ekranı.
+    // Other destinations related to this graph (e.g., an "Update Required" screen)
+    // could be added here.
 }

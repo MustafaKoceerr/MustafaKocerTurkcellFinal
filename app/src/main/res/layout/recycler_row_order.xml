@@ -34,7 +34,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/order_item_id_label"
-            android:textAppearance="@style/TextAppearance.Material3.LabelLarge"
+            android:textAppearance="@style/TextAppearance.App.BodyMedium"
             android:textColor="?attr/colorOnSurfaceVariant"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -44,14 +44,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/order_item_text_start_margin"
-            android:textAppearance="@style/TextAppearance.Material3.BodyLarge"
+            android:textAppearance="@style/TextAppearance.App.BodyLarge"
             android:textStyle="bold"
             android:textColor="?attr/colorOnSurface"
             app:layout_constraintBaseline_toBaselineOf="@id/txtOrderIdLabel"
             app:layout_constraintStart_toEndOf="@id/txtOrderIdLabel"
             tools:text="#24" />
 
-        <!-- Yönlendirme oku (YENİ) -->
+        <!-- Yönlendirme oku -->
         <ImageView
             android:id="@+id/imgChevron"
             android:layout_width="@dimen/order_item_chevron_size"
@@ -83,7 +83,7 @@
             android:layout_marginEnd="@dimen/order_item_text_end_margin"
             android:drawablePadding="@dimen/order_item_drawable_padding"
             android:gravity="center_vertical"
-            android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
+            android:textAppearance="@style/TextAppearance.App.BodyMedium"
             android:textColor="?attr/colorOnSurface"
             app:drawableStartCompat="@drawable/ic_products_24"
             app:drawableTint="?attr/colorOnSurfaceVariant"
@@ -92,12 +92,12 @@
             app:layout_constraintTop_toBottomOf="@id/divider"
             tools:text="3 Ürün (10 Adet)" />
 
-        <!-- İndirimsiz toplam (üstü çizili – kodda set edeceğiz) -->
+        <!-- İndirimsiz toplam -->
         <TextView
             android:id="@+id/txtOriginalTotal"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
+            android:textAppearance="@style/TextAppearance.App.BodyMedium"
             android:textColor="?attr/colorOnSurfaceVariant"
             app:layout_constraintEnd_toStartOf="@id/imgChevron"
             app:layout_constraintTop_toTopOf="@id/txtTotalProducts"
@@ -109,8 +109,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/order_item_price_gap_top"
-            android:textAppearance="@style/TextAppearance.Material3.TitleLarge"
-            android:textStyle="bold"
+            android:textAppearance="@style/TextAppearance.App.Price"
             android:textColor="?attr/colorPrimary"
             app:layout_constraintEnd_toStartOf="@id/imgChevron"
             app:layout_constraintTop_toBottomOf="@id/txtOriginalTotal"

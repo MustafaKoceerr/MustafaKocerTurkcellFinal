@@ -1,11 +1,6 @@
 package com.example.mustafakocer.presentation.feature_splash.components
 
-import androidx.compose.animation.core.FastOutSlowInEasing
-import androidx.compose.animation.core.RepeatMode
-import androidx.compose.animation.core.animateFloat
-import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.rememberInfiniteTransition
-import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.MaterialTheme
@@ -15,6 +10,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.unit.dp
 
+/**
+ * A composable that displays a pulsing three-dot loading indicator.
+ * The animation is continuous and uses the primary theme color.
+ *
+ * @param modifier The modifier to be applied to the Row container.
+ * @param dotSize The size of each individual dot in dp.
+ * @param spacing The spacing between each dot in dp.
+ * @param duration The duration for one cycle of the pulse animation in milliseconds.
+ */
 @Composable
 fun DotPulseIndicator(
     modifier: Modifier = Modifier,
@@ -22,29 +26,29 @@ fun DotPulseIndicator(
     spacing: Int = 8,
     duration: Int = 900
 ) {
-    val cs = MaterialTheme.colorScheme
+    val colorScheme = MaterialTheme.colorScheme
     val transition = rememberInfiniteTransition(label = "dots")
-    val d1 = transition.animateFloat(
-        initialValue = 0.6f, targetValue = 1f,
-        animationSpec = infiniteRepeatable(tween(duration, easing = FastOutSlowInEasing), RepeatMode.Reverse),
-        label = "d1"
-    )
-    val d2 = transition.animateFloat(
-        initialValue = 0.6f, targetValue = 1f,
-        animationSpec = infiniteRepeatable(tween(duration, delayMillis = duration / 6, easing = FastOutSlowInEasing), RepeatMode.Reverse),
-        label = "d2"
-    )
-    val d3 = transition.animateFloat(
-        initialValue = 0.6f, targetValue = 1f,
-        animationSpec = infiniteRepeatable(tween(duration, delayMillis = duration / 3, easing = FastOutSlowInEasing), RepeatMode.Reverse),
-        label = "d3"
-    )
+
+    val dots = List(3) { index ->
+        transition.animateFloat(
+            initialValue = 0.6f,
+            targetValue = 1f,
+            animationSpec = infiniteRepeatable(
+                animation = tween(duration, easing = FastOutSlowInEasing),
+                repeatMode = RepeatMode.Reverse,
+                initialStartOffset = StartOffset((duration / 6) * index)
+            ),
+            label = "dot$index"
+        )
+    }
+
     Row(modifier = modifier, horizontalArrangement = Arrangement.spacedBy(spacing.dp)) {
-        listOf(d1.value, d2.value, d3.value).forEach { s ->
+        dots.forEach { scale ->
             Surface(
-                modifier = Modifier.size(dotSize.dp).scale(s),
-                color = cs.primary,
-                contentColor = cs.onPrimary,
+                modifier = Modifier
+                    .size(dotSize.dp)
+                    .scale(scale.value),
+                color = colorScheme.primary,
                 shape = CircleShape
             ) {}
         }

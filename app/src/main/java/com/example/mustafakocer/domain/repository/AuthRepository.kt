@@ -1,38 +1,33 @@
 package com.example.mustafakocer.domain.repository
 
-import com.example.mustafakocer.data.model.dto.LoginResponseDto
+import com.example.mustafakocer.domain.model.AuthSession
 import com.example.mustafakocer.domain.util.Resource
 import kotlinx.coroutines.flow.Flow
 
-
-
-
+/**
+ * A contract for the data layer to handle all authentication-related operations.
+ */
 interface AuthRepository {
 
     /**
-     * Verilen kullanıcı adı ve şifre ile giriş yapmayı dener.
-     * @return Giriş sonucunu, ham 'LoginResponseDto' ile birlikte bir Resource akışı
-     *         olarak döndürür. Token ve ID'yi kaydetme sorumluluğu ViewModel/UseCase'dedir.
+     * Attempts to log in with the given credentials and persists the session upon success.
+     * @return A flow emitting the resource state of the login operation.
+     * On success, it contains the AuthSession.
      */
-    fun login(username: String, password: String): Flow<Resource<LoginResponseDto>>
+    fun login(username: String, password: String): Flow<Resource<AuthSession>>
 
     /**
-     * Verilen oturum anahtarlarını (token ve userId) kalıcı depolamaya kaydeder.
-     */
-    suspend fun saveSession(token: String, userId: Int)
-
-    /**
-     * Kaydedilmiş yetkilendirme token'ını bir akış olarak döndürür.
+     * Retrieves the saved authentication token as a flow.
      */
     fun getAuthToken(): Flow<String?>
 
     /**
-     * Kaydedilmiş kullanıcı ID'sini bir akış olarak döndürür.
+     * Retrieves the saved user ID as a flow.
      */
     fun getUserId(): Flow<Int?>
 
     /**
-     * Sadece oturum anahtarlarını (token, id) kalıcı depolamadan temizler.
+     * Clears the persisted session data (token, id).
      */
     suspend fun logout()
 }

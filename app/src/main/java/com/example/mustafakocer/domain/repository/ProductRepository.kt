@@ -8,40 +8,47 @@ import com.example.mustafakocer.domain.util.Resource
 import kotlinx.coroutines.flow.Flow
 
 /**
- * Ürünler ve kategorilerle ilgili tüm veri operasyonları için sözleşme (arayüz).
- * Bu arayüz, veri kaynağının (network, veritabanı vb.) detaylarını soyutlar.
- *
- * MİMARİ NOT: Fonksiyonlar artık suspend değil, Flow<Resource<...>> döndürüyor.
- * Bu, UI katmanının veri akışını (Yükleniyor, Başarılı, Hata) reaktif olarak
- * dinlemesini sağlar.
+ * A contract for the data layer to handle all data operations related to products and categories.
+ * This interface abstracts the data source details (network, database, etc.).
  */
 interface ProductRepository {
 
     /**
-     * Tüm ürünlerin listesini ağdan getirir.
+     * Retrieves a paginated stream of all products, typically for the home screen.
+     * This is expected to be implemented with an offline-first strategy.
      */
     fun getPaginatedProducts(): Flow<PagingData<Product>>
 
     /**
-     * Mevcut tüm ürün kategorilerinin listesini ağdan getirir.
+     * Fetches the list of all available product categories.
      */
     fun getCategories(): Flow<Resource<List<Category>>>
 
     /**
-     * Belirli bir kategoriye ait ürünlerin listesini ağdan getirir.
+     * Retrieves a paginated stream of products filtered by a specific category.
      */
-    fun getPaginatedProductsByCategory(categoryName: String): Flow<PagingData<Product>> // YENİ
+    fun getPaginatedProductsByCategory(categoryName: String): Flow<PagingData<Product>>
 
     /**
-     * Arama sorgusuyla eşleşen ürünlerin listesini ağdan getirir.
+     * Retrieves a paginated stream of products matching a search query.
+     * This is expected to be a network-only operation.
      */
     fun searchPaginatedProducts(query: String): Flow<PagingData<Product>>
 
     /**
-     * Verilen ID listesine sahip ürünlerin detaylarını getirir.
-     * Bu, offline-first çalışır; önce veritabanından dener, sonra ağdan çeker.
+     * Fetches a single product's summary data as a [Resource] flow.
      */
     fun getSingleProduct(productId: Int): Flow<Resource<Product>>
 
+    /**
+     * Fetches the full details of a single product as a [Resource] flow.
+     */
     fun getProductDetail(productId: Int): Flow<Resource<ProductDetail>>
+
+    /**
+     * Fetches a single product's summary data directly.
+     * This suspend function will either return the [Product] on success or throw an
+     * [AppException] on failure.
+     */
+    suspend fun getProduct(productId: Int): Product
 }

@@ -1,32 +1,40 @@
 package com.example.mustafakocer.presentation.common
 
+import android.graphics.Paint
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.example.mustafakocer.databinding.RecylerRowProductGridBinding
-import com.example.mustafakocer.domain.model.Product // Artık CartItem değil, Product
+import com.example.mustafakocer.domain.model.Product
+import com.example.mustafakocer.presentation.common.util.parsePriceToDouble
 
-// ViewHolder'ı da bu dosya içine alarak daha düzenli hale getirebiliriz.
+
+/**
+ * A [PagingDataAdapter] for displaying a grid of [Product] items.
+ *
+ * @param onProductClick A lambda function to be invoked when a product item is clicked.
+ */
 class ProductListAdapter(
-    // DEĞİŞTİ: Artık karmaşık bir sealed class yerine basit bir lambda alıyoruz.
     private val onProductClick: (productId: Int) -> Unit,
 ) : PagingDataAdapter<Product, ProductListAdapter.ProductViewHolder>(ProductDiffCallback) {
 
+    /**
+     * ViewHolder for a single product item in the grid.
+     * It handles data binding and click events for its item.
+     */
     inner class ProductViewHolder(private val binding: RecylerRowProductGridBinding) :
-        androidx.recyclerview.widget.RecyclerView.ViewHolder(binding.root) {
+        RecyclerView.ViewHolder(binding.root) {
 
         init {
-            // Tıklama olayını burada yönetiyoruz.
             binding.root.setOnClickListener {
-                // Pozisyonun geçerli olduğundan ve bir ürün olduğundan emin ol.
                 val position = bindingAdapterPosition
-                if (position != androidx.recyclerview.widget.RecyclerView.NO_POSITION) {
+                if (position != RecyclerView.NO_POSITION) {
                     getItem(position)?.let { product ->
-                        // Lambda'yı ürünün ID'si ile çağır.
                         onProductClick(product.id)
                     }
                 }
@@ -40,16 +48,26 @@ class ProductListAdapter(
                 txtRatingValue.text = product.rating.toString()
                 txtDiscountedPrice.text = product.discountedPrice
                 txtPrice.text = product.price
-                // TODO: Fiyatın üzerini çizme ve rozet mantıkları eklenecek.
 
-                // Görsel: animasyonu kapat, oran sabitse zıplama olmaz (XML’de ratio önerilir)
+                val originalPriceValue = product.price.parsePriceToDouble()
+                val discountedPriceValue = product.discountedPrice.parsePriceToDouble()
+
+                if (discountedPriceValue < originalPriceValue) {
+                    txtPrice.isVisible = true
+                    txtPrice.paintFlags = txtPrice.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
+                } else {
+                    // This else block is crucial to prevent incorrect states on recycled views.
+                    txtPrice.isVisible = false
+                    txtPrice.paintFlags = txtPrice.paintFlags and Paint.STRIKE_THRU_TEXT_FLAG.inv()
+                }
+
                 Glide.with(root.context)
                     .load(product.thumbnailUrl)
                     .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
                     .dontAnimate()
                     .into(imgProduct)
-                // Sepetle ilgili tüm görünümleri gizliyoruz.
-                badgeDiscount.isVisible = false // Bu mantık daha sonra eklenebilir.
+
+                badgeDiscount.isVisible = false
                 badgeStock.isVisible = false
             }
         }
@@ -68,6 +86,10 @@ class ProductListAdapter(
         getItem(position)?.let { holder.bind(it) }
     }
 
+    /**
+     * A [DiffUtil.ItemCallback] for calculating the difference between two non-null items in a list.
+     * This is essential for the [PagingDataAdapter] to efficiently update the RecyclerView.
+     */
     private object ProductDiffCallback : DiffUtil.ItemCallback<Product>() {
         override fun areItemsTheSame(oldItem: Product, newItem: Product): Boolean {
             return oldItem.id == newItem.id

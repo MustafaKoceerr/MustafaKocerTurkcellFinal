@@ -1,167 +1,209 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">MustafaKocerTurkcellFinal</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
 
-    <string name="navigation_drawer_open">Open navigation drawer</string>
-    <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="title_activity_login">LoginActivity</string>
 
-    <string name="order_product_count_format">%1$d Ürün (%2$d Adet)</string>
-    <string name="empty_orders_message">Henüz verilmiş bir siparişiniz bulunmuyor.</string>
-
-
-    <string name="title_home">Ana Sayfa</string>
-    <string name="title_categories">Kategoriler</string>
-    <string name="title_search">Ara</string>
-    <string name="title_orders">Siparişlerim</string>
-    <string name="title_profile">Profilim</string>
-    <string name="title_cart">Sepetim</string>
-    <string name="title_order_details">Sipariş Detayı #%1$d</string>
+    <string name="title_home">Home</string>
+    <string name="title_categories">Categories</string>
+    <string name="title_search">Search</string>
+    <string name="title_orders">My Orders</string>
+    <string name="title_profile">My Profile</string>
+    <string name="title_cart">My Cart</string>
+    <string name="title_order_details">Order Details #%1$d</string>
 
     <!-- Cart Fragment -->
-    <string name="cart_empty_message">Sepetinizde ürün bulunmuyor.</string>
-    <string name="cart_summary_total_label">Genel Toplam</string>
-    <string name="cart_checkout_button">Ödemeye Geç</string>
+    <string name="cart_summary_total_label">Order Total</string>
+    <string name="cart_checkout_button">Proceed to Checkout</string>
 
     <!-- Order Details Fragment -->
-    <string name="order_details_summary_title">Sipariş Özeti</string>
-    <string name="order_details_order_id_label">Sipariş Numarası:</string>
-    <string name="order_details_total_amount_label">Toplam Tutar:</string>
-    <string name="order_details_products_section_title">Sipariş Edilen Ürünler</string>
+    <string name="order_details_summary_title">Order Summary</string>
+    <string name="order_details_order_id_label">Order Number:</string>
+    <string name="order_details_total_amount_label">Total Amount:</string>
+    <string name="order_details_products_section_title">Ordered Products</string>
 
-    <string name="cd_header_profile_image">Profil resmi</string>
+    <string name="cd_header_profile_image">Profile picture</string>
 
     <!-- Home states & actions -->
-    <string name="state_empty_title">Henüz ürün bulunamadı</string>
-    <string name="state_empty_subtitle">Filtreleri değiştirin veya daha sonra tekrar deneyin.</string>
-    <string name="state_error_title">Bir şeyler ters gitti</string>
-    <string name="action_scroll_to_top">En üste dön</string>
-    <string name="cd_scroll_to_top">Listeyi en üste kaydır</string>
+    <string name="action_scroll_to_top">Scroll to top</string>
+    <string name="cd_scroll_to_top">Scroll list to top</string>
 
-    <string name="category_empty_title">Kategori bulunamadı</string>
-    <string name="category_empty_subtitle">Daha sonra tekrar deneyin veya filtreleri temizleyin.</string>
-    <string name="category_error_title">Kategoriler yüklenemedi</string>
+    <string name="pbc_empty_title">No products found in this category</string>
+    <string name="pbc_empty_subtitle">Choose another category or clear the filters.</string>
 
-    <string name="pbc_empty_title">Bu kategoride ürün bulunamadı</string>
-    <string name="pbc_empty_subtitle">Başka bir kategori seçin veya filtreleri temizleyin.</string>
-    <string name="pbc_error_title">Ürünler yüklenemedi</string>
-
-    <string name="cd_checkout">Ödeme yap butonu</string>
-
-
-    <string name="orders_error_title">Siparişler yüklenemedi</string>
-
+    <string name="cd_checkout">Checkout button</string>
 
     <!-- Yeni alanlar -->
-    <string name="order_details_date_label">Tarih</string>
-    <string name="order_details_items_label">Ürün Adedi</string>
+    <string name="order_details_date_label">Date</string>
+    <string name="order_details_items_label">Items</string>
 
     <!-- Durumlar (chip) -->
-    <string name="order_status_preparing">Hazırlanıyor</string>
-    <string name="order_status_paid">Ödendi</string>
-    <string name="order_status_shipped">Kargolandı</string>
-    <string name="order_status_delivered">Teslim edildi</string>
-
-    <!-- Hata / aksiyon -->
-    <string name="order_details_error_title">Sipariş detayı yüklenemedi</string>
-
-    <!-- Arama -->
+    <string name="order_status_preparing">Preparing</string>
 
     <!-- Profil -->
-    <string name="cd_profile_image">Profil resmi</string>
-    <string name="profile_change_photo">Fotoğrafı değiştir</string>
-    <string name="cd_change_photo">Profil fotoğrafını değiştir</string>
+    <string name="cd_profile_image">Profile picture</string>
+    <string name="profile_change_photo">Change photo</string>
+    <string name="cd_change_photo">Change profile photo</string>
 
-    <string name="profile_first_name_hint">Ad</string>
-    <string name="profile_last_name_hint">Soyad</string>
-    <string name="profile_username_hint">Kullanıcı Adı</string>
-    <string name="profile_phone_hint">Telefon Numarası</string>
-    <string name="profile_age_hint">Yaş</string>
+    <string name="profile_first_name_hint">First name</string>
+    <string name="profile_last_name_hint">Last name</string>
+    <string name="profile_username_hint">Username</string>
+    <string name="profile_phone_hint">Phone number</string>
+    <string name="profile_age_hint">Age</string>
 
-    <string name="profile_update_button">Bilgileri Güncelle</string>
-    <string name="cd_update_profile">Bilgileri güncelle butonu</string>
+    <string name="profile_update_button">Update Information</string>
+    <string name="cd_update_profile">Update information button</string>
 
+    <string name="cd_category_icon">Category icon</string>
 
-    <string name="cd_category_icon">Kategori simgesi</string>
-
-    <string name="order_item_id_label">Sipariş No:</string>
-    <string name="cd_go_to_order_details">Sipariş detayına git</string>
+    <string name="order_item_id_label">Order No:</string>
+    <string name="cd_go_to_order_details">Go to order details</string>
 
     <!-- (İsteğe bağlı) Erişilebilirlik için satır özeti -->
-    <string name="a11y_order_row">Sipariş %1$s, %2$s tarihinde, %3$d ürün, toplam %4$s</string>
 
-    <string name="cd_order_item_image">Sipariş ürünü görseli</string>
+    <string name="cd_order_item_image">Order item image</string>
     <!-- İstersen runtime'da kullanmak için -->
-    <string name="order_details_qty_label">Adet: %1$d</string>
 
+    <string name="cd_product_image">Product image</string>
+    <string name="product_add_to_cart">Add</string>
+    <string name="cd_add_to_cart">Add to cart</string>
+    <string name="cd_increase">Increase quantity</string>
+    <string name="cd_decrease">Decrease quantity</string>
+    <!-- örn: Son 3 -->
 
-    <string name="cd_product_image">Ürün görseli</string>
-    <string name="product_add_to_cart">Ekle</string>
-    <string name="cd_add_to_cart">Sepete ekle</string>
-    <string name="cd_increase">Adeti artır</string>
-    <string name="cd_decrease">Adeti azalt</string>
-    <string name="product_out_of_stock">Tükendi</string>
-    <string name="product_low_stock">Son %1$d</string> <!-- örn: Son 3 -->
+    <string name="login_title">Welcome Back</string>
 
-
-    <string name="login_title">Tekrar Hoş Geldin</string>
-    <string name="login_subtitle">Hesabına giriş yap ve alışverişe kaldığın yerden devam et.</string>
-
-    <string name="login_username_label">Kullanıcı Adı</string>
-    <string name="login_username_placeholder">ornek_kullanici</string>
-    <string name="login_password_label">Şifre</string>
+    <string name="login_username_label">Username</string>
+    <string name="login_username_placeholder">sample_user</string>
+    <string name="login_password_label">Password</string>
     <string name="login_password_placeholder">••••••••</string>
 
-    <string name="login_cta">Giriş Yap</string>
-    <string name="login_forgot_password">Şifremi unuttum</string>
-    <string name="login_create_account">Hesap Oluştur</string>
-    <string name="login_terms_hint">Devam ederek, Kullanım Koşulları ve Gizlilik Politikasını kabul etmiş olursun.</string>
+    <string name="login_cta">Log In</string>
+    <string name="login_forgot_password">Forgot password</string>
+    <string name="login_create_account">Create account</string>
+    <string name="login_terms_hint">By continuing, you agree to the Terms of Use and Privacy Policy.</string>
 
-    <string name="cd_show_password">Şifreyi göster</string>
-    <string name="cd_hide_password">Şifreyi gizle</string>
+    <string name="cd_show_password">Show password</string>
+    <string name="cd_hide_password">Hide password</string>
 
-    <string name="cd_app_logo">Uygulama logosu</string>
-    <string name="splash_tagline">Parmaklarının ucunda modern alışveriş.</string>
-
-    <string name="brand_name">NEXUSCART</string>
-
-
-    <!-- Header meta -->
-    <string name="pd_chip_brand">Marka</string>
-    <string name="pd_chip_category">Kategori</string>
+    <string name="cd_app_logo">App logo</string>
 
     <!-- Fiyat / açıklama / özellikler -->
-    <string name="pd_specs_title">Öne çıkan özellikler</string>
-    <string name="pd_description_title">Açıklama</string>
-    <string name="pd_read_more">Devamını oku</string>
-    <string name="pd_read_less">Daha az göster</string>
+    <string name="pd_description_title">Description</string>
+    <string name="pd_read_more">Read more</string>
 
     <!-- Yorumlar -->
-    <string name="pd_reviews_title">Değerlendirmeler</string>
-    <string name="pd_reviews_see_all">Tümünü gör</string>
+    <string name="pd_reviews_title">Reviews</string>
+    <string name="pd_reviews_see_all">See all</string>
 
     <!-- Hata durumu -->
-    <string name="pd_error_title">Ürün yüklenemedi</string>
 
-    <string name="cart_remove">Kaldır</string>
-    <string name="cd_remove_item">Ürünü sepetten kaldır</string>
+    <string name="cart_remove">Remove</string>
+    <string name="cd_remove_item">Remove item from cart</string>
 
-    <string name="cd_product_gallery_image">Ürün galerisi görseli</string>
+    <string name="cd_product_gallery_image">Product gallery image</string>
 
     <!-- Product Detail Sayfası -->
-    <string name="pd_action_read_more">Devamını Oku</string>
-    <string name="pd_action_show_less">Gizle</string>
+    <string name="pd_action_read_more">Read More</string>
+    <string name="pd_action_show_less">Show Less</string>
     <string name="content_desc_rating">Product rating</string>
 
-    <string name="search_hint">Ürün ara</string>
-    <string name="search_idle_message">Arama yapmak için yazmaya başlayın</string>
+    <string name="search_hint">Search products</string>
 
-    <string name="search_empty_title">Sonuç bulunamadı</string>
-    <string name="search_empty_subtitle">“%1$s” için eşleşen ürün bulunamadı. Lütfen farklı anahtar kelimeler deneyin.</string>
+    <string name="search_empty_title">No results found</string>
+    <string name="search_empty_subtitle">"%1$s" did not match any products. Please try different keywords.</string>
 
-    <string name="search_error_title">Bir sorun oluştu</string>
-    <string name="action_retry">Tekrar dene</string>
-    <string name="cd_retry">Tekrar dene</string>
+    <string name="action_retry">Try again</string>
+
+    <!-- ProfileFragment -->
+    <string name="profile_updating_button">Updating…</string>
+
+    <!-- Kullanıcı adını formatlamak için. Örnek: @kullaniciadi -->
+    <string name="profile_username_format">\@%s</string>
+
+    <!-- Hata Yönetimi (UiErrorMapper tarafından kullanılır) -->
+    <string name="action_login">Log In</string>
+
+    <string name="error_title_no_internet">Connection Issue</string>
+    <string name="error_subtitle_no_internet">Please check your internet connection.</string>
+
+    <string name="error_title_unauthorized">Sign-in Required</string>
+    <string name="error_subtitle_unauthorized">Please sign in to view this content.</string>
+
+    <string name="error_title_server">Server Error</string>
+    <string name="error_subtitle_server">Something went wrong, please try again later.</string>
+
+    <string name="error_title_unknown">An Error Occurred</string>
+    <string name="error_subtitle_unknown">An unexpected issue occurred.</string>
+
+    <string name="empty_orders_title">No Orders Yet</string>
+    <string name="empty_orders_subtitle">Start shopping to place your first order.</string>
+
+    <!-- CartFragment -->
+    <string name="cart_empty_title">Your Cart is Empty</string>
+    <string name="cart_empty_subtitle">Start shopping to fill your cart.</string>
+
+    <string name="order_details_item_count_format">%d items</string>
+
+    <string name="search_idle_title">Start Searching</string>
+    <string name="search_idle_subtitle">Discover products, brands, and more.</string>
+
+    <!-- Cart Confirmation Dialogs -->
+    <string name="dialog_title_clear_cart">Clear Cart</string>
+    <string name="dialog_message_clear_cart">Are you sure you want to remove all items from your cart?</string>
+    <string name="dialog_title_remove_item">Remove Item</string>
+    <string name="dialog_message_remove_item">Are you sure you want to completely remove this item from your cart?</string>
+
+    <!-- Dialog Actions -->
+    <string name="action_confirm">Yes</string>
+    <string name="action_cancel">No</string>
+    <string name="pd_rating_format">%.1f (%d)</string>
+    <string name="order_product_count_format">%d products, %d items</string>
+    <string name="order_item_quantity_format">Quantity: %d</string>
+
+    <string name="empty_categories_title">No Categories Found</string>
+    <string name="empty_categories_subtitle">We couldn\'t find any product categories at the moment.</string>
+
+    <string name="toast_no_changes_made">No changes were made.</string>
+    <string name="toast_update_failed">Update failed.</string>
+    <string name="toast_profile_updated">Profile updated successfully!</string>
+    <!-- Search Screen -->
+    <string name="toast_user_info_error">Could not retrieve user information.</string>
+
+    <string name="state_empty_default_title">No Results Found</string>
+    <string name="state_empty_default_subtitle">Please try again later.</string>
+    <string name="state_error_default_title">Something Went Wrong</string>
+    <string name="state_error_default_subtitle">Please check your internet connection.</string>
+    <string name="state_error_retry_button">Try Again</string>
+    <string name="state_prompt_default_title">Start Searching</string>
+    <string name="state_prompt_default_subtitle">You can start by entering at least 3 characters.</string>
+
+    <string name="error_title_generic">Something Went Wrong</string>
+    <string name="error_message_order_not_found">Order details couldn\'t be found. Please try again or contact support.</string>
+    <string name="press_back_again_to_exit">Press back again to exit</string>
+
+    <!-- Genel Dolar formatı (ör: $12.34) -->
+    <string name="price_format_dollar">%1$s</string>
+    <string name="price_per_unit_format_dollar">%1$s / unit</string>
+
+    <string name="state_loading_content_desc">Loading</string>
+
+    <!-- Drawer / menü -->
+    <string name="nav_home">Home</string>
+    <string name="nav_category">Category</string>
+    <string name="nav_search">Search</string>
+    <string name="nav_orders">Orders</string>
+    <string name="nav_cart">Cart</string>
+    <string name="nav_profile">Profile</string>
+    <string name="nav_logout">Log out</string>
+
+    <!-- Cart menüsü -->
+    <string name="cart_clear">Clear cart</string>
+    <string name="paging_error_message">Couldn\'t load results.</string>
+
+    <string name="title_product_detail">Product Details</string>
+    <string name="order_static_date">Aug 11, 2025, 13:20</string>
+    <string name="home_empty_title">No Products Found</string>
+    <string name="home_empty_subtitle">There are no products to display.</string>
 
 </resources>

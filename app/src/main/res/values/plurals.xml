@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Plurals (English) -->
+    <plurals name="order_details_item_count">
+        <item quantity="one">%d item</item>
+        <item quantity="other">%d items</item>
+    </plurals>
+
+    <plurals name="order_products_count">
+        <item quantity="one">%d product</item>
+        <item quantity="other">%d products</item>
+    </plurals>
+
+    <plurals name="order_items_count">
+        <item quantity="one">%d item</item>
+        <item quantity="other">%d items</item>
+    </plurals>
+
+    <plurals name="order_item_quantity">
+        <item quantity="one">Quantity: %d</item>
+        <item quantity="other">Quantity: %d</item>
+    </plurals>
+
+</resources>

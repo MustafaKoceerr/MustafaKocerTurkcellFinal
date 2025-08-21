@@ -1,11 +1,6 @@
 package com.example.mustafakocer.presentation.feature_auth.components
 
-
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -14,16 +9,8 @@ import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconToggleButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
@@ -43,21 +30,14 @@ fun LoginFields(
     state: LoginUiState,
     onEvent: (LoginEvent) -> Unit,
     modifier: Modifier = Modifier,
-    emailError: String? = null,
-    passwordError: String? = null,
     onSubmit: () -> Unit = { onEvent(LoginEvent.LoginClicked) }
 ) {
     val focusManager = LocalFocusManager.current
     val passwordFocus = remember { FocusRequester() }
     var isPasswordVisible by remember { mutableStateOf(false) }
 
-    // DEĞİŞTİ: İki alanı bir Column içine alarak aralarındaki boşluğu
-    // Spacer yerine Column'un kendi `spacedBy` özelliği ile yöneteceğiz.
-    // Bu, daha temiz bir yaklaşımdır.
-    Column(
-        verticalArrangement = Arrangement.spacedBy(4.dp) // Boşluğu buradan kontrol et.
-    ) {
-        // E-POSTA
+    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+        // USERNAME — Inter bodyLarge
         OutlinedTextField(
             value = state.email,
             onValueChange = { onEvent(LoginEvent.EmailChanged(it)) },
@@ -65,17 +45,20 @@ fun LoginFields(
             enabled = !state.isLoading,
             shape = RoundedCornerShape(16.dp),
             singleLine = true,
-            label = { Text(stringResource(R.string.login_username_label)) },
-            placeholder = { Text(stringResource(R.string.login_username_placeholder)) },
+            textStyle = MaterialTheme.typography.bodyLarge, // <<< Inter
+            label = { Text(stringResource(R.string.login_username_label), style = MaterialTheme.typography.labelLarge) },
+            placeholder = { Text(stringResource(R.string.login_username_placeholder), style = MaterialTheme.typography.bodyLarge) },
             leadingIcon = { Icon(Icons.Filled.Person, contentDescription = null) },
-            isError = !emailError.isNullOrBlank(),
+            isError = !state.emailError.isNullOrBlank(),
             supportingText = {
-                if (!emailError.isNullOrBlank()) {
-                    Text(text = emailError, color = MaterialTheme.colorScheme.error)
+                if (!state.emailError.isNullOrBlank()) {
+                    Text(
+                        text = state.emailError,
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.error
+                    )
                 } else {
-                    // Hata olmadığında, layout'un zıplamasını önlemek için
-                    // sabit bir boşluk bırakıyoruz. Bu, TextField'ın yüksekliğini sabit tutar.
-                    Spacer(Modifier.height(0.dp)) // Veya çok küçük bir değer
+                    Spacer(Modifier.height(0.dp))
                 }
             },
             keyboardOptions = KeyboardOptions(
@@ -87,7 +70,7 @@ fun LoginFields(
             )
         )
 
-        // ŞİFRE
+        // PASSWORD — Inter bodyLarge
         OutlinedTextField(
             value = state.password,
             onValueChange = { onEvent(LoginEvent.PasswordChanged(it)) },
@@ -97,8 +80,9 @@ fun LoginFields(
             enabled = !state.isLoading,
             shape = RoundedCornerShape(16.dp),
             singleLine = true,
-            label = { Text(stringResource(R.string.login_password_label)) },
-            placeholder = { Text(stringResource(R.string.login_password_placeholder)) },
+            textStyle = MaterialTheme.typography.bodyLarge, // <<< Inter
+            label = { Text(stringResource(R.string.login_password_label), style = MaterialTheme.typography.labelLarge) },
+            placeholder = { Text(stringResource(R.string.login_password_placeholder), style = MaterialTheme.typography.bodyLarge) },
             leadingIcon = { Icon(Icons.Filled.Lock, contentDescription = null) },
             visualTransformation = if (isPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
             trailingIcon = {
@@ -115,12 +99,15 @@ fun LoginFields(
                     )
                 }
             },
-            isError = !passwordError.isNullOrBlank(),
+            isError = !state.passwordError.isNullOrBlank(),
             supportingText = {
-                if (!passwordError.isNullOrBlank()) {
-                    Text(text = passwordError, color = MaterialTheme.colorScheme.error)
+                if (!state.passwordError.isNullOrBlank()) {
+                    Text(
+                        text = state.passwordError,
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.error
+                    )
                 } else {
-                    // Aynı şekilde, hata olmadığında sabit bir boşluk bırakıyoruz.
                     Spacer(Modifier.height(0.dp))
                 }
             },

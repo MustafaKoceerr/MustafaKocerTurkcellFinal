@@ -7,167 +7,44 @@
     android:background="?attr/colorSurface"
     tools:context=".presentation.feature_product_search.SearchFragment">
 
-    <!-- Arama alanı ve filtreler, durumdan bağımsız olarak her zaman görünür kalır -->
+    <!-- SearchAutoComplete, temadaki android:editTextStyle (Widget.App.EditText) ile INTER kullanır -->
     <androidx.appcompat.widget.SearchView
         android:id="@+id/searchView"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/search_content_margin"
-        android:layout_marginTop="@dimen/search_content_margin_top"
-        android:layout_marginEnd="@dimen/search_content_margin"
+        android:layout_margin="16dp"
         android:background="@drawable/bg_search_view"
-        android:focusable="true"
-        android:iconifiedByDefault="false"
-        android:imeOptions="actionSearch"
-        android:inputType="text"
-        android:paddingStart="@dimen/search_field_inner_padding_h"
-        android:paddingEnd="@dimen/search_field_inner_padding_h"
+        app:iconifiedByDefault="false"
+        app:queryHint="@string/search_hint"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:queryHint="@string/search_hint" />
+        app:layout_constraintTop_toTopOf="parent" />
 
-    <HorizontalScrollView
-        android:id="@+id/filtersScroll"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/search_content_margin"
-        android:layout_marginTop="@dimen/search_filters_margin_top"
-        android:layout_marginEnd="@dimen/search_content_margin"
-        android:overScrollMode="never"
-        android:scrollbars="none"
-        android:visibility="gone"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/searchView"
-        tools:visibility="visible">
-        <!-- Filtre ChipGroup'u buraya gelecek -->
-    </HorizontalScrollView>
-
-
-    <!-- =================================================================== -->
-    <!-- ======================= STATE SWITCHER ============================ -->
-    <!-- Tüm UI durumları bu ViewAnimator içinde yönetilir.                -->
-    <!-- Bu, manuel visibility yönetimini ve kırpışmayı ortadan kaldırır. -->
-    <!-- =================================================================== -->
-    <ViewAnimator
-        android:id="@+id/stateSwitcher"
+    <com.example.mustafakocer.presentation.common.StateLayout
+        android:id="@+id/state_layout"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginTop="@dimen/search_results_padding_top"
-        app:layout_constraintTop_toBottomOf="@id/filtersScroll"
+        android:layout_marginTop="16dp"
+        app:emptyIcon="@drawable/ic_search_off_24"
+        app:emptyTitle="@string/search_empty_title"
+        app:errorIcon="@drawable/ic_cloud_off_24"
+        app:promptIcon="@drawable/ic_search_24"
+        app:promptSubtitle="@string/search_idle_subtitle"
+        app:promptTitle="@string/search_idle_title"
+        app:layout_constraintTop_toBottomOf="@id/searchView"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
-        <!-- CHILD 0: IDLE (Boşta Durumu) -->
-        <LinearLayout
-            android:id="@+id/stateIdleGroup"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:gravity="center"
-            android:orientation="vertical"
-            android:padding="@dimen/state_padding">
-            <!-- Eski stateIdleGroup içeriğini buraya taşıdık -->
-            <ImageView
-                android:layout_width="72dp"
-                android:layout_height="72dp"
-                android:alpha="0.12"
-                android:contentDescription="@null"
-                android:src="@drawable/ic_search_24"
-                app:tint="?attr/colorOnSurface" />
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/state_subtitle_top"
-                android:text="@string/search_idle_message"
-                android:textAppearance="?attr/textAppearanceBodyMedium"
-                android:textColor="?attr/colorOnSurfaceVariant" />
-        </LinearLayout>
-
-        <!-- CHILD 1: CONTENT (İçerik) -->
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/searchRecyclerView"
+            android:id="@+id/contentView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:clipToPadding="false"
-            android:paddingStart="@dimen/home_content_margin"
-            android:paddingEnd="@dimen/home_content_margin"
-            android:paddingBottom="@dimen/search_results_padding_bottom"
+            android:paddingHorizontal="8dp"
             tools:listitem="@layout/recyler_row_product_grid" />
+    </com.example.mustafakocer.presentation.common.StateLayout>
 
-        <!-- CHILD 2: EMPTY (Boş Sonuç) -->
-        <LinearLayout
-            android:id="@+id/stateEmptyGroup"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:gravity="center"
-            android:orientation="vertical"
-            android:padding="@dimen/state_padding">
-            <!-- Eski stateEmptyGroup içeriğini buraya taşıdık -->
-            <ImageView
-                android:layout_width="72dp"
-                android:layout_height="72dp"
-                android:alpha="0.12"
-                android:contentDescription="@null"
-                android:src="@drawable/ic_search_off_24"
-                app:tint="?attr/colorOnSurface" />
-            <TextView
-                android:id="@+id/txtEmptyTitle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/search_empty_title"
-                android:textAppearance="?attr/textAppearanceTitleMedium" />
-            <TextView
-                android:id="@+id/txtEmptySubtitle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/state_subtitle_top"
-                android:textAppearance="?attr/textAppearanceBodyMedium"
-                android:textColor="?attr/colorOnSurfaceVariant"
-                tools:text="Aranan: 'imkansız bir ürün'" />
-        </LinearLayout>
-
-        <!-- CHILD 3: ERROR (Hata) -->
-        <LinearLayout
-            android:id="@+id/stateErrorGroup"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:gravity="center"
-            android:orientation="vertical"
-            android:padding="@dimen/state_padding">
-            <!-- Eski stateErrorGroup içeriğini buraya taşıdık -->
-            <TextView
-                android:id="@+id/txtErrorTitle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/search_error_title"
-                android:textAppearance="?attr/textAppearanceTitleMedium" />
-            <Button
-                android:id="@+id/btnRetry"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/state_action_top"
-                android:text="@string/action_retry" />
-        </LinearLayout>
-
-        <!-- CHILD 4: LOADING (Yükleniyor) -->
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-            <!-- ProgressBar'ı ortalamak için FrameLayout kullandık -->
-            <com.google.android.material.progressindicator.CircularProgressIndicator
-                android:id="@+id/progressbar"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:indeterminate="true" />
-        </FrameLayout>
-
-    </ViewAnimator>
-
-
-    <!-- FAB, ViewAnimator'ın dışında kalmalı ki her zaman diğerlerinin üstünde olsun -->
     <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
         android:id="@+id/fabScrollTop"
         android:layout_width="wrap_content"
@@ -175,8 +52,11 @@
         android:layout_margin="@dimen/fab_margin"
         android:contentDescription="@string/cd_scroll_to_top"
         android:text="@string/action_scroll_to_top"
+        android:textColor="?attr/colorOnTertiaryContainer"
         android:visibility="gone"
+        app:backgroundTint="?attr/colorTertiaryContainer"
         app:icon="@drawable/ic_arrow_upward_24"
+        app:iconTint="?attr/colorOnTertiaryContainer"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         tools:visibility="visible" />

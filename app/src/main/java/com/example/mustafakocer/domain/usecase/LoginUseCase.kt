@@ -1,26 +1,33 @@
 package com.example.mustafakocer.domain.usecase
 
-import com.example.mustafakocer.data.model.dto.LoginResponseDto
 import com.example.mustafakocer.domain.exception.AppException
+import com.example.mustafakocer.domain.model.AuthSession
 import com.example.mustafakocer.domain.repository.AuthRepository
 import com.example.mustafakocer.domain.util.Resource
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
 import javax.inject.Inject
 
+/**
+ * Encapsulates the business logic for user login.
+ * This includes validating the inputs before delegating the call to the repository.
+ */
 class LoginUseCase @Inject constructor(
     private val authRepository: AuthRepository,
 ) {
-    operator fun invoke(username: String, password: String): Flow<Resource<LoginResponseDto>> {
-        // 1. İŞ KURALI: Girdi (input) doğrulaması burada yapılır.
+    /**
+     * Executes the login use case.
+     * @param username The user's username.
+     * @param password The user's password.
+     * @return A [Flow] of [Resource] indicating the login attempt's outcome. It will
+     * emit an [AppException.Data.InputError] immediately if inputs are invalid.
+     */
+    operator fun invoke(username: String, password: String): Flow<Resource<AuthSession>> {
         if (username.isBlank() || password.isBlank()) {
-            // Ağ isteği atmadan, anında bir hata durumu içeren bir Flow döndür.
-            return flow {
-                emit(Resource.Error(AppException.Data.ValidationError("Kullanıcı adı veya şifre boş olamaz.")))
-            }
+            val error = AppException.Data.InputError("Username and password cannot be empty.")
+            return flowOf(Resource.Error(error))
         }
 
-        // 2. Girdiler geçerliyse, Repository'ye git.
         return authRepository.login(username, password)
     }
 }

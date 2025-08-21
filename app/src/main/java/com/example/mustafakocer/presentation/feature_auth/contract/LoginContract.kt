@@ -1,27 +1,31 @@
 package com.example.mustafakocer.presentation.feature_auth.contract
 
 import com.example.mustafakocer.domain.exception.AppException
-import com.example.mustafakocer.domain.presentation.BaseUiEffect
-import com.example.mustafakocer.domain.presentation.BaseUiEvent
-import com.example.mustafakocer.domain.presentation.BaseUiState
+import com.example.mustafakocer.presentation.mvi.BaseUiEffect
+import com.example.mustafakocer.presentation.mvi.BaseUiEvent
+import com.example.mustafakocer.presentation.mvi.BaseUiState
 
 /**
- * Login ekranının UI durumunu (State) temsil eden veri sınıfı.
+ * Represents the UI state for the Login screen.
  *
- * @param email Kullanıcının girdiği e-posta adresi.
- * @param password Kullanıcının girdiği şifre.
- * @param isLoading Giriş işlemi sırasında yüklenme durumunu belirtir.
- * @param error Bir hata oluştuğunda gösterilecek olan istisna.
+ * @param email The email address entered by the user.
+ * @param password The password entered by the user.
+ * @param emailError A validation error message for the email field.
+ * @param passwordError A validation error message for the password field.
+ * @param isLoading Indicates if a login operation is in progress.
+ * @param error A general exception to be displayed (e.g., network error).
  */
 data class LoginUiState(
     val email: String = "",
     val password: String = "",
+    val emailError: String? = null,
+    val passwordError: String? = null,
     override val isLoading: Boolean = false,
     override val error: AppException? = null
 ) : BaseUiState
 
 /**
- * Login ekranında gerçekleşebilecek tüm kullanıcı eylemlerini (Event) temsil eder.
+ * Represents all possible user actions (Events) on the Login screen.
  */
 sealed interface LoginEvent : BaseUiEvent {
     data class EmailChanged(val email: String) : LoginEvent
@@ -30,8 +34,8 @@ sealed interface LoginEvent : BaseUiEvent {
 }
 
 /**
- * Login ekranından tetiklenebilecek tek seferlik olayları (Effect) temsil eder.
- * Örn: Navigasyon, Snackbar gösterme.
+ * Represents one-time side-effects (Effects) that can be triggered from the Login screen,
+ * such as navigation or showing a snackbar.
  */
 sealed interface LoginEffect : BaseUiEffect {
     object NavigateToHome : LoginEffect

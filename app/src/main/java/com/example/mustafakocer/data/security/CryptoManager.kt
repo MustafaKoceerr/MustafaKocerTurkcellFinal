@@ -10,6 +10,11 @@ import javax.crypto.spec.GCMParameterSpec
 import javax.inject.Inject
 import javax.inject.Singleton
 
+/**
+ * A singleton class responsible for all symmetric encryption and decryption operations.
+ * It uses the Android KeyStore system to securely generate, store, and retrieve the
+ * cryptographic key, ensuring it never leaves the device's secure hardware.
+ */
 @Singleton
 class CryptoManager @Inject constructor() {
 
@@ -21,10 +26,10 @@ class CryptoManager @Inject constructor() {
         get() = Cipher.getInstance(TRANSFORMATION)
 
     private fun getDecryptCipherForIv(iv: ByteArray): Cipher {
-        val cipher = Cipher.getInstance(TRANSFORMATION)
-        val spec = GCMParameterSpec(128, iv)
-        cipher.init(Cipher.DECRYPT_MODE, getKey(), spec)
-        return cipher
+        return Cipher.getInstance(TRANSFORMATION).apply {
+            val spec = GCMParameterSpec(128, iv)
+            init(Cipher.DECRYPT_MODE, getKey(), spec)
+        }
     }
 
     private fun getKey(): SecretKey {
@@ -42,27 +47,37 @@ class CryptoManager @Inject constructor() {
                     .setBlockModes(BLOCK_MODE)
                     .setEncryptionPaddings(PADDING)
                     .setKeySize(256)
-                    .setUserAuthenticationRequired(false) // İsteğe bağlı
-                    .setRandomizedEncryptionRequired(true) // GCM için önerilir
+                    .setUserAuthenticationRequired(false)
+                    .setRandomizedEncryptionRequired(true)
                     .build()
             )
         }.generateKey()
     }
 
+    /**
+     * Encrypts the given byte array.
+     * The 12-byte Initialization Vector (IV) is prepended to the resulting ciphertext,
+     * which is essential for decryption.
+     * @param data The raw data to be encrypted.
+     * @return A byte array containing the IV followed by the encrypted data.
+     */
     fun encrypt(data: ByteArray): ByteArray {
-        val cipher = encryptCipher
-        cipher.init(Cipher.ENCRYPT_MODE, getKey())
-        // IV'yi (Initialization Vector) şifrelenmiş verinin başına ekliyoruz.
-        // Bu, her şifrelemede farklı bir IV kullanılmasını sağlar ve deşifreleme için gereklidir.
+        val cipher = encryptCipher.apply {
+            init(Cipher.ENCRYPT_MODE, getKey())
+        }
         return cipher.iv + cipher.doFinal(data)
     }
 
+    /**
+     * Decrypts the given byte array.
+     * It assumes the first 12 bytes of the array are the Initialization Vector (IV).
+     * @param encryptedData A byte array containing the IV and the encrypted data.
+     * @return The original, decrypted raw data.
+     */
     fun decrypt(encryptedData: ByteArray): ByteArray {
-        // Verinin başındaki IV'yi ayırıyoruz. AES/GCM için IV 12 byte'tır.
         val iv = encryptedData.copyOfRange(0, 12)
         val data = encryptedData.copyOfRange(12, encryptedData.size)
-        val cipher = getDecryptCipherForIv(iv)
-        return cipher.doFinal(data)
+        return getDecryptCipherForIv(iv).doFinal(data)
     }
 
     private companion object {

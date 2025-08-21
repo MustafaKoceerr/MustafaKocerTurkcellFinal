@@ -3,43 +3,39 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:showIn="navigation_view">
 
-    <group android:id="@+id/group_main" android:checkableBehavior="single">
+    <group android:checkableBehavior="single">
         <item
             android:id="@+id/homeFragment"
             android:icon="@drawable/home_icon"
-            android:title="Home" />
+            android:title="@string/nav_home" />
         <item
             android:id="@+id/categoryFragment"
             android:icon="@drawable/ic_category"
-            android:title="Category" />
+            android:title="@string/nav_category" />
         <item
             android:id="@+id/searchFragment"
             android:icon="@drawable/ic_search_24"
-            android:title="Search" />
+            android:title="@string/nav_search" />
         <item
             android:id="@+id/ordersFragment"
             android:icon="@drawable/ic_order"
-            android:title="Order" />
+            android:title="@string/nav_orders" />
         <item
             android:id="@+id/cartFragment"
             android:icon="@drawable/ic_shopping_cart"
-            android:title="Cart" />
+            android:title="@string/nav_cart" />
         <item
             android:id="@+id/profileFragment"
             android:icon="@drawable/profile_icon"
-            android:title="Profile" />
+            android:title="@string/nav_profile" />
     </group>
 
-    <!-- Araya çizgi eklemek için ayrı bir item kullanılır -->
-    <item
-        android:id="@+id/group_divider"
-        android:title="">
+    <item android:title="">
         <menu>
             <item
                 android:id="@+id/nav_logout"
                 android:icon="@drawable/ic_logout"
-                android:title="Log out" />
+                android:title="@string/nav_logout" />
         </menu>
     </item>
-
 </menu>

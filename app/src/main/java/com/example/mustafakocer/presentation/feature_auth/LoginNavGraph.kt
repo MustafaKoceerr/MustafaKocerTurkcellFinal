@@ -7,14 +7,20 @@ import com.example.mustafakocer.presentation.navigation.contracts.LoginNavAction
 import com.example.mustafakocer.presentation.navigation.destinations.LoginScreenRoute
 
 /**
- * Login özelliğinin navigasyon grafiğini tanımlar.
+ * Defines the navigation graph for the entire login feature.
+ *
+ * This modular approach allows the main `AppNavHost` to include the login flow
+ * with a single function call, keeping the main navigation graph clean and organized.
+ *
+ * @param navController The main NavController, passed down for potential nested navigation.
+ * @param navActions The specific navigation actions that can be triggered from the login feature.
  */
 fun NavGraphBuilder.loginNavGraph(
     navController: NavController,
     navActions: LoginNavActions
 ) {
     composable<LoginScreenRoute> {
-        // LoginRoute, ViewModel ile UI arasındaki bağlantıyı kurar.
+        // The LoginRoute composable connects the ViewModel to the LoginScreen UI.
         LoginRoute(navActions = navActions)
     }
 }

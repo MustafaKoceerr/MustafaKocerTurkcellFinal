@@ -5,16 +5,16 @@ import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 /**
- * DataStore'dan mevcut kullanıcının ID'sini getirme iş kuralını kapsüller.
+ * Encapsulates the business logic for retrieving the current user's ID.
  */
 class GetUserIdUseCase @Inject constructor(
     private val authRepository: AuthRepository
 ) {
     /**
-     * @return Kullanıcı ID'sini içeren bir Flow. Eğer kullanıcı giriş yapmamışsa
-     *         veya ID kaydedilmemişse null dönebilir.
+     * Executes the use case.
+     * @return A [Flow] emitting the user's ID. It may emit null if the user is not
+     * logged in or if the ID has not been persisted.
      */
-    operator fun invoke(): Flow<Int?> {
-        return authRepository.getUserId()
-    }
+    operator fun invoke(): Flow<Int?> =
+        authRepository.getUserId()
 }

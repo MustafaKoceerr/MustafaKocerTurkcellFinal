@@ -14,9 +14,17 @@ import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 import javax.inject.Singleton
 
-// DataStore instance'ını Context'e extension olarak tanımlıyoruz.
+/**
+ * Creates a singleton instance of DataStore, scoped to the application context.
+ * The file name "encrypted_session_storage" indicates its purpose.
+ */
 private val Context.sessionDataStore: DataStore<Preferences> by preferencesDataStore(name = "encrypted_session_storage")
 
+/**
+ * Manages the secure persistence of the authentication token using Jetpack DataStore.
+ * It collaborates with a [CryptoManager] to encrypt data before writing to disk and
+ * decrypt it after reading.
+ */
 @Singleton
 class SessionStorage @Inject constructor(
     @ApplicationContext private val context: Context,
@@ -24,12 +32,13 @@ class SessionStorage @Inject constructor(
 ) {
     private val dataStore = context.sessionDataStore
 
-    companion object {
-        private val ENCRYPTED_AUTH_TOKEN = stringPreferencesKey("encrypted_auth_token")
+    private companion object {
+        val ENCRYPTED_AUTH_TOKEN = stringPreferencesKey("encrypted_auth_token")
     }
 
     /**
-     * Verilen Token'i şifreler ve DataStore'a kaydeder.
+     * Encrypts the given token and saves it to DataStore.
+     * The encrypted byte array is stored as a Base64 string.
      */
     suspend fun saveAuthToken(token: String) {
         val tokenBytes = token.encodeToByteArray()
@@ -42,7 +51,8 @@ class SessionStorage @Inject constructor(
     }
 
     /**
-     * DataStore'dan şifrelenmiş token'ı okur, şifresini çözer ve bir Flow olarak sunar.
+     * A flow that reads the encrypted token from DataStore, decrypts it, and emits the result.
+     * Emits null if the token is not found or if a decryption error occurs.
      */
     val authTokenFlow: Flow<String?> = dataStore.data
         .map { preferences ->
@@ -52,18 +62,17 @@ class SessionStorage @Inject constructor(
                 val decryptedBytes = cryptoManager.decrypt(encryptedBytes)
                 decryptedBytes.decodeToString()
             } catch (e: Exception) {
-                // Deşifreleme hatası (örn: anahtar değişti, veri bozuk)
+                // Handles decryption errors (e.g., key changed, data corrupted) gracefully.
                 null
             }
         }
 
     /**
-     * Kaydedilmiş tüm oturum bilgilerini temizler.
+     * Clears all data from this specific DataStore instance.
      */
     suspend fun clear() {
         dataStore.edit { preferences ->
             preferences.clear()
         }
     }
-
 }

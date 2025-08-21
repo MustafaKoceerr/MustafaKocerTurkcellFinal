@@ -6,6 +6,10 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.example.mustafakocer.data.model.entity.CategoryRemoteKeyEntity
 
+/**
+ * Data Access Object for category-specific remote keys.
+ * Manages pagination state for the Paging 3 library on a per-category basis.
+ */
 @Dao
 interface CategoryRemoteKeyDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)

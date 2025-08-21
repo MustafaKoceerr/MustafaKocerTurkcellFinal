@@ -6,31 +6,37 @@ import com.example.mustafakocer.domain.model.Order
 import com.example.mustafakocer.domain.model.OrderProduct
 import java.text.DecimalFormat
 
-// OrderProductDto -> OrderProduct (Domain Model)
+/**
+ * A private helper function to format a Double into a standard currency string.
+ * Encapsulates the formatting logic to avoid code duplication.
+ */
+private fun Double.toFormattedPrice(): String = DecimalFormat("$#,##0.00").format(this)
+
+/**
+ * Converts an [OrderProductDto] from the data layer to an [OrderProduct] in the domain layer.
+ * It also calculates the price per unit from the total price.
+ */
 fun OrderProductDto.toDomain(): OrderProduct {
-    val priceFormat = DecimalFormat("$#,##0.00")
-    // API, ürünün toplam indirimli fiyatını veriyor, biz birim fiyatını hesaplayalım.
     val discountedPricePerUnit = if (quantity > 0) discountedTotal / quantity else 0.0
 
     return OrderProduct(
-        id = this.id,
-        title = this.title,
-        quantity = this.quantity,
-        discountedPricePerUnit = priceFormat.format(discountedPricePerUnit),
-        thumbnail = this.thumbnail
+        id = id,
+        title = title,
+        quantity = quantity,
+        discountedPricePerUnit = discountedPricePerUnit.toFormattedPrice(),
+        thumbnail = thumbnail
     )
 }
 
-// OrderDto -> Order (Domain Model)
-fun OrderDto.toDomain(): Order {
-    val priceFormat = DecimalFormat("$#,##0.00")
-
-    return Order(
-        id = this.id,
-        totalProducts = this.totalProducts,
-        totalQuantity = this.totalQuantity,
-        discountedTotal = priceFormat.format(this.discountedTotal),
-        total = priceFormat.format(this.total),
-        products = this.products.map { it.toDomain() } // İç içe mapping
-    )
-}
+/**
+ * Converts an [OrderDto] from the data layer to an [Order] in the domain layer.
+ * It also formats the total prices and maps its nested product list.
+ */
+fun OrderDto.toDomain(): Order = Order(
+    id = id,
+    totalProducts = totalProducts,
+    totalQuantity = totalQuantity,
+    discountedTotal = discountedTotal.toFormattedPrice(),
+    total = total.toFormattedPrice(),
+    products = products.map { it.toDomain() }
+)

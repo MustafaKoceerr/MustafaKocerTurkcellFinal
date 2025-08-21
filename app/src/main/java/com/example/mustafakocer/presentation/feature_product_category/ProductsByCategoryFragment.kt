@@ -2,8 +2,6 @@ package com.example.mustafakocer.presentation.feature_product_category
 
 import android.os.Bundle
 import android.view.View
-import android.widget.Toast
-import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -12,49 +10,92 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.paging.LoadState
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.example.mustafakocer.R
 import com.example.mustafakocer.databinding.FragmentProductsByCategoryBinding
 import com.example.mustafakocer.presentation.base.BaseFragment
+import com.example.mustafakocer.presentation.common.PagingLoadStateAdapter
 import com.example.mustafakocer.presentation.common.ProductListAdapter
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
+/**
+ * Displays a paginated grid of products for a specific category.
+ * It reuses the [CategoryViewModel] to get a reactive flow of products based on the
+ * category name passed through navigation arguments.
+ */
 @AndroidEntryPoint
 class ProductsByCategoryFragment : BaseFragment<FragmentProductsByCategoryBinding>(
     FragmentProductsByCategoryBinding::inflate
 ) {
-    // Bu fragment, kendi ViewModel'ine sahip.
     private val viewModel: CategoryViewModel by viewModels()
     private val args: ProductsByCategoryFragmentArgs by navArgs()
     private lateinit var productListAdapter: ProductListAdapter
+    private lateinit var recyclerView: RecyclerView // RecyclerView referansı için
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         setupRecyclerView()
         observeProductPagingFlow()
         observeLoadState()
+        setupFab() // Yeni eklenen fonksiyon çağrısı
 
-        // Navigasyon argümanından gelen kategori adını ViewModel'e bildirerek
-        // doğru ürünlerin akışını tetikliyoruz.
+        // Inform the ViewModel about the selected category.
         viewModel.onCategorySelected(args.categoryName)
     }
 
+    /**
+     * Initializes the RecyclerView, its adapter, and the load state footer.
+     */
     private fun setupRecyclerView() {
         productListAdapter = ProductListAdapter { productId ->
-            // ProductsByCategoryFragment'e özel action'ı kullanıyoruz.
-            val action = ProductsByCategoryFragmentDirections.actionProductsByCategoryFragmentToProductDetailFragment(
-                productId = productId
-            )
+            val action =
+                ProductsByCategoryFragmentDirections.actionProductsByCategoryFragmentToProductDetailFragment(
+                    productId
+                )
             findNavController().navigate(action)
         }
 
-        binding.productsByCategoryRecyclerView.apply {
-            adapter = productListAdapter
+        binding.stateLayout.onRetry = {
+            productListAdapter.retry()
+        }
+
+        recyclerView = binding.stateLayout.findViewById<RecyclerView>(R.id.contentView).apply {
+            adapter = productListAdapter.withLoadStateFooter(
+                footer = PagingLoadStateAdapter { productListAdapter.retry() }
+            )
             layoutManager = GridLayoutManager(requireContext(), 2)
         }
     }
 
+    /**
+     * Sets up the ExtendedFloatingActionButton's visibility and click listener.
+     */
+    private fun setupFab() {
+        binding.fabScrollTop.setOnClickListener {
+            recyclerView.smoothScrollToPosition(0)
+        }
+
+        recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+                // Kullanıcı aşağı kaydırıyorsa ve buton görünmüyorsa
+                if (dy > 0 && !binding.fabScrollTop.isShown) {
+                    binding.fabScrollTop.show()
+                }
+                // Kullanıcı yukarı kaydırıyorsa ve buton görünüyorsa
+                else if (dy < 0 && binding.fabScrollTop.isShown) {
+                    binding.fabScrollTop.hide()
+                }
+            }
+        })
+    }
+
+
+    /**
+     * Subscribes to the paginated product flow from the ViewModel.
+     */
     private fun observeProductPagingFlow() {
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -65,19 +106,42 @@ class ProductsByCategoryFragment : BaseFragment<FragmentProductsByCategoryBindin
         }
     }
 
+    /**
+     * Subscribes to the adapter's load state to manage the UI (loading, error, empty states).
+     */
     private fun observeLoadState() {
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 productListAdapter.loadStateFlow.collectLatest { loadStates ->
-                    val refreshState = loadStates.refresh
-                    binding.progressbar.isVisible = refreshState is LoadState.Loading
-                    if (refreshState is LoadState.Error) {
-                        Toast.makeText(
-                            requireContext(),
-                            "Hata: ${refreshState.error.localizedMessage}",
-                            Toast.LENGTH_LONG
-                        ).show()
+                    // --- DEĞİŞİKLİK BAŞLANGICI ---
+                    // Race condition'ı önlemek için UI durumunu `refresh` state'ine göre
+                    // hiyerarşik bir şekilde kontrol ediyoruz.
+                    when (val refreshState = loadStates.refresh) {
+                        is LoadState.Loading -> {
+                            // Sadece liste tamamen boşken tam ekran yükleme göster.
+                            if (productListAdapter.itemCount == 0) {
+                                binding.stateLayout.showLoading()
+                            }
+                        }
+
+                        is LoadState.NotLoading -> {
+                            // Yükleme bittiğinde, listenin boş olup olmadığını güvenle kontrol edebiliriz.
+                            if (productListAdapter.itemCount < 1) {
+                                binding.stateLayout.showEmpty()
+                            } else {
+                                binding.stateLayout.showContent()
+                            }
+                        }
+
+                        is LoadState.Error -> {
+                            // Sadece ilk yüklemede hata alınırsa tam ekran hata göster.
+                            if (productListAdapter.itemCount == 0) {
+                                val errorMessage = (refreshState.error as? Exception)?.message
+                                binding.stateLayout.showError(subtitle = errorMessage)
+                            }
+                        }
                     }
+                    // --- DEĞİŞİKLİK SONU ---
                 }
             }
         }

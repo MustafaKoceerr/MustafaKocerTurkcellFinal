@@ -1,17 +1,17 @@
 package com.example.mustafakocer.data.model.dto
 
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 /**
- * Kullanıcı profilini güncellemek için API'ye gönderilecek olan istek gövdesi.
- * Sadece güncellenebilecek alanları içerir ve tüm alanlar opsiyoneldir.
- * `kotlinx.serialization`, null olan alanları JSON'a dahil etmeyecektir.
+ * Represents the request body for updating a user's profile.
+ * Fields are nullable, so only non-null values will be sent in the JSON payload.
  */
 @Serializable
 data class UserUpdateDto(
-    val firstName: String? = null,
-    val lastName: String? = null,
-    val email: String? = null,
-    val phone: String? = null,
-    val age: Int? = null
+    @SerialName("firstName") val firstName: String? = null,
+    @SerialName("lastName") val lastName: String? = null,
+    @SerialName("email") val email: String? = null,
+    @SerialName("phone") val phone: String? = null,
+    @SerialName("age") val age: Int? = null
 )

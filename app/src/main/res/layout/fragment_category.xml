@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- CategoryFragment (SwipeRefreshLayout kaldırıldı) -->
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -9,102 +7,29 @@
     android:background="?attr/colorSurface"
     tools:context=".presentation.feature_product_category.CategoryFragment">
 
-    <!-- Liste -->
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/categoryRecyclerView"
+    <com.example.mustafakocer.presentation.common.StateLayout
+        android:id="@+id/state_layout"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:clipToPadding="false"
-        android:paddingStart="@dimen/category_content_inset"
-        android:paddingEnd="@dimen/category_content_inset"
-        android:paddingTop="@dimen/category_content_inset_top"
-        android:paddingBottom="@dimen/category_content_inset_bottom"
-        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        tools:listitem="@layout/recycler_row_category"
-        tools:itemCount="12" />
-
-    <!-- Yüklenme göstergesi (ID korunur) -->
-    <com.google.android.material.progressindicator.CircularProgressIndicator
-        android:id="@+id/progressbar"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:visibility="gone"
-        app:indicatorSize="32dp"
-        app:trackThickness="3dp"
-        app:indicatorInset="8dp"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        tools:visibility="visible" />
+        app:errorIcon="@drawable/ic_cloud_off_24"
+        app:emptyIcon="@drawable/ic_category_24"
+        app:emptyTitle="@string/empty_categories_title"
+        app:emptySubtitle="@string/empty_categories_subtitle">
 
-    <!-- Empty state -->
-    <LinearLayout
-        android:id="@+id/stateEmptyGroup"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:orientation="vertical"
-        android:padding="@dimen/state_padding"
-        android:visibility="gone"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        tools:visibility="gone">
-
-        <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/txtEmptyTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
-            android:textColor="?attr/colorOnSurface"
-            android:text="@string/category_empty_title" />
-
-        <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/txtEmptySubtitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/state_subtitle_top"
-            android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
-            android:textColor="?attr/colorOnSurfaceVariant"
-            android:text="@string/category_empty_subtitle" />
-    </LinearLayout>
-
-    <!-- Error state -->
-    <LinearLayout
-        android:id="@+id/stateErrorGroup"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:orientation="vertical"
-        android:padding="@dimen/state_padding"
-        android:visibility="gone"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        tools:visibility="gone">
-
-        <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/txtErrorTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
-            android:textColor="?attr/colorOnSurface"
-            android:text="@string/category_error_title" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnRetry"
-            style="?attr/materialButtonOutlinedStyle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/state_action_top"
-            android:text="@string/action_retry"
-            android:contentDescription="@string/cd_retry" />
-    </LinearLayout>
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/contentView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:paddingStart="@dimen/category_content_inset"
+            android:paddingTop="@dimen/category_content_inset_top"
+            android:paddingEnd="@dimen/category_content_inset"
+            android:paddingBottom="@dimen/category_content_inset_bottom"
+            tools:listitem="@layout/recycler_row_category" />
+    </com.example.mustafakocer.presentation.common.StateLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

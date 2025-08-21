@@ -7,16 +7,17 @@ import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 /**
- * Kullanıcının siparişlerinin sayfalama destekli listesini getirme iş kuralını kapsüller.
+ * Encapsulates the business logic for retrieving the paginated list of the current user's orders.
+ * This use case is session-aware, meaning it will automatically react to login/logout events
+ * because it relies on a reactive repository.
  */
 class GetOrdersUseCase @Inject constructor(
     private val orderRepository: OrderRepository
 ) {
     /**
-     * @param userId Siparişleri getirilecek kullanıcının ID'si.
-     * @return Kullanıcının siparişlerini içeren bir PagingData akışı.
+     * Executes the use case.
+     * @return A [Flow] of [PagingData] containing the user's orders.
      */
-    operator fun invoke(userId: String): Flow<PagingData<Order>> {
-        return orderRepository.getPaginatedOrdersByUserId(userId)
-    }
+    operator fun invoke(): Flow<PagingData<Order>> =
+        orderRepository.getPaginatedOrdersByUserId()
 }

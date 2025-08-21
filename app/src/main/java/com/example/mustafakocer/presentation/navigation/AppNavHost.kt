@@ -2,9 +2,10 @@ package com.example.mustafakocer.presentation.navigation
 
 import android.app.Activity
 import android.content.Intent
-import androidx.activity.compose.LocalActivity
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import com.example.mustafakocer.presentation.feature_auth.loginNavGraph
@@ -20,51 +21,51 @@ fun AppNavHost(
     navController: NavHostController,
     modifier: Modifier = Modifier,
 ) {
-    val activity = LocalActivity.current
+    val context = LocalContext.current
+
+    // Create and remember the navigation actions. This prevents them from being
+    // recreated on every recomposition, improving performance.
+    val navActions = remember(navController, context) {
+        AppNavActions(navController, context as Activity)
+    }
 
     NavHost(
         navController = navController,
         startDestination = SplashScreenRoute,
         modifier = modifier
     ) {
-        // 1. Her NavGraph için ayrı ayrı, anonim 'object' implementasyonları oluşturuyoruz.
         splashNavGraph(
             navController = navController,
-            navActions = object : SplashNavActions {
-                override fun navigateToHome() {
-                    // 2. Tekrarlanan mantığı private bir yardımcı fonksiyona yönlendiriyoruz.
-                    activity?.navigateToHomeAndFinish()
-                }
-
-                override fun navigateToLogin() {
-                    navController.navigate(LoginScreenRoute) {
-                        popUpTo(SplashScreenRoute) { inclusive = true }
-                    }
-                }
-            }
+            navActions = navActions
         )
 
         loginNavGraph(
             navController = navController,
-            navActions = object : LoginNavActions {
-                override fun navigateToHome() {
-                    // 2. Tekrarlanan mantığı aynı yardımcı fonksiyona yönlendiriyoruz.
-                    activity?.navigateToHomeAndFinish()
-                }
-            }
+            navActions = navActions
         )
     }
 }
 
 /**
- * MainActivity'ye giden ve mevcut Activity'yi sonlandıran,
- * tekrarlanan navigasyon mantığını kapsülleyen özel bir yardımcı fonksiyon.
- * Bu bir extension function olduğu için, sadece bu dosya içinden erişilebilir (private).
+ * A concrete implementation of the navigation action interfaces.
+ * This class centralizes the navigation logic, making it reusable and easier to manage.
  */
-private fun Activity.navigateToHomeAndFinish() {
-    val intent = Intent(this, MainActivity::class.java).apply {
-        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+private class AppNavActions(
+    private val navController: NavHostController,
+    private val activity: Activity
+) : SplashNavActions, LoginNavActions {
+
+    override fun navigateToHome() {
+        val intent = Intent(activity, MainActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        }
+        activity.startActivity(intent)
+        activity.finish()
     }
-    startActivity(intent)
-    finish()
+
+    override fun navigateToLogin() {
+        navController.navigate(LoginScreenRoute) {
+            popUpTo(SplashScreenRoute) { inclusive = true }
+        }
+    }
 }

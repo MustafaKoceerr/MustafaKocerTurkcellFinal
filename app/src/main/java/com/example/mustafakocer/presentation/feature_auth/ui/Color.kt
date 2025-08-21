@@ -4,6 +4,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 
+/**
+ * Defines the custom color palettes for the application's Light and Dark themes,
+ * adhering to the Material 3 color system.
+ */
+
 // ---- LIGHT ----
 private val PrimaryLight = Color(0xFF1F3A5F)
 private val OnPrimaryLight = Color(0xFFFFFFFF)

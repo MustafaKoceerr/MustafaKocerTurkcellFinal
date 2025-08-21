@@ -5,9 +5,13 @@ import com.example.mustafakocer.domain.model.Order
 import kotlinx.coroutines.flow.Flow
 
 /**
- * Siparişlerle ilgili tüm veri operasyonları için sözleşme (arayüz).
+ * A contract for the data layer to handle all order-related data operations.
  */
 interface OrderRepository {
 
-    fun getPaginatedOrdersByUserId(userId: String): Flow<PagingData<Order>>
+    /**
+     * Retrieves a paginated stream of orders for the currently logged-in user.
+     * @return A flow of [PagingData] containing the user's [Order]s.
+     */
+    fun getPaginatedOrdersByUserId(): Flow<PagingData<Order>>
 }

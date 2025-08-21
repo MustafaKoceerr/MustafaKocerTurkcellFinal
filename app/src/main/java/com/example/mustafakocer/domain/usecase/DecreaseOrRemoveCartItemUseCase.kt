@@ -4,10 +4,18 @@ import com.example.mustafakocer.domain.repository.CartRepository
 import com.example.mustafakocer.domain.util.Resource
 import javax.inject.Inject
 
+/**
+ * Encapsulates the business logic for decreasing a product's quantity in the cart
+ * or removing it entirely if the quantity is one.
+ */
 class DecreaseOrRemoveCartItemUseCase @Inject constructor(
     private val cartRepository: CartRepository
 ) {
-    suspend operator fun invoke(userId: String, productId: Int): Resource<Unit> {
-        return cartRepository.decreaseOrRemoveCartItem(userId, productId)
-    }
+    /**
+     * Executes the use case.
+     * @param productId The ID of the product to decrease or remove.
+     * @return A [Resource] indicating the outcome of the operation.
+     */
+    suspend operator fun invoke(productId: Int): Resource<Unit> =
+        cartRepository.decreaseOrRemoveCartItem(productId)
 }

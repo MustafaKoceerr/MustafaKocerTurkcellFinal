@@ -2,9 +2,7 @@ package com.example.mustafakocer.presentation.feature_product_list
 
 import android.os.Bundle
 import android.view.View
-import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
-import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -12,90 +10,142 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.paging.LoadState
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.example.mustafakocer.R
 import com.example.mustafakocer.databinding.FragmentHomeBinding
 import com.example.mustafakocer.presentation.base.BaseFragment
+import com.example.mustafakocer.presentation.common.PagingLoadStateAdapter
 import com.example.mustafakocer.presentation.common.ProductListAdapter
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
+/**
+ * Displays the main screen of the application, showing a paginated grid of products.
+ * It also handles the "press back again to exit" functionality.
+ */
 @AndroidEntryPoint
 class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::inflate) {
 
     private val viewModel: HomeViewModel by viewModels()
     private lateinit var productListAdapter: ProductListAdapter
+    private lateinit var recyclerView: RecyclerView
 
-    // YENİ: Geri tuşuna basılma zamanını takip etmek için değişken.
     private var lastBackPressedTime = 0L
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         setupRecyclerView()
         observeProductPagingFlow()
         observeLoadState()
-        setupBackButtonHandler() // YENİ: Geri tuşu dinleyicisini kur.
+        setupBackButtonHandler()
+        setupFab()
     }
 
+    /**
+     * Initializes the RecyclerView, its adapter, and the load state footer.
+     */
     private fun setupRecyclerView() {
         productListAdapter = ProductListAdapter { productId ->
-            // HomeFragment'e özel action'ı kullanıyoruz.
-            val action = HomeFragmentDirections.actionHomeFragmentToProductDetailFragment(
-                productId = productId
-            )
+            val action = HomeFragmentDirections.actionHomeFragmentToProductDetailFragment(productId)
             findNavController().navigate(action)
         }
-
-        binding.homeRecyclerView.apply {
-            adapter = productListAdapter
-            layoutManager = GridLayoutManager(requireContext(), 2)
-        }
+        recyclerView = binding.stateLayout.findViewById<RecyclerView>(R.id.contentView)
+            .apply {
+                adapter = productListAdapter.withLoadStateFooter(
+                    footer = PagingLoadStateAdapter { productListAdapter.retry() }
+                )
+                layoutManager = GridLayoutManager(requireContext(), 2)
+            }
     }
 
+    /**
+     * Configures the FloatingActionButton to scroll the list to the top and to
+     * show/hide based on scroll direction.
+     */
+    private fun setupFab() {
+        binding.fabScrollToTop.setOnClickListener {
+            recyclerView.smoothScrollToPosition(0)
+        }
+        recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+                if (dy > 0 && !binding.fabScrollToTop.isShown) {
+                    binding.fabScrollToTop.show()
+                } else if (dy < 0 && binding.fabScrollToTop.isShown) {
+                    binding.fabScrollToTop.hide()
+                }
+            }
+        })
+    }
+
+    /**
+     * Subscribes to the PagingData flow from the ViewModel and submits it to the adapter.
+     */
     private fun observeProductPagingFlow() {
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                // ViewModel'den gelen PagingData<Product> akışını dinle
                 viewModel.productsFlow.collectLatest { pagingData ->
-                    // ve doğrudan adaptöre gönder. Fragment'ın başka bir şey yapmasına gerek yok.
                     productListAdapter.submitData(pagingData)
                 }
             }
         }
     }
 
+    /**
+     * Subscribes to the adapter's load state to manage the UI (loading, error, empty states),
+     * preventing race conditions by checking for the end of pagination.
+     */
     private fun observeLoadState() {
+        binding.stateLayout.onRetry = {
+            productListAdapter.retry()
+        }
+
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 productListAdapter.loadStateFlow.collectLatest { loadStates ->
-                    val refreshState = loadStates.refresh
-
-                    // Yükleniyorsa progressBar'ı göster.
-                    binding.progressbar.isVisible = refreshState is LoadState.Loading
-
-                    // Hata varsa, Toast ile göster.
-                    if (refreshState is LoadState.Error) {
-                        Toast.makeText(
-                            requireContext(),
-                            "Hata: ${refreshState.error.localizedMessage}",
-                            Toast.LENGTH_LONG
-                        ).show()
+                    // --- DEĞİŞİKLİK BAŞLANGICI ---
+                    // Race condition'ı önlemek için UI durumunu `refresh` state'ine göre
+                    // hiyerarşik bir şekilde kontrol ediyoruz.
+                    when (val refreshState = loadStates.refresh) {
+                        is LoadState.Loading -> {
+                            // Sadece liste tamamen boşken tam ekran yükleme göster.
+                            // Bu, "swipe-to-refresh" sırasında içeriğin kaybolmasını engeller.
+                            if (productListAdapter.itemCount == 0) {
+                                binding.stateLayout.showLoading()
+                            }
+                        }
+                        is LoadState.NotLoading -> {
+                            // Yükleme bittiğinde, listenin boş olup olmadığını güvenle kontrol edebiliriz.
+                            if (productListAdapter.itemCount < 1) {
+                                binding.stateLayout.showEmpty()
+                            } else {
+                                binding.stateLayout.showContent()
+                            }
+                        }
+                        is LoadState.Error -> {
+                            // Sadece ilk yüklemede hata alınırsa tam ekran hata göster.
+                            if (productListAdapter.itemCount == 0) {
+                                val errorMessage = (refreshState.error as? Exception)?.message
+                                binding.stateLayout.showError(subtitle = errorMessage)
+                            }
+                        }
                     }
+                    // --- DEĞİŞİKLİK SONU ---
                 }
             }
         }
     }
 
-    // YENİ FONKSİYON: Geri tuşu davranışını yönetir.
+    /**
+     * Sets up a custom back press handler to implement the "press back again to exit" feature.
+     */
     private fun setupBackButtonHandler() {
         val callback = object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
-                // Son basıştan bu yana 2 saniyeden fazla geçtiyse
                 if (System.currentTimeMillis() - lastBackPressedTime > 2000) {
-                    // DEĞİŞTİ: Toast yerine Snackbar gösteriyoruz.
-                    // binding.root, Snackbar'ın hangi layout içinde gösterileceğini belirtir.
-                    Snackbar.make(binding.root, "Çıkmak için tekrar basın", Snackbar.LENGTH_SHORT)
+                    Snackbar.make(binding.root, R.string.press_back_again_to_exit, Snackbar.LENGTH_SHORT)
                         .show()
                     lastBackPressedTime = System.currentTimeMillis()
                 } else {
@@ -103,8 +153,6 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
                 }
             }
         }
-        // Callback'i, bu fragment'ın yaşam döngüsüne bağlı olarak dispatcher'a ekle.
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, callback)
     }
-
 }

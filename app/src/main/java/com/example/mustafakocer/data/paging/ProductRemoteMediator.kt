@@ -9,14 +9,22 @@ import com.example.mustafakocer.data.db.AppDatabase
 import com.example.mustafakocer.data.mapper.toEntity
 import com.example.mustafakocer.data.model.entity.HomeRemoteKeyEntity
 import com.example.mustafakocer.data.model.entity.ProductEntity
-import com.example.mustafakocer.data.network.IDummyApi
+import com.example.mustafakocer.data.network.DummyApi
 import retrofit2.HttpException
 import java.io.IOException
+import javax.inject.Inject
 
+/**
+ * A [RemoteMediator] for the main product list, implementing an offline-first strategy.
+ * It fetches products from the network, saves them to the local Room database, and manages
+ * pagination keys. The database serves as the single source of truth.
+ *
+ * @param api The Retrofit API service, injected by Hilt.
+ * @param db The Room database instance, injected by Hilt.
+ */
 @OptIn(ExperimentalPagingApi::class)
-// Hilt anotasyonu yok, bu basit bir sınıf.
-class ProductRemoteMediator(
-    private val api: IDummyApi,
+class ProductRemoteMediator @Inject constructor(
+    private val api: DummyApi,
     private val db: AppDatabase
 ) : RemoteMediator<Int, ProductEntity>() {
 
@@ -32,9 +40,7 @@ class ProductRemoteMediator(
                 LoadType.REFRESH -> 0
                 LoadType.PREPEND -> return MediatorResult.Success(endOfPaginationReached = true)
                 LoadType.APPEND -> {
-                    // DEĞİŞTİ: Anahtarı PagingState yerine doğrudan DB'den alıyoruz.
                     val remoteKey = getRemoteKeyForLastItem()
-                    // Eğer son anahtarın bir sonraki sayfası yoksa, paginasyon bitti demektir.
                     remoteKey?.nextKey ?: return MediatorResult.Success(endOfPaginationReached = true)
                 }
             }
@@ -70,9 +76,11 @@ class ProductRemoteMediator(
         }
     }
 
-    // DEĞİŞTİ: Bu fonksiyon artık PagingState'e bağımlı değil.
+    /**
+     * Retrieves the [HomeRemoteKeyEntity] for the last [ProductEntity] in the database.
+     * This is a robust method to determine the next page key for an APPEND operation.
+     */
     private suspend fun getRemoteKeyForLastItem(): HomeRemoteKeyEntity? {
-        // Veritabanındaki son ürünü al ve onun remote key'ini döndür.
         return productDao.getLastProduct()?.let { product ->
             remoteKeyDao.getRemoteKeyForProductId(product.id)
         }

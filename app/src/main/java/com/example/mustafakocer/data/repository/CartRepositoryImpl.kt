@@ -1,8 +1,11 @@
 package com.example.mustafakocer.data.repository
 
+import com.example.mustafakocer.data.preferences.SessionManager
 import com.example.mustafakocer.domain.exception.AppException
+import com.example.mustafakocer.domain.model.CartItemBasic
 import com.example.mustafakocer.domain.repository.CartRepository
 import com.example.mustafakocer.domain.util.Resource
+import com.example.mustafakocer.util.FirebaseConstants
 import com.google.firebase.database.*
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
@@ -13,148 +16,118 @@ import javax.inject.Inject
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
+/**
+ * Implements the [CartRepository] interface, providing a bridge to the Firebase Realtime Database.
+ * It handles all cart-related operations, translating Firebase's callback-based API into
+ * modern coroutine Flows and suspend functions.
+ */
 class CartRepositoryImpl @Inject constructor(
     private val dbRef: DatabaseReference,
+    private val sessionManager: SessionManager,
 ) : CartRepository {
 
-    companion object {
-        private const val PATH_CARTS = "carts"
+    /**
+     * A centralized helper to get the current user's cart reference.
+     * Throws a specific session exception if the user is not logged in.
+     */
+    private fun getUserCartRef(): DatabaseReference {
+        val userId = sessionManager.userId.value
+            ?: throw AppException.Session.MissingSessionData("User is not logged in to access the cart.")
+        return dbRef.child(FirebaseConstants.PATH_CARTS).child(userId.toString())
     }
 
-    override fun getRawCartItems(userId: String): Flow<Resource<List<Pair<Int, Int>>>> =
-        callbackFlow {
-            // 1. Dinlenecek doğru Firebase yolunu belirle.
-            val cartRef = dbRef.child(PATH_CARTS).child(userId)
+    /**
+     * A private wrapper to centralize error handling for all suspend Firebase operations.
+     * It mirrors the `safeApiCall` pattern for consistency.
+     */
+    private suspend fun <T> safeFirebaseCall(block: suspend () -> T): Resource<T> {
+        return try {
+            Resource.Success(block())
+        } catch (e: Exception) {
+            Resource.Error(AppException.Unknown(e))
+        }
+    }
 
-            // 2. Dinleyiciye ilk bağlandığında Yükleniyor durumunu gönder.
+    /**
+     * A suspend function that wraps the verbose Firebase Transaction API in a coroutine.
+     */
+    private suspend fun runTransactionSuspend(
+        itemRef: DatabaseReference,
+        operation: (currentQuantity: Long) -> Long?,
+    ) {
+        suspendCancellableCoroutine<Unit> { continuation ->
+            itemRef.runTransaction(object : Transaction.Handler {
+                override fun doTransaction(currentData: MutableData): Transaction.Result {
+                    val currentQuantity = currentData.getValue(Long::class.java) ?: 0L
+                    currentData.value = operation(currentQuantity)
+                    return Transaction.success(currentData)
+                }
+
+                override fun onComplete(
+                    error: DatabaseError?,
+                    committed: Boolean,
+                    data: DataSnapshot?,
+                ) {
+                    if (continuation.isActive) {
+                        if (error == null) continuation.resume(Unit)
+                        else continuation.resumeWithException(error.toException())
+                    }
+                }
+            })
+        }
+    }
+
+
+    override fun getRawCartItems(): Flow<Resource<List<CartItemBasic>>> = callbackFlow {
+        try {
+            val cartRef = getUserCartRef()
             trySend(Resource.Loading)
 
-            // 3. Firebase'in ValueEventListener'ını oluştur. Bu, veri her değiştiğinde tetiklenir.
             val listener = object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
-                    // Gelen veriyi List<Pair<Int, Int>> formatına dönüştür.
                     val rawItems = snapshot.children.mapNotNull { productSnapshot ->
-                        try {
-                            // key: "114", value: 5L (Long)
-                            val productId = productSnapshot.key?.toInt()
-                            val quantity = (productSnapshot.value as? Long)?.toInt()
-
-                            // Sadece geçerli ve düzgün formatlanmış veriyi al.
-                            if (productId != null && quantity != null) {
-                                Pair(productId, quantity)
-                            } else {
-                                null // Hatalı veriyi (örn: key'i Int olmayan) atla.
+                        productSnapshot.key?.toIntOrNull()?.let { productId ->
+                            (productSnapshot.value as? Long)?.toInt()?.let { quantity ->
+                                CartItemBasic(productId = productId, quantity = quantity)
                             }
-                        } catch (e: Exception) {
-                            // Parse etme sırasında bir hata olursa bu satırı atla.
-                            null
                         }
                     }
-                    // 4. Başarıyla parse edilen listeyi Flow'a gönder.
                     trySend(Resource.Success(rawItems))
                 }
 
                 override fun onCancelled(error: DatabaseError) {
-                    // 5. Dinleyici iptal edilirse veya bir izin hatası olursa, Hata durumunu gönder.
-                    val exception = AppException.Firebase(error.message, error.toException())
+                    val exception = AppException.Unknown(error.toException())
                     trySend(Resource.Error(exception))
-                    close(exception) // Flow'u hatayla sonlandır.
+                    close(exception)
                 }
             }
-
-            // 6. Dinleyiciyi Firebase referansına bağla.
             cartRef.addValueEventListener(listener)
-
-            // 7. Bu Flow dinlenmeyi bıraktığında (coroutine iptal olduğunda),
-            // memory leak olmaması için listener'ı mutlaka kaldır.
             awaitClose { cartRef.removeEventListener(listener) }
+
+        } catch (e: AppException) {
+            trySend(Resource.Error(e))
+            close(e)
         }
+    }
 
-    override suspend fun addOrIncreaseCartItem(userId: String, productId: Int): Resource<Unit> {
-        return try {
-            val itemRef = dbRef.child(PATH_CARTS).child(userId).child(productId.toString())
-            suspendCancellableCoroutine { continuation ->
-                continuation.invokeOnCancellation { /* No-op */ }
-                itemRef.runTransaction(object : Transaction.Handler {
-                    override fun doTransaction(currentData: MutableData): Transaction.Result {
-                        // DEĞİŞTİ: Artık CartItemEntity değil, direkt Long (miktar) okuyoruz.
-                        val currentQuantity = currentData.getValue(Long::class.java) ?: 0L
-                        currentData.value = currentQuantity + 1
-                        return Transaction.success(currentData)
-                    }
+    override suspend fun addOrIncreaseCartItem(productId: Int): Resource<Unit> = safeFirebaseCall {
+        val itemRef = getUserCartRef().child(productId.toString())
+        runTransactionSuspend(itemRef) { currentQuantity -> currentQuantity + 1 }
+    }
 
-                    override fun onComplete(
-                        error: DatabaseError?,
-                        committed: Boolean,
-                        currentData: DataSnapshot?,
-                    ) {
-                        if (continuation.isActive) {
-                            if (error == null) continuation.resume(Unit)
-                            else continuation.resumeWithException(error.toException())
-                        }
-                    }
-                })
+    override suspend fun decreaseOrRemoveCartItem(productId: Int): Resource<Unit> =
+        safeFirebaseCall {
+            val itemRef = getUserCartRef().child(productId.toString())
+            runTransactionSuspend(itemRef) { currentQuantity ->
+                if (currentQuantity <= 1) null else currentQuantity - 1
             }
-            Resource.Success(Unit)
-        } catch (e: Exception) {
-            Resource.Error(AppException.Unknown(e))
         }
+
+    override suspend fun clearCart(): Resource<Unit> = safeFirebaseCall {
+        getUserCartRef().removeValue().await()
     }
 
-    override suspend fun decreaseOrRemoveCartItem(userId: String, productId: Int): Resource<Unit> {
-        return try {
-            val itemRef = dbRef.child(PATH_CARTS).child(userId).child(productId.toString())
-            suspendCancellableCoroutine { continuation ->
-                continuation.invokeOnCancellation { /* No-op */ }
-                itemRef.runTransaction(object : Transaction.Handler {
-                    override fun doTransaction(currentData: MutableData): Transaction.Result {
-                        val currentQuantity = currentData.getValue(Long::class.java)
-                        // Miktar 1 ise veya hiç yoksa, sil (null ata).
-                        if (currentQuantity == null || currentQuantity <= 1) {
-                            currentData.value = null
-                        } else {
-                            // Değilse, 1 azalt.
-                            currentData.value = currentQuantity - 1
-                        }
-                        return Transaction.success(currentData)
-                    }
-
-                    override fun onComplete(
-                        error: DatabaseError?,
-                        committed: Boolean,
-                        currentData: DataSnapshot?,
-                    ) {
-                        if (continuation.isActive) {
-                            if (error == null) continuation.resume(Unit)
-                            else continuation.resumeWithException(error.toException())
-                        }
-                    }
-                })
-            }
-            Resource.Success(Unit)
-        } catch (e: Exception) {
-            Resource.Error(AppException.Unknown(e))
-        }
-    }
-
-    override suspend fun clearCart(userId: String): Resource<Unit> {
-        return try {
-            dbRef.child(PATH_CARTS).child(userId).removeValue().await()
-            Resource.Success(Unit)
-        } catch (e: Exception) {
-            Resource.Error(AppException.Unknown(e))
-        }
-    }
-
-    // YENİ FONKSİYONUN UYGULAMASI
-    override suspend fun removeCartItem(userId: String, productId: Int): Resource<Unit> {
-        return try {
-            // Firebase'de "carts -> {userId} -> {productId}" yolundaki veriyi sil.
-            dbRef.child(PATH_CARTS).child(userId).child(productId.toString()).removeValue().await()
-            Resource.Success(Unit)
-        } catch (e: Exception) {
-            // Ağ hatası veya başka bir Firebase hatası durumunda sarmala.
-            Resource.Error(AppException.Unknown(e))
-        }
+    override suspend fun removeCartItem(productId: Int): Resource<Unit> = safeFirebaseCall {
+        getUserCartRef().child(productId.toString()).removeValue().await()
     }
 }

@@ -20,7 +20,6 @@
         android:layout_height="wrap_content"
         android:padding="@dimen/product_content_padding">
 
-        <!-- Görsel -->
         <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/imgProduct"
             android:layout_width="96dp"
@@ -42,7 +41,7 @@
             android:layout_marginEnd="@dimen/spacing_small"
             android:ellipsize="end"
             android:maxLines="2"
-            android:textAppearance="@style/TextAppearance.Material3.TitleSmall"
+            android:textAppearance="@style/TextAppearance.App.TitleSmall"
             android:textColor="?attr/colorOnSurface"
             app:layout_constraintEnd_toStartOf="@id/txtLineTotal"
             app:layout_constraintStart_toEndOf="@id/imgProduct"
@@ -54,9 +53,8 @@
             android:id="@+id/txtLineTotal"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
+            android:textAppearance="@style/TextAppearance.App.Price"
             android:textColor="?attr/colorPrimary"
-            android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@id/txtTitle"
             tools:text="₺21.998" />
@@ -66,7 +64,7 @@
             android:id="@+id/txtPricePerUnit"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textAppearance="@style/TextAppearance.Material3.BodySmall"
+            android:textAppearance="@style/TextAppearance.App.BodySmall"
             android:textColor="?attr/colorOnSurfaceVariant"
             app:layout_constraintEnd_toEndOf="@id/txtLineTotal"
             app:layout_constraintTop_toBottomOf="@id/txtLineTotal"
@@ -106,7 +104,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/cart_qty_gap"
                 android:layout_marginEnd="@dimen/cart_qty_gap"
-                android:textAppearance="@style/TextAppearance.Material3.TitleSmall"
+                android:textAppearance="@style/TextAppearance.App.TitleSmall"
                 android:textColor="?attr/colorOnSurface"
                 android:textStyle="bold"
                 tools:text="2" />
@@ -122,7 +120,7 @@
                 app:tint="?attr/colorOnSurface" />
         </LinearLayout>
 
-        <!-- KALDIR (tek dokunuşta tüm adeti sil) -->
+        <!-- KALDIR -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnRemove"
             style="@style/Widget.Material3.Button.TextButton"
@@ -142,7 +140,7 @@
             app:layout_constraintStart_toEndOf="@id/layoutCartOperations"
             app:layout_constraintTop_toBottomOf="@id/txtPricePerUnit" />
 
-        <!-- (Opsiyonel) İndirim etiketi -->
+        <!-- İndirim etiketi (opsiyonel) -->
         <TextView
             android:id="@+id/badgeDiscount"
             android:layout_width="wrap_content"
@@ -155,7 +153,7 @@
             android:paddingTop="@dimen/badge_v"
             android:paddingEnd="@dimen/badge_h"
             android:paddingBottom="@dimen/badge_v"
-            android:textAppearance="@style/TextAppearance.Material3.LabelSmall"
+            android:textAppearance="@style/TextAppearance.App.LabelSmall"
             android:textColor="?attr/colorOnPrimaryContainer"
             android:textStyle="bold"
             android:visibility="gone"
