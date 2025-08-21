@@ -1,4 +1,3 @@
-// com/example/mustafakocer/presentation/feature_product_search/SearchViewModel.kt (Refactor Edilmiş Hali)
 package com.example.mustafakocer.presentation.feature_product_search
 
 import androidx.lifecycle.ViewModel
@@ -10,44 +9,38 @@ import com.example.mustafakocer.domain.usecase.SearchProductsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.debounce
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.*
 import javax.inject.Inject
 
+/**
+ * Manages the business logic for the product search feature.
+ * It exposes a single reactive flow of [PagingData] that updates based on the search query.
+ */
 @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
 @HiltViewModel
 class SearchViewModel @Inject constructor(
     private val searchProductsUseCase: SearchProductsUseCase,
 ) : ViewModel() {
 
-    // 1. UI'ın dinleyeceği tek ve ana veri akışı bu olacak.
     val productsFlow: Flow<PagingData<Product>>
-
-    // 2. Arama sorgusunu tutan ve arama mantığını tetikleyen StateFlow.
     private val _searchQuery = MutableStateFlow("")
 
     init {
         productsFlow = _searchQuery
-            .debounce(300L) // Kullanıcı yazmayı bırakınca 300ms bekle
-            .distinctUntilChanged() // Aynı sorguyu tekrar gönderme
+            .debounce(300L)
+            .distinctUntilChanged()
             .flatMapLatest { query ->
-                // Sadece sorgu yeterli uzunluktaysa use case'i çağır.
-                // Değilse, boş bir PagingData akışı döndür.
                 if (query.length >= SearchProductsUseCase.MIN_QUERY_LENGTH) {
                     searchProductsUseCase(query)
                 } else {
                     MutableStateFlow(PagingData.empty())
                 }
             }
-            .cachedIn(viewModelScope) // Sonuçları scope içinde cache'le
+            .cachedIn(viewModelScope)
     }
 
     /**
-     * Fragment'tan çağrılacak olan metod.
-     * Kullanıcı arama kutusuna bir şey yazdığında bu tetiklenir.
+     * Called by the UI when the search query text changes.
      */
     fun onSearchQueryChanged(query: String) {
         _searchQuery.value = query.trim()

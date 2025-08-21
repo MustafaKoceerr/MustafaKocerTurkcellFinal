@@ -113,25 +113,35 @@ class ProductsByCategoryFragment : BaseFragment<FragmentProductsByCategoryBindin
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 productListAdapter.loadStateFlow.collectLatest { loadStates ->
+                    // --- DEĞİŞİKLİK BAŞLANGICI ---
+                    // Race condition'ı önlemek için UI durumunu `refresh` state'ine göre
+                    // hiyerarşik bir şekilde kontrol ediyoruz.
                     when (val refreshState = loadStates.refresh) {
                         is LoadState.Loading -> {
+                            // Sadece liste tamamen boşken tam ekran yükleme göster.
                             if (productListAdapter.itemCount == 0) {
                                 binding.stateLayout.showLoading()
                             }
                         }
+
                         is LoadState.NotLoading -> {
-                            val isListEmpty = loadStates.append.endOfPaginationReached && productListAdapter.itemCount < 1
-                            if (isListEmpty) {
+                            // Yükleme bittiğinde, listenin boş olup olmadığını güvenle kontrol edebiliriz.
+                            if (productListAdapter.itemCount < 1) {
                                 binding.stateLayout.showEmpty()
                             } else {
                                 binding.stateLayout.showContent()
                             }
                         }
+
                         is LoadState.Error -> {
-                            val errorMessage = (refreshState.error as? Exception)?.message
-                            binding.stateLayout.showError(subtitle = errorMessage)
+                            // Sadece ilk yüklemede hata alınırsa tam ekran hata göster.
+                            if (productListAdapter.itemCount == 0) {
+                                val errorMessage = (refreshState.error as? Exception)?.message
+                                binding.stateLayout.showError(subtitle = errorMessage)
+                            }
                         }
                     }
+                    // --- DEĞİŞİKLİK SONU ---
                 }
             }
         }

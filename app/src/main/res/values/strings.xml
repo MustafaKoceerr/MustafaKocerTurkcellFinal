@@ -203,5 +203,7 @@
 
     <string name="title_product_detail">Product Details</string>
     <string name="order_static_date">Aug 11, 2025, 13:20</string>
+    <string name="home_empty_title">No Products Found</string>
+    <string name="home_empty_subtitle">There are no products to display.</string>
 
 </resources>

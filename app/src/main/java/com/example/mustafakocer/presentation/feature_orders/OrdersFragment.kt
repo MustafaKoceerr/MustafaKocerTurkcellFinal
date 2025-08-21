@@ -110,14 +110,19 @@ class OrdersFragment : BaseFragment<FragmentOrdersBinding>(FragmentOrdersBinding
                 // Observe the adapter's load state to show/hide loading, error, and empty states.
                 launch {
                     orderListAdapter.loadStateFlow.collectLatest { loadStates ->
+                        // --- DEĞİŞİKLİK BAŞLANGICI ---
+                        // Race condition'ı önlemek için UI durumunu `refresh` state'ine göre
+                        // hiyerarşik bir şekilde kontrol ediyoruz.
                         when (val refreshState = loadStates.refresh) {
                             is LoadState.Loading -> {
+                                // Sadece liste tamamen boşken tam ekran yükleme göster.
                                 if (orderListAdapter.itemCount == 0) {
                                     binding.stateLayout.showLoading()
                                 }
                             }
 
                             is LoadState.NotLoading -> {
+                                // Yükleme bittiğinde, listenin boş olup olmadığını güvenle kontrol edebiliriz.
                                 if (orderListAdapter.itemCount < 1) {
                                     binding.stateLayout.showEmpty()
                                 } else {
@@ -126,10 +131,14 @@ class OrdersFragment : BaseFragment<FragmentOrdersBinding>(FragmentOrdersBinding
                             }
 
                             is LoadState.Error -> {
-                                val errorMessage = (refreshState.error as? Exception)?.message
-                                binding.stateLayout.showError(subtitle = errorMessage)
+                                // Sadece ilk yüklemede hata alınırsa tam ekran hata göster.
+                                if (orderListAdapter.itemCount == 0) {
+                                    val errorMessage = (refreshState.error as? Exception)?.message
+                                    binding.stateLayout.showError(subtitle = errorMessage)
+                                }
                             }
                         }
+                        // --- DEĞİŞİKLİK SONU ---
                     }
                 }
             }
