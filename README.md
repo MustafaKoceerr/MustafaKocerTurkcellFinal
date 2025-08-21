@@ -10,9 +10,6 @@ Hybrid Architecture · Clean MVVM + MVI · Secure by Design
 
 ## 📸 App Gallery
 
-> Screenshots will be added here (light and dark themes).
-## 📸 App Gallery
-
 <h3>📱 Light Theme Screens</h3>
 
 <table>
@@ -20,47 +17,32 @@ Hybrid Architecture · Clean MVVM + MVI · Secure by Design
     <th style="width:160px;">Splash</th>
     <th style="width:160px;">Login</th>
     <th style="width:160px;">Home</th>
-    <th style="width:160px;">Category(1)</th>
-    <th style="width:160px;">Category(2)</th>
+    <th style="width:160px;">Orders</th>
+    <th style="width:160px;">Profile</th>
   </tr>
   <tr>
     <td><img src="assets/light/splash_light_1.jpg" height="400"/></td>
     <td><img src="assets/light/login_light_1.jpg" height="400"/></td>
     <td><img src="assets/light/home_light_1.jpg" height="400"/></td>
+    <td><img src="assets/light/orders_light_1.jpg" height="400"/></td>
+    <td><img src="assets/light/profile_light_1.jpg" height="400"/></td>
+  </tr>
+</table>
+
+<table>
+  <tr>
+    <th style="width:160px;">Category(1)</th>
+    <th style="width:160px;">Category(2)</th>
+    <th style="width:160px;">Cart</th>
+    <th style="width:160px;">Order Details</th>
+    <th style="width:160px;">Details</th>
+  </tr>
+  <tr>
     <td><img src="assets/light/category_light_1.jpg" height="400"/></td>
     <td><img src="assets/light/category_light_2.jpg" height="400"/></td>
-  </tr>
-</table>
-
-<table>
-  <tr>
-    <th style="width:160px;">Drawer</th>
-    <th style="width:160px;">Cart</th>
-    <th style="width:160px;">Orders</th>
-    <th style="width:160px;">Order Details</th>
-  </tr>
-  <tr>
-    <td><img src="assets/light/drawer_light_1.jpg" height="400"/></td>
     <td><img src="assets/light/cart_light_1.jpg" height="400"/></td>
-    <td><img src="assets/light/orders_light_1.jpg" height="400"/></td>
     <td><img src="assets/light/order_details_light_1.jpg" height="400"/></td>
-  </tr>
-</table>
-
-<table>
-  <tr>
-    <th style="width:160px;">Profile</th>
-    <th style="width:160px;">Details(1)</th>
-    <th style="width:160px;">Details(2)</th>
-    <th style="width:160px;">Search(1)</th>
-    <th style="width:160px;">Search(2)</th>
-  </tr>
-  <tr>
-    <td><img src="assets/light/profile_light_1.jpg" height="400"/></td>
     <td><img src="assets/light/details_light_1.jpg" height="400"/></td>
-    <td><img src="assets/light/details_light_2.jpg" height="400"/></td>
-    <td><img src="assets/light/search_light_1.jpg" height="400"/></td>
-    <td><img src="assets/light/search_light_2.jpg" height="400"/></td>
   </tr>
 </table>
 
@@ -73,47 +55,32 @@ Hybrid Architecture · Clean MVVM + MVI · Secure by Design
     <th style="width:160px;">Splash</th>
     <th style="width:160px;">Login</th>
     <th style="width:160px;">Home</th>
-    <th style="width:160px;">Category(1)</th>
-    <th style="width:160px;">Category(2)</th>
+    <th style="width:160px;">Orders</th>
+    <th style="width:160px;">Profile</th>
   </tr>
   <tr>
     <td><img src="assets/dark/splash_dark_1.jpg" height="400"/></td>
     <td><img src="assets/dark/login_dark_1.jpg" height="400"/></td>
     <td><img src="assets/dark/home_dark_1.jpg" height="400"/></td>
+    <td><img src="assets/dark/orders_dark_1.jpg" height="400"/></td>
+    <td><img src="assets/dark/profile_dark_1.jpg" height="400"/></td>
+  </tr>
+</table>
+
+<table>
+  <tr>
+    <th style="width:160px;">Category(1)</th>
+    <th style="width:160px;">Category(2)</th>
+    <th style="width:160px;">Cart</th>
+    <th style="width:160px;">Order Details</th>
+    <th style="width:160px;">Details</th>
+  </tr>
+  <tr>
     <td><img src="assets/dark/category_dark_1.jpg" height="400"/></td>
     <td><img src="assets/dark/category_dark_2.jpg" height="400"/></td>
-  </tr>
-</table>
-
-<table>
-  <tr>
-    <th style="width:160px;">Drawer</th>
-    <th style="width:160px;">Cart</th>
-    <th style="width:160px;">Orders</th>
-    <th style="width:160px;">Order Details</th>
-  </tr>
-  <tr>
-    <td><img src="assets/dark/drawer_dark_1.jpg" height="400"/></td>
     <td><img src="assets/dark/cart_dark_1.jpg" height="400"/></td>
-    <td><img src="assets/dark/orders_dark_1.jpg" height="400"/></td>
     <td><img src="assets/dark/order_details_dark_1.jpg" height="400"/></td>
-  </tr>
-</table>
-
-<table>
-  <tr>
-    <th style="width:160px;">Profile</th>
-    <th style="width:160px;">Details(1)</th>
-    <th style="width:160px;">Details(2)</th>
-    <th style="width:160px;">Search(1)</th>
-    <th style="width:160px;">Search(2)</th>
-  </tr>
-  <tr>
-    <td><img src="assets/dark/profile_dark_1.jpg" height="400"/></td>
     <td><img src="assets/dark/details_dark_1.jpg" height="400"/></td>
-    <td><img src="assets/dark/details_dark_2.jpg" height="400"/></td>
-    <td><img src="assets/dark/search_dark_1.jpg" height="400"/></td>
-    <td><img src="assets/dark/search_dark_2.jpg" height="400"/></td>
   </tr>
 </table>
 
@@ -124,32 +91,21 @@ Hybrid Architecture · Clean MVVM + MVI · Secure by Design
 <table>
   <tr>
     <th style="width:160px;">Login</th>
-    <th style="width:160px;">Home</th>
     <th style="width:160px;">Category</th>
     <th style="width:160px;">Cart</th>
-  </tr>
-  <tr>
-    <td><img src="assets/gifs/login.gif" height="400"/></td>  
-    <td><img src="assets/gifs/home.gif" height="400"/></td>
-    <td><img src="assets/gifs/category.gif" height="400"/></td>
-    <td><img src="assets/gifs/cart.gif" height="400"/></td>
-  </tr>
-</table>
-
-<table>
-  <tr>
-    <th style="width:160px;">Orders</th>
-    <th style="width:160px;">Profile</th>
     <th style="width:160px;">Search</th>
   </tr>
   <tr>
-    <td><img src="assets/gifs/orders.gif" height="400"/></td>  
-    <td><img src="assets/gifs/profile.gif" height="400"/></td>
+    <td><img src="assets/gifs/login.gif" height="400"/></td>  
+    <td><img src="assets/gifs/category.gif" height="400"/></td>
+    <td><img src="assets/gifs/cart.gif" height="400"/></td>
     <td><img src="assets/gifs/search.gif" height="400"/></td>
   </tr>
 </table>
 
 <br/>
+
+> 💡 Note: For all screenshots and GIFs of the application, please check the [assets folder](./assets).
 
 ---
 
