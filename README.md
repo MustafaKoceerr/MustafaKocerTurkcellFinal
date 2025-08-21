@@ -1,6 +1,6 @@
 <!-- README.md (NexusCart) -->
 
-# NexusCart — Modern E-Commerce App
+# 🛒 NexusCart — Modern E-Commerce App
 
 Hybrid Architecture · Clean MVVM + MVI · Secure by Design
 
@@ -8,13 +8,13 @@ Hybrid Architecture · Clean MVVM + MVI · Secure by Design
 
 ![Kotlin](https://img.shields.io/badge/Kotlin-2.1.0-7F52FF?logo=kotlin&logoColor=white) ![Architecture](https://img.shields.io/badge/Clean%20Architecture-Hybrid%20MVVM%2FMVI-4CAF50) ![Hilt](https://img.shields.io/badge/Hilt-2.56.2-1976D2?logo=dagger)
 
-## App Gallery
+## 📸 App Gallery
 
 > Screenshots will be added here (light and dark themes).
 
 ---
 
-## Overview
+## 🚀 Overview
 
 NexusCart is a **modern, production-grade e-commerce application** showcasing:
 - Hybrid **MVVM (XML)** + **MVI (Compose)**
@@ -25,9 +25,9 @@ NexusCart is a **modern, production-grade e-commerce application** showcasing:
 
 ---
 
-## Features
+## ✨ Features
 
-### 👤 Authentication
+### 🔐 Authentication
 - Login & session persistence
 - Secure token encryption (AES/GCM via AndroidKeyStore)
 - Automatic auth header injection (`@Authenticated`)
@@ -38,7 +38,7 @@ NexusCart is a **modern, production-grade e-commerce application** showcasing:
 - Category feeds & category-scoped pagination
 - Product detail: images, pricing, chips, reviews
 
-### 🔍 Search
+### 🔎 Search
 - Reactive search with debounce + validation
 - Network-backed PagingSource
 
@@ -58,7 +58,7 @@ NexusCart is a **modern, production-grade e-commerce application** showcasing:
 
 ---
 
-## Architectural Highlights
+## 🏛️ Architectural Highlights
 
 - **Hybrid Architecture**: MVVM for XML Fragments, MVI for Compose screens.
 - **Dependency Injection**: Hilt modules for API, DB, repositories, interceptors.
@@ -69,25 +69,23 @@ NexusCart is a **modern, production-grade e-commerce application** showcasing:
 
 ---
 
-## Technologies & Libraries
-
-- Kotlin 2.1.0
-- Hilt 2.56.2
-- Coroutines 1.10.2
-- Retrofit 3.0.0 + Kotlinx Serialization
-- OkHttp 4.12.0
-- Room 2.7.2
-- Paging 3.3.6
-- DataStore 1.1.7
-- Security Crypto 1.1.0
-- Jetpack Compose BOM 2025.07.00 (Material3, activity-compose)
-- Navigation Compose 2.9.3 + Fragment KTX
-- Material Components 1.12.0
-- Firebase (Messaging, Database, Config)
+## 🛠️ Technologies & Libraries
+- **Kotlin** `2.1.0`
+- **Jetpack Compose** (UI) `BOM 2025.07.00` (Material3, activity-compose)
+- **Hilt** (Dependency Injection) `2.56.2`
+- **Room** (Database) `2.7.2`
+- **Retrofit** (Networking) `3.0.0` & **OkHttp** `4.12.0`
+- **Paging 3** (Pagination, offline-first) `3.3.6`
+- **DataStore** (Preferences) `1.1.7`
+- **Kotlin Coroutines & Flow** (Async, reactive) `1.10.2`
+- **Coil** (Image loading) `2.6.0`
+- **Firebase** (Messaging, Database, Config) `BoM 33.2.0`
+- **JUnit** `4.13.2`, **Mockito** `5.8.0`, **Espresso** `3.6.1` (Testing)
+- **Modular Gradle setup**
 
 ---
 
-## Project Structure
+## 🏗️ Project Structure
 
 ```text
 app/src/main/java/com/example/mustafakocer/
@@ -106,30 +104,7 @@ app/src/main/java/com/example/mustafakocer/
 
 ---
 
-## Setup & Build
-
-1. Install Android Studio (Giraffe+), JDK 17
-2. Clone repository
-3. Sync Gradle
-4. Run on device/emulator (min SDK 24, target 35)
-
-Build variants: `debug`, `release`
-
-```bash
-./gradlew clean assembleDebug
-```
-
----
-
-## Running the App
-
-- Entry activity (Compose Auth flow): `AuthActivity`
-- After login → `MainActivity` (XML stack)
-- Back-press on home: double-tap exit
-
----
-
-## Security
+## 🔒 Security
 
 - AES/GCM encryption via `CryptoManager`
 - Secure DataStore storage
@@ -137,7 +112,7 @@ Build variants: `debug`, `release`
 
 ---
 
-## Testing
+## 🧪 Testing
 
 - Unit tests: use cases, repositories
 - ViewModel tests: state, events, effects
@@ -145,7 +120,7 @@ Build variants: `debug`, `release`
 
 ---
 
-## Roadmap
+## 🗺️ Roadmap
 
 - Expand Compose coverage (orders, cart)
 - Add instrumentation tests
@@ -153,10 +128,29 @@ Build variants: `debug`, `release`
 
 ---
 
-## License
+# 🔥 Don’t Just Browse — Explore the Engine Behind the Project!
 
-Educational project. Patterns may be reused with attribution.
+**🚀 [Dive into the Full Technical Deep-Dive →](DETAILS.md)**
+
+*Curious about how everything is built? Discover detailed architecture explanations, real-world code examples, and the decisions that power this project. If you want to see the structure and implementation up close, this is the place to start!*
 
 ---
 
-➡ For in-depth explanation, see [`DETAILS.md`](./DETAILS.md).
+## 🎥 Full App Experience (YouTube Video)
+
+If you want to see the full experience of the application in action, check out the video below:
+
+👉 **[Watch Full Demo on YouTube »](https://youtu.be/)**
+
+---
+
+## 📲 Download & Test the App
+
+Experience the app firsthand on your Android device.  
+You can download the latest release APK directly from the GitHub Releases page.
+
+<p align="center">
+  <a href="https://github.com/MustafaKoceerr/MustafaKocerTurkcellFinal/releases/tag/v1.0.0" target="_blank">
+    <img src="https://img.shields.io/badge/Download-v1.0.0%20APK-brightgreen?style=for-the-badge&logo=android" alt="Download APK from Releases">
+  </a>
+</p>
