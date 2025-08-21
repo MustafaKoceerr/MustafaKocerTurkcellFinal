@@ -10,6 +10,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.paging.LoadState
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.mustafakocer.R
 import com.example.mustafakocer.databinding.FragmentHomeBinding
 import com.example.mustafakocer.presentation.base.BaseFragment
@@ -29,6 +30,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
 
     private val viewModel: HomeViewModel by viewModels()
     private lateinit var productListAdapter: ProductListAdapter
+    private lateinit var recyclerView: RecyclerView // RecyclerView referansı için
 
     private var lastBackPressedTime = 0L
 
@@ -38,6 +40,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
         observeProductPagingFlow()
         observeLoadState()
         setupBackButtonHandler()
+        setupFab() // Yeni eklenen fonksiyon çağrısı
     }
 
     /**
@@ -49,13 +52,36 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
             findNavController().navigate(action)
         }
 
-        binding.stateLayout.findViewById<androidx.recyclerview.widget.RecyclerView>(R.id.contentView)
+        recyclerView = binding.stateLayout.findViewById<RecyclerView>(R.id.contentView)
             .apply {
                 adapter = productListAdapter.withLoadStateFooter(
                     footer = PagingLoadStateAdapter { productListAdapter.retry() }
                 )
                 layoutManager = GridLayoutManager(requireContext(), 2)
             }
+    }
+
+    /**
+     * Sets up the ExtendedFloatingActionButton's visibility and click listener.
+     */
+    private fun setupFab() {
+        binding.fabScrollToTop.setOnClickListener {
+            recyclerView.smoothScrollToPosition(0)
+        }
+
+        recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+                // Kullanıcı aşağı kaydırıyorsa ve buton görünmüyorsa
+                if (dy > 0 && !binding.fabScrollToTop.isShown) {
+                    binding.fabScrollToTop.show()
+                }
+                // Kullanıcı yukarı kaydırıyorsa ve buton görünüyorsa
+                else if (dy < 0 && binding.fabScrollToTop.isShown) {
+                    binding.fabScrollToTop.hide()
+                }
+            }
+        })
     }
 
     /**
