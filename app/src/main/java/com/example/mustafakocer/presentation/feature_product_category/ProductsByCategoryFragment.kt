@@ -32,12 +32,14 @@ class ProductsByCategoryFragment : BaseFragment<FragmentProductsByCategoryBindin
     private val viewModel: CategoryViewModel by viewModels()
     private val args: ProductsByCategoryFragmentArgs by navArgs()
     private lateinit var productListAdapter: ProductListAdapter
+    private lateinit var recyclerView: RecyclerView // RecyclerView referansı için
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupRecyclerView()
         observeProductPagingFlow()
         observeLoadState()
+        setupFab() // Yeni eklenen fonksiyon çağrısı
 
         // Inform the ViewModel about the selected category.
         viewModel.onCategorySelected(args.categoryName)
@@ -59,13 +61,37 @@ class ProductsByCategoryFragment : BaseFragment<FragmentProductsByCategoryBindin
             productListAdapter.retry()
         }
 
-        binding.stateLayout.findViewById<RecyclerView>(R.id.contentView).apply {
+        recyclerView = binding.stateLayout.findViewById<RecyclerView>(R.id.contentView).apply {
             adapter = productListAdapter.withLoadStateFooter(
                 footer = PagingLoadStateAdapter { productListAdapter.retry() }
             )
             layoutManager = GridLayoutManager(requireContext(), 2)
         }
     }
+
+    /**
+     * Sets up the ExtendedFloatingActionButton's visibility and click listener.
+     */
+    private fun setupFab() {
+        binding.fabScrollTop.setOnClickListener {
+            recyclerView.smoothScrollToPosition(0)
+        }
+
+        recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+                // Kullanıcı aşağı kaydırıyorsa ve buton görünmüyorsa
+                if (dy > 0 && !binding.fabScrollTop.isShown) {
+                    binding.fabScrollTop.show()
+                }
+                // Kullanıcı yukarı kaydırıyorsa ve buton görünüyorsa
+                else if (dy < 0 && binding.fabScrollTop.isShown) {
+                    binding.fabScrollTop.hide()
+                }
+            }
+        })
+    }
+
 
     /**
      * Subscribes to the paginated product flow from the ViewModel.
