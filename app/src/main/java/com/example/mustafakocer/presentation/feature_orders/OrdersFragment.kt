@@ -29,11 +29,13 @@ class OrdersFragment : BaseFragment<FragmentOrdersBinding>(FragmentOrdersBinding
 
     private val viewModel: OrderViewModel by viewModels()
     private lateinit var orderListAdapter: OrderListAdapter
+    private lateinit var recyclerView: RecyclerView // RecyclerView referansı için
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupRecyclerView()
         observeState()
+        setupFab() // Yeni eklenen fonksiyon çağrısı
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -60,13 +62,37 @@ class OrdersFragment : BaseFragment<FragmentOrdersBinding>(FragmentOrdersBinding
             orderListAdapter.retry()
         }
 
-        binding.stateLayout.findViewById<RecyclerView>(R.id.contentView).apply {
+        recyclerView = binding.stateLayout.findViewById<RecyclerView>(R.id.contentView).apply {
             adapter = orderListAdapter.withLoadStateFooter(
                 footer = PagingLoadStateAdapter { orderListAdapter.retry() }
             )
             layoutManager = LinearLayoutManager(requireContext())
         }
     }
+
+    /**
+     * Sets up the ExtendedFloatingActionButton's visibility and click listener.
+     */
+    private fun setupFab() {
+        binding.fabScrollTop.setOnClickListener {
+            recyclerView.smoothScrollToPosition(0)
+        }
+
+        recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+                // Kullanıcı aşağı kaydırıyorsa ve buton görünmüyorsa
+                if (dy > 0 && !binding.fabScrollTop.isShown) {
+                    binding.fabScrollTop.show()
+                }
+                // Kullanıcı yukarı kaydırıyorsa ve buton görünüyorsa
+                else if (dy < 0 && binding.fabScrollTop.isShown) {
+                    binding.fabScrollTop.hide()
+                }
+            }
+        })
+    }
+
 
     /**
      * Subscribes to the PagingData flow and the adapter's LoadState flow
